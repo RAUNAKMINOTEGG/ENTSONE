@@ -67,6 +67,7 @@ async function createTables() {
 
 createTables();
 
+// Home
 app.get("/", (req, res) => {
   res.json({
     success: true,
@@ -75,6 +76,7 @@ app.get("/", (req, res) => {
   });
 });
 
+// Health
 app.get("/api/health", (req, res) => {
   res.json({
     success: true,
@@ -83,6 +85,7 @@ app.get("/api/health", (req, res) => {
   });
 });
 
+// Database test
 app.get("/api/db-test", async (req, res) => {
   try {
     const result = await pool.query("SELECT NOW()");
@@ -93,6 +96,8 @@ app.get("/api/db-test", async (req, res) => {
       time: result.rows[0].now
     });
   } catch (error) {
+    console.error(error);
+
     res.status(500).json({
       success: false,
       database: "connection_failed"
@@ -100,6 +105,7 @@ app.get("/api/db-test", async (req, res) => {
   }
 });
 
+// GET all tournaments
 app.get("/api/tournaments", async (req, res) => {
   try {
     const result = await pool.query(
@@ -116,6 +122,117 @@ app.get("/api/tournaments", async (req, res) => {
     res.status(500).json({
       success: false,
       tournaments: []
+    });
+  }
+});
+
+// GET single tournament
+app.get("/api/tournaments/:id", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT * FROM tournaments WHERE id = $1",
+      [req.params.id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Tournament not found"
+      });
+    }
+
+    res.json({
+      success: true,
+      tournament: result.rows[0]
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
+  }
+});
+
+// CREATE tournament
+app.post("/api/tournaments", async (req, res) => {
+  try {
+    const {
+      name,
+      game,
+      mode,
+      entry_fee = 0,
+      prize_pool = 0,
+      start_time,
+      status = "UPCOMING"
+    } = req.body;
+
+    if (!name || !game) {
+      return res.status(400).json({
+        success: false,
+        message: "Tournament name and game are required"
+      });
+    }
+
+    const result = await pool.query(
+      `
+      INSERT INTO tournaments
+      (name, game, mode, entry_fee, prize_pool, start_time, status)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      RETURNING *
+      `,
+      [
+        name,
+        game,
+        mode || null,
+        entry_fee,
+        prize_pool,
+        start_time || null,
+        status
+      ]
+    );
+
+    res.status(201).json({
+      success: true,
+      tournament: result.rows[0]
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Could not create tournament"
+    });
+  }
+});
+
+// DELETE tournament
+app.delete("/api/tournaments/:id", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "DELETE FROM tournaments WHERE id = $1 RETURNING *",
+      [req.params.id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Tournament not found"
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Tournament deleted",
+      tournament: result.rows[0]
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Could not delete tournament"
     });
   }
 });
