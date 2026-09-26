@@ -156,6 +156,36 @@ function moneyAction(){let a=Number(document.getElementById('amount').value);if(
 function renderWallet(){document.getElementById('navBalance').textContent='₹0';document.getElementById('walletBalance').textContent='₹0';document.getElementById('transactions').innerHTML='<div class="empty">No transactions yet.</div>'}
 function toast(m){let t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(window.__t);window.__t=setTimeout(()=>t.classList.remove('show'),3000)}
 renderHomeTours();renderGames();renderProfile();renderWallet();renderHistory();renderNotifications();renderSettings();if(location.hash==="#admin")page("admin");
+async function loadBackendTournaments(){
+  try{
+    const response = await fetch(`${API_BASE}/api/tournaments`);
+    const data = await response.json();
+
+    if(data.success && Array.isArray(data.tournaments)){
+      if(data.tournaments.length > 0){
+        tours = data.tournaments.map(t => [
+          t.name,
+          `${t.game} · ${t.mode || ''}`,
+          t.game,
+          `₹${Number(t.prize_pool || 0).toLocaleString('en-IN')}`,
+          `₹${Number(t.entry_fee || 0).toLocaleString('en-IN')}`,
+          t.start_time
+            ? new Date(t.start_time).toLocaleString('en-IN')
+            : 'Scheduled',
+          t.status || 'UPCOMING',
+          t.id
+        ]);
+
+        renderHomeTours();
+        renderTours();
+        renderAdmin();
+      }
+    }
+  }catch(error){
+    console.error("ENTSONE API error:", error);
+  }
+}
+  loadBackendTournaments();
 </script>
 </body>
 </html>
