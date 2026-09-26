@@ -15,25 +15,57 @@ const pool = new Pool({
   }
 });
 
-// Database connection test
-app.get("/api/db-test", async (req, res) => {
+// Create database tables
+async function createTables() {
   try {
-    const result = await pool.query("SELECT NOW()");
-    
-    res.json({
-      success: true,
-      database: "connected",
-      time: result.rows[0].now
-    });
-  } catch (error) {
-    console.error(error);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS tournaments (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        game VARCHAR(100) NOT NULL,
+        mode VARCHAR(50),
+        entry_fee NUMERIC DEFAULT 0,
+        prize_pool NUMERIC DEFAULT 0,
+        start_time TIMESTAMP,
+        status VARCHAR(50) DEFAULT 'UPCOMING',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
 
-    res.status(500).json({
-      success: false,
-      database: "connection_failed"
-    });
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255),
+        email VARCHAR(255) UNIQUE,
+        phone VARCHAR(30) UNIQUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS tournament_registrations (
+        id SERIAL PRIMARY KEY,
+        tournament_id INTEGER REFERENCES tournaments(id) ON DELETE CASCADE,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        team_name VARCHAR(255),
+        mode VARCHAR(50),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS results (
+        id SERIAL PRIMARY KEY,
+        tournament_id INTEGER REFERENCES tournaments(id) ON DELETE CASCADE,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        position INTEGER,
+        kills INTEGER DEFAULT 0,
+        points INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    console.log("ENTSONE database tables ready");
+  } catch (error) {
+    console.error("Database table error:", error);
   }
-});
+}
+
+createTables();
 
 app.get("/", (req, res) => {
   res.json({
@@ -51,6 +83,23 @@ app.get("/api/health", (req, res) => {
   });
 });
 
+app.get("/api/db-test", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT NOW()");
+
+    res.json({
+      success: true,
+      database: "connected",
+      time: result.rows[0].now
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      database: "connection_failed"
+    });
+  }
+});
+
 app.get("/api/tournaments", async (req, res) => {
   try {
     const result = await pool.query(
@@ -64,8 +113,8 @@ app.get("/api/tournaments", async (req, res) => {
   } catch (error) {
     console.error(error);
 
-    res.json({
-      success: true,
+    res.status(500).json({
+      success: false,
       tournaments: []
     });
   }
