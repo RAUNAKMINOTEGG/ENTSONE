@@ -236,7 +236,73 @@ app.delete("/api/tournaments/:id", async (req, res) => {
     });
   }
 });
+// UPDATE tournament
+app.put("/api/tournaments/:id", async (req, res) => {
+  try {
+    const {
+      name,
+      game,
+      mode,
+      entry_fee = 0,
+      prize_pool = 0,
+      start_time,
+      status = "UPCOMING"
+    } = req.body;
 
+    if (!name || !game) {
+      return res.status(400).json({
+        success: false,
+        message: "Tournament name and game are required"
+      });
+    }
+
+    const result = await pool.query(
+      `
+      UPDATE tournaments
+      SET
+        name = $1,
+        game = $2,
+        mode = $3,
+        entry_fee = $4,
+        prize_pool = $5,
+        start_time = $6,
+        status = $7
+      WHERE id = $8
+      RETURNING *
+      `,
+      [
+        name,
+        game,
+        mode || null,
+        entry_fee,
+        prize_pool,
+        start_time || null,
+        status,
+        req.params.id
+      ]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Tournament not found"
+      });
+    }
+
+    res.json({
+      success: true,
+      tournament: result.rows[0]
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Could not update tournament"
+    });
+  }
+});
 app.listen(PORT, () => {
   console.log(`ENTSONE backend running on port ${PORT}`);
 });
