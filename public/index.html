@@ -2123,113 +2123,153 @@ toast('Account details saved. Real OTP verification is the next backend connecti
 }
 
 function openTournament(n,g,p,e){
-let t=tours.find(x=>x[0]===n);
+  let t=tours.find(x=>x[0]===n);
 
-selectedTour={
-n,
-g,
-p,
-e,
-meta:t?t[5]:''
-};
+  selectedTour={
+    n,
+    g,
+    p,
+    e,
+    id:t?t[7]:null,
+    meta:t?t[5]:''
+  };
 
-document.getElementById('tmName').textContent=n;
-document.getElementById('tmGame').textContent=g;
-document.getElementById('tmPrize').textContent=p;
-document.getElementById('tmEntry').textContent=e;
+  document.getElementById('tmName').textContent=n;
+  document.getElementById('tmGame').textContent=g;
+  document.getElementById('tmPrize').textContent=p;
+  document.getElementById('tmEntry').textContent=e;
+  document.getElementById('tmSlots').textContent=
+    (t&&t[5]?t[5].match(/\d+/)?.[0]:'100')+' Slots';
+  document.getElementById('tmStart').textContent=
+    t&&t[5]?t[5].replace(/\d+ Slots · /,''):'Scheduled';
 
-document.getElementById('tmSlots').textContent=
-(t&&t[5]?t[5].match(/\d+/)?.[0]:'100')+' Slots';
+  document.getElementById('tmRules').textContent=
+    (g.includes('Squad')
+      ?'Squad match · team registration · placement + performance scoring.'
+      :g.includes('Duo')
+        ?'Duo match · team registration · placement + performance scoring.'
+        :'Match format · performance determines leaderboard position.')
+    +' Final results are published after the match.';
 
-document.getElementById('tmStart').textContent=
-t&&t[5]?t[5].replace(/\d+ Slots · /,''):'Scheduled';
+  let joined=joinedTours.find(x=>x.name===n);
 
-document.getElementById('tmRules').textContent=
-(g.includes('Squad')
-?'Squad match · team registration · placement + performance scoring.'
-:g.includes('Duo')
-?'Duo match · team registration · placement + performance scoring.'
-:'Match format · performance determines leaderboard position.')
-+' Final results are published after the match.';
+  document.getElementById('roomBtn').style.display=
+    joined?'block':'none';
 
-let joined=joinedTours.find(x=>x.name===n);
+  if(joined){
+    document.getElementById('teamName').value=joined.team||'';
+    if(document.getElementById('joinMode'))
+      document.getElementById('joinMode').value=joined.mode||'Solo';
+  }else{
+    document.getElementById('teamName').value='';
+  }
 
-document.getElementById('roomBtn').style.display=
-joined?'block':'none';
-
-if(joined){
-document.getElementById('teamName').value=joined.team||'';
-
-if(document.getElementById('joinMode'))
-document.getElementById('joinMode').value=joined.mode||'Solo';
-}else{
-document.getElementById('teamName').value='';
+  document.getElementById('tourModal').classList.add('show');
 }
 
-document.getElementById('tourModal').classList.add('show');
-}
+async function joinTournament(){
+  if(!user){
+    closeModal('tourModal');
+    openAuth();
+    toast('Login required before joining');
+    return;
+  }
 
-function joinTournament(){
-if(!user){
-closeModal('tourModal');
-openAuth();
-toast('Login required before joining');
-return
-}
+  if(!selectedTour)return;
 
-if(!selectedTour)return;
+  if(joinedTours.some(x=>x.name===selectedTour.n)){
+    closeModal('tourModal');
+    toast('You already joined this tournament');
+    return;
+  }
 
-if(joinedTours.some(x=>x.name===selectedTour.n)){
-closeModal('tourModal');
-toast('You already joined this tournament');
-return
-}
+  let mode=document.getElementById('joinMode')?.value||'Solo';
+  let team=(document.getElementById('teamName')?.value||'').trim();
 
-let mode=document.getElementById('joinMode')?.value||'Solo';
-let team=(document.getElementById('teamName')?.value||'').trim();
+  try{
+    /* Demo login user ko PostgreSQL user ID milegi.
+       OTP/authentication ko abhi touch nahi kar rahe. */
+    if(!user.id){
+      let userRes=await fetch(`${API_BASE}/api/users`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          name:user.name||'ENTSONE Player',
+          phone:user.phone||null
+        })
+      });
 
-let entry={
-name:selectedTour.n,
-game:selectedTour.g,
-entry:selectedTour.e,
-prize:selectedTour.p,
-status:'Upcoming',
-mode,
-team:team||user.name,
-joinedAt:new Date().toLocaleString(),
-result:null
-};
+      let userData=await userRes.json();
 
-joinedTours.unshift(entry);
+      if(!userRes.ok||!userData.success||!userData.user?.id){
+        throw new Error(userData.message||'Could not create player');
+      }
 
-localStorage.setItem(
-'entsoneJoined',
-JSON.stringify(joinedTours)
-);
+      user.id=userData.user.id;
+      localStorage.setItem('entsoneUser',JSON.stringify(user));
+    }
 
-user.joined=(user.joined||0)+1;
+    /* PostgreSQL registration */
+    if(!selectedTour.id){
+      throw new Error('Tournament ID not found');
+    }
 
-localStorage.setItem(
-'entsoneUser',
-JSON.stringify(user)
-);
+    let r=await fetch(`${API_BASE}/api/tournament-registrations`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        tournament_id:Number(selectedTour.id),
+        user_id:Number(user.id),
+        mode,
+        team_name:team||user.name
+      })
+    });
 
-notifications.unshift({
-id:Date.now(),
-title:'Tournament joined',
-text:`You joined ${selectedTour.n}.`,
-read:false,
-time:'Just now'
-});
+    let d=await r.json();
 
-saveNotifications();
+    if(!r.ok||!d.success){
+      throw new Error(d.message||'Registration failed');
+    }
 
-closeModal('tourModal');
-renderProfile();
-renderHistory();
-page('history');
+    let entry={
+      name:selectedTour.n,
+      game:selectedTour.g,
+      entry:selectedTour.e,
+      prize:selectedTour.p,
+      status:'Upcoming',
+      mode,
+      team:team||user.name,
+      joinedAt:new Date().toLocaleString(),
+      result:null,
+      tournamentId:selectedTour.id,
+      registrationId:d.registration?.id||null
+    };
 
-toast('Tournament added to your history.');
+    joinedTours.unshift(entry);
+    localStorage.setItem('entsoneJoined',JSON.stringify(joinedTours));
+
+    user.joined=(user.joined||0)+1;
+    localStorage.setItem('entsoneUser',JSON.stringify(user));
+
+    notifications.unshift({
+      id:Date.now(),
+      title:'Tournament joined',
+      text:`You joined ${selectedTour.n}.`,
+      read:false,
+      time:'Just now'
+    });
+
+    saveNotifications();
+    closeModal('tourModal');
+    renderProfile();
+    renderHistory();
+    page('history');
+
+    toast('Tournament registration saved to database.');
+
+  }catch(e){
+    toast(e.message||'Could not join tournament');
+  }
 }
 
 function renderProfile(){
