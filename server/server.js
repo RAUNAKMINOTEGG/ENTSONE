@@ -15,7 +15,10 @@ const pool = new Pool({
   }
 });
 
-// Create database tables
+/* =========================
+   DATABASE SETUP
+========================= */
+
 async function createTables() {
   try {
     await pool.query(`
@@ -59,6 +62,18 @@ async function createTables() {
       );
     `);
 
+    /*
+      Existing tournaments table ko upgrade karne ke liye.
+      Agar columns pehle se hain to kuch nahi hoga.
+    */
+    await pool.query(`
+      ALTER TABLE tournaments
+      ADD COLUMN IF NOT EXISTS slots INTEGER DEFAULT 0;
+
+      ALTER TABLE tournaments
+      ADD COLUMN IF NOT EXISTS start_label VARCHAR(255);
+    `);
+
     console.log("ENTSONE database tables ready");
   } catch (error) {
     console.error("Database table error:", error);
@@ -67,7 +82,10 @@ async function createTables() {
 
 createTables();
 
-// Home
+/* =========================
+   HOME
+========================= */
+
 app.get("/", (req, res) => {
   res.json({
     success: true,
@@ -76,7 +94,10 @@ app.get("/", (req, res) => {
   });
 });
 
-// Health
+/* =========================
+   HEALTH
+========================= */
+
 app.get("/api/health", (req, res) => {
   res.json({
     success: true,
@@ -85,7 +106,10 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// Database test
+/* =========================
+   DATABASE TEST
+========================= */
+
 app.get("/api/db-test", async (req, res) => {
   try {
     const result = await pool.query("SELECT NOW()");
@@ -96,7 +120,7 @@ app.get("/api/db-test", async (req, res) => {
       time: result.rows[0].now
     });
   } catch (error) {
-    console.error(error);
+    console.error("DB test error:", error);
 
     res.status(500).json({
       success: false,
@@ -105,19 +129,35 @@ app.get("/api/db-test", async (req, res) => {
   }
 });
 
-// GET all tournaments
+/* =========================
+   GET ALL TOURNAMENTS
+========================= */
+
 app.get("/api/tournaments", async (req, res) => {
   try {
-    const result = await pool.query(
-      "SELECT * FROM tournaments ORDER BY id DESC"
-    );
+    const result = await pool.query(`
+      SELECT
+        id,
+        name,
+        game,
+        mode,
+        entry_fee,
+        prize_pool,
+        start_time,
+        start_label,
+        slots,
+        status,
+        created_at
+      FROM tournaments
+      ORDER BY id DESC
+    `);
 
     res.json({
       success: true,
       tournaments: result.rows
     });
   } catch (error) {
-    console.error(error);
+    console.error("Get tournaments error:", error);
 
     res.status(500).json({
       success: false,
@@ -126,11 +166,29 @@ app.get("/api/tournaments", async (req, res) => {
   }
 });
 
-// GET single tournament
+/* =========================
+   GET SINGLE TOURNAMENT
+========================= */
+
 app.get("/api/tournaments/:id", async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT * FROM tournaments WHERE id = $1",
+      `
+      SELECT
+        id,
+        name,
+        game,
+        mode,
+        entry_fee,
+        prize_pool,
+        start_time,
+        start_label,
+        slots,
+        status,
+        created_at
+      FROM tournaments
+      WHERE id = $1
+      `,
       [req.params.id]
     );
 
@@ -146,7 +204,7 @@ app.get("/api/tournaments/:id", async (req, res) => {
       tournament: result.rows[0]
     });
   } catch (error) {
-    console.error(error);
+    console.error("Get tournament error:", error);
 
     res.status(500).json({
       success: false,
@@ -155,7 +213,10 @@ app.get("/api/tournaments/:id", async (req, res) => {
   }
 });
 
-// CREATE tournament
+/* =========================
+   CREATE TOURNAMENT
+========================= */
+
 app.post("/api/tournaments", async (req, res) => {
   try {
     const {
@@ -164,7 +225,9 @@ app.post("/api/tournaments", async (req, res) => {
       mode,
       entry_fee = 0,
       prize_pool = 0,
-      start_time,
+      start_time = null,
+      start_label = "Scheduled",
+      slots = 0,
       status = "UPCOMING"
     } = req.body;
 
@@ -175,21 +238,37 @@ app.post("/api/tournaments", async (req, res) => {
       });
     }
 
+    const safeEntryFee = Number(entry_fee) || 0;
+    const safePrizePool = Number(prize_pool) || 0;
+    const safeSlots = Math.max(0, Number(slots) || 0);
+
     const result = await pool.query(
       `
       INSERT INTO tournaments
-      (name, game, mode, entry_fee, prize_pool, start_time, status)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      (
+        name,
+        game,
+        mode,
+        entry_fee,
+        prize_pool,
+        start_time,
+        start_label,
+        slots,
+        status
+      )
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
       RETURNING *
       `,
       [
         name,
         game,
         mode || null,
-        entry_fee,
-        prize_pool,
+        safeEntryFee,
+        safePrizePool,
         start_time || null,
-        status
+        start_label || "Scheduled",
+        safeSlots,
+        status || "UPCOMING"
       ]
     );
 
@@ -198,7 +277,7 @@ app.post("/api/tournaments", async (req, res) => {
       tournament: result.rows[0]
     });
   } catch (error) {
-    console.error(error);
+    console.error("Create tournament error:", error);
 
     res.status(500).json({
       success: false,
@@ -207,11 +286,98 @@ app.post("/api/tournaments", async (req, res) => {
   }
 });
 
-// DELETE tournament
+/* =========================
+   UPDATE TOURNAMENT
+========================= */
+
+app.put("/api/tournaments/:id", async (req, res) => {
+  try {
+    const {
+      name,
+      game,
+      mode,
+      entry_fee = 0,
+      prize_pool = 0,
+      start_time = null,
+      start_label = "Scheduled",
+      slots = 0,
+      status = "UPCOMING"
+    } = req.body;
+
+    if (!name || !game) {
+      return res.status(400).json({
+        success: false,
+        message: "Tournament name and game are required"
+      });
+    }
+
+    const safeEntryFee = Number(entry_fee) || 0;
+    const safePrizePool = Number(prize_pool) || 0;
+    const safeSlots = Math.max(0, Number(slots) || 0);
+
+    const result = await pool.query(
+      `
+      UPDATE tournaments
+      SET
+        name = $1,
+        game = $2,
+        mode = $3,
+        entry_fee = $4,
+        prize_pool = $5,
+        start_time = $6,
+        start_label = $7,
+        slots = $8,
+        status = $9
+      WHERE id = $10
+      RETURNING *
+      `,
+      [
+        name,
+        game,
+        mode || null,
+        safeEntryFee,
+        safePrizePool,
+        start_time || null,
+        start_label || "Scheduled",
+        safeSlots,
+        status || "UPCOMING",
+        req.params.id
+      ]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Tournament not found"
+      });
+    }
+
+    res.json({
+      success: true,
+      tournament: result.rows[0]
+    });
+  } catch (error) {
+    console.error("Update tournament error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Could not update tournament"
+    });
+  }
+});
+
+/* =========================
+   DELETE TOURNAMENT
+========================= */
+
 app.delete("/api/tournaments/:id", async (req, res) => {
   try {
     const result = await pool.query(
-      "DELETE FROM tournaments WHERE id = $1 RETURNING *",
+      `
+      DELETE FROM tournaments
+      WHERE id = $1
+      RETURNING *
+      `,
       [req.params.id]
     );
 
@@ -228,7 +394,7 @@ app.delete("/api/tournaments/:id", async (req, res) => {
       tournament: result.rows[0]
     });
   } catch (error) {
-    console.error(error);
+    console.error("Delete tournament error:", error);
 
     res.status(500).json({
       success: false,
@@ -236,73 +402,11 @@ app.delete("/api/tournaments/:id", async (req, res) => {
     });
   }
 });
-// UPDATE tournament
-app.put("/api/tournaments/:id", async (req, res) => {
-  try {
-    const {
-      name,
-      game,
-      mode,
-      entry_fee = 0,
-      prize_pool = 0,
-      start_time,
-      status = "UPCOMING"
-    } = req.body;
 
-    if (!name || !game) {
-      return res.status(400).json({
-        success: false,
-        message: "Tournament name and game are required"
-      });
-    }
+/* =========================
+   START SERVER
+========================= */
 
-    const result = await pool.query(
-      `
-      UPDATE tournaments
-      SET
-        name = $1,
-        game = $2,
-        mode = $3,
-        entry_fee = $4,
-        prize_pool = $5,
-        start_time = $6,
-        status = $7
-      WHERE id = $8
-      RETURNING *
-      `,
-      [
-        name,
-        game,
-        mode || null,
-        entry_fee,
-        prize_pool,
-        start_time || null,
-        status,
-        req.params.id
-      ]
-    );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "Tournament not found"
-      });
-    }
-
-    res.json({
-      success: true,
-      tournament: result.rows[0]
-    });
-
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      success: false,
-      message: "Could not update tournament"
-    });
-  }
-});
 app.listen(PORT, () => {
   console.log(`ENTSONE backend running on port ${PORT}`);
 });
