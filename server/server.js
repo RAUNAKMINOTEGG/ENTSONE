@@ -62,10 +62,6 @@ async function createTables() {
       );
     `);
 
-    /*
-      Existing tournaments table ko upgrade karne ke liye.
-      Agar columns pehle se hain to kuch nahi hoga.
-    */
     await pool.query(`
       ALTER TABLE tournaments
       ADD COLUMN IF NOT EXISTS slots INTEGER DEFAULT 0;
@@ -129,6 +125,151 @@ app.get("/api/db-test", async (req, res) => {
   }
 });
 
+/* =========================================================
+   STEP 7A
+   USER SYSTEM - CREATE / FIND USER
+========================================================= */
+
+app.post("/api/users", async (req, res) => {
+  try {
+    const {
+      name = null,
+      email = null,
+      phone = null
+    } = req.body;
+
+    const cleanName = name ? String(name).trim() : null;
+    const cleanEmail = email
+      ? String(email).trim().toLowerCase()
+      : null;
+    const cleanPhone = phone
+      ? String(phone).trim()
+      : null;
+
+    if (!cleanEmail && !cleanPhone) {
+      return res.status(400).json({
+        success: false,
+        message: "Email or phone is required"
+      });
+    }
+
+    /* Find existing user by email */
+    if (cleanEmail) {
+      const emailUser = await pool.query(
+        `
+        SELECT id, name, email, phone, created_at
+        FROM users
+        WHERE email = $1
+        `,
+        [cleanEmail]
+      );
+
+      if (emailUser.rows.length > 0) {
+        return res.json({
+          success: true,
+          existing: true,
+          user: emailUser.rows[0]
+        });
+      }
+    }
+
+    /* Find existing user by phone */
+    if (cleanPhone) {
+      const phoneUser = await pool.query(
+        `
+        SELECT id, name, email, phone, created_at
+        FROM users
+        WHERE phone = $1
+        `,
+        [cleanPhone]
+      );
+
+      if (phoneUser.rows.length > 0) {
+        return res.json({
+          success: true,
+          existing: true,
+          user: phoneUser.rows[0]
+        });
+      }
+    }
+
+    /* Create new user */
+    const result = await pool.query(
+      `
+      INSERT INTO users
+      (
+        name,
+        email,
+        phone
+      )
+      VALUES ($1, $2, $3)
+      RETURNING id, name, email, phone, created_at
+      `,
+      [
+        cleanName,
+        cleanEmail,
+        cleanPhone
+      ]
+    );
+
+    res.status(201).json({
+      success: true,
+      existing: false,
+      user: result.rows[0]
+    });
+
+  } catch (error) {
+    console.error("Create/find user error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Could not create/find user"
+    });
+  }
+});
+
+/* =========================
+   GET USER BY ID
+========================= */
+
+app.get("/api/users/:id", async (req, res) => {
+  try {
+    const result = await pool.query(
+      `
+      SELECT
+        id,
+        name,
+        email,
+        phone,
+        created_at
+      FROM users
+      WHERE id = $1
+      `,
+      [req.params.id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    res.json({
+      success: true,
+      user: result.rows[0]
+    });
+
+  } catch (error) {
+    console.error("Get user error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
+  }
+});
+
 /* =========================
    GET ALL TOURNAMENTS
 ========================= */
@@ -156,6 +297,7 @@ app.get("/api/tournaments", async (req, res) => {
       success: true,
       tournaments: result.rows
     });
+
   } catch (error) {
     console.error("Get tournaments error:", error);
 
@@ -203,6 +345,7 @@ app.get("/api/tournaments/:id", async (req, res) => {
       success: true,
       tournament: result.rows[0]
     });
+
   } catch (error) {
     console.error("Get tournament error:", error);
 
@@ -276,6 +419,7 @@ app.post("/api/tournaments", async (req, res) => {
       success: true,
       tournament: result.rows[0]
     });
+
   } catch (error) {
     console.error("Create tournament error:", error);
 
@@ -356,6 +500,7 @@ app.put("/api/tournaments/:id", async (req, res) => {
       success: true,
       tournament: result.rows[0]
     });
+
   } catch (error) {
     console.error("Update tournament error:", error);
 
@@ -393,6 +538,7 @@ app.delete("/api/tournaments/:id", async (req, res) => {
       message: "Tournament deleted",
       tournament: result.rows[0]
     });
+
   } catch (error) {
     console.error("Delete tournament error:", error);
 
