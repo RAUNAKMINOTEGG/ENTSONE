@@ -1756,44 +1756,58 @@ ${arr.map((r,i)=>`
 </table>`
 }
 
-function addResult(){
-let s=document.getElementById('rTournament');
-let name=document.getElementById('rName').value.trim();
-let place=Number(document.getElementById('rPlace').value);
-let kills=Number(document.getElementById('rKills').value)||0;
+async function addResult(){
+  const idx = Number(document.getElementById('rTournament').value);
+  const name = document.getElementById('rName').value.trim();
+  const place = Number(document.getElementById('rPlace').value);
+  const kills = Number(document.getElementById('rKills').value) || 0;
 
-if(!name){
-toast('Enter player or team name');
-return
-}
+  if(!name || !place || place < 1 || kills < 0){
+    toast('Enter player, placement and kills');
+    return;
+  }
 
-if(!place||place<1){
-toast('Enter valid placement');
-return
-}
+  const t = tours[idx];
+  const tid = t?.[7];
 
-let idx=Number(s.value);
+  if(!tid){
+    toast('Tournament database ID missing');
+    return;
+  }
 
-if(!results[String(idx)])results[String(idx)]=[];
+  try{
+    const response = await fetch(`${API_BASE}/api/results`,{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json'
+      },
+      body:JSON.stringify({
+        tournament_id:Number(tid),
+        user_id:user?.id ? Number(user.id) : null,
+        player_name:name,
+        team_name:name,
+        position:place,
+        kills:kills
+      })
+    });
 
-results[String(idx)].push({
-name,
-place,
-kills,
-points:totalPoints(place,kills)
-});
+    const data = await response.json();
 
-results[String(idx)].sort((a,b)=>b.points-a.points||a.place-b.place);
+    if(!response.ok || !data.success){
+      throw new Error(data.message || 'Result could not be saved');
+    }
 
-saveResults();
+    ['rName','rPlace','rKills'].forEach(id=>{
+      document.getElementById(id).value='';
+    });
 
-document.getElementById('rName').value='';
-document.getElementById('rPlace').value='';
-document.getElementById('rKills').value='';
+    await renderResultTable();
 
-renderResultTable();
-
-toast('Result added');
+    toast('Result saved to PostgreSQL');
+  }catch(error){
+    console.error('Result save error:',error);
+    toast(error.message || 'Could not save result');
+  }
 }
 
 function removeResult(ti,ri){
