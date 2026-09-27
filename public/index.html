@@ -5,1097 +5,236 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#080b18">
 <title>ENTSONE — eSports Tournament Platform</title>
-
 <style>
-:root{
---bg:#070a14;--p:#10162a;--p2:#151d35;--line:#283351;
---txt:#f7f8ff;--mut:#9ca8c4;--a:#7c5cff;--c:#16d9ff;
---g:#39e58c;--r:#ff5d76
-}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{
-margin:0;
-background:radial-gradient(circle at 15% -5%,#27204d 0,#0a0d1b 38%,#070a14 78%);
-color:var(--txt);
-font:14px system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif
-}
-button,input{font:inherit}
-button{cursor:pointer}
-.wrap{max-width:1200px;margin:auto;padding:0 18px}
-
-.top{
-position:sticky;
-top:0;
-z-index:30;
-background:#080b18df;
-backdrop-filter:blur(18px);
-border-bottom:1px solid #202943
-}
-.nav{
-height:68px;
-display:flex;
-align-items:center;
-gap:22px
-}
-.logo{
-font-weight:950;
-letter-spacing:.1em;
-font-size:25px;
-background:linear-gradient(90deg,#fff,#a88dff,#43e8ff);
--webkit-background-clip:text;
-color:transparent
-}
-.links{
-display:flex;
-gap:20px;
-flex:1
-}
-.links a{
-color:#aeb9d1;
-text-decoration:none;
-font-size:13px
-}
-.links a:hover{color:#fff}
-.navRight{
-display:flex;
-gap:8px;
-align-items:center
-}
-.walletPill,.profilePill{
-border:1px solid var(--line);
-background:#0e1427;
-border-radius:12px;
-padding:9px 11px
-}
-.walletPill{color:#ffd75c}
-
-.btn{
-border:0;
-border-radius:12px;
-padding:11px 15px;
-color:#fff;
-font-weight:850;
-background:linear-gradient(135deg,var(--a),#4c91ff);
-box-shadow:0 8px 25px #604cff25
-}
-.btn.secondary{
-background:#141d34;
-border:1px solid #2d3958;
-box-shadow:none
-}
-.btn.danger{
-background:#441928;
-border:1px solid #713046;
-box-shadow:none
-}
-.btn.full{
-width:100%;
-margin-top:10px
-}
-.btn.sm{
-padding:8px 11px;
-font-size:12px
-}
-
-.page{display:none}
-.page.active{display:block}
-
-.hero{padding:38px 0 18px}
-.heroGrid{
-display:grid;
-grid-template-columns:1.15fr .85fr;
-gap:18px
-}
-.card{
-border:1px solid var(--line);
-background:linear-gradient(145deg,#151c33,#0e1425);
-border-radius:24px
-}
-.heroMain{
-padding:34px;
-min-height:450px;
-background:linear-gradient(135deg,#221d4d,#11172d 60%,#0d1323);
-position:relative;
-overflow:hidden
-}
-.heroMain:after{
-content:"";
-position:absolute;
-width:360px;
-height:360px;
-right:-130px;
-top:-140px;
-border-radius:50%;
-background:#16d9ff17
-}
-.eyebrow{
-color:#5de8ff;
-font-weight:900;
-letter-spacing:.15em;
-font-size:12px
-}
-.hero h1{
-font-size:clamp(42px,7vw,72px);
-line-height:.95;
-margin:13px 0
-}
-.hero h1 span{color:#55e6ff}
-.hero p{
-color:#abb7d0;
-line-height:1.7;
-max-width:650px;
-font-size:16px
-}
-.actions{
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-margin-top:22px
-}
-.stats{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:10px;
-margin-top:26px
-}
-.stat{
-background:#0b1121;
-border:1px solid #27324d;
-border-radius:15px;
-padding:14px
-}
-.stat b{font-size:20px}
-.stat small{
-display:block;
-color:var(--mut);
-margin-top:3px
-}
-
-.featured{padding:24px}
-.tag{
-display:inline-block;
-border-radius:99px;
-padding:6px 9px;
-background:#30224e;
-color:#d7cbff;
-font-size:11px;
-font-weight:900
-}
-.featured h2{
-font-size:27px;
-margin:18px 0 6px
-}
-.mut{color:var(--mut)}
-.prize{
-font-size:35px;
-font-weight:950;
-margin:22px 0
-}
-.bar{
-height:8px;
-background:#26304a;
-border-radius:99px;
-overflow:hidden
-}
-.bar i{
-display:block;
-height:100%;
-width:72%;
-background:linear-gradient(90deg,var(--a),var(--c))
-}
-
-section{padding:25px 0}
-.head{
-display:flex;
-justify-content:space-between;
-gap:12px;
-align-items:end;
-margin-bottom:15px
-}
-.head h2{
-margin:0;
-font-size:24px
-}
-.head p{
-margin:4px 0 0;
-color:var(--mut);
-font-size:12px
-}
-
-.grid4{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:12px
-}
-.game{
-padding:17px;
-border:1px solid var(--line);
-border-radius:18px;
-background:#10172a;
-min-height:128px
-}
-.game .ico{font-size:30px}
-.game h3{margin:9px 0 4px}
-.game small{color:var(--mut)}
-
-.filters{
-display:flex;
-gap:7px;
-overflow:auto;
-padding-bottom:3px
-}
-.chip{
-border:1px solid #2b3654;
-background:#10172a;
-color:#aeb9d1;
-border-radius:99px;
-padding:8px 12px;
-white-space:nowrap
-}
-.chip.active{
-background:#6c53e8;
-color:#fff
-}
-
-.tours{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:12px;
-margin-top:12px
-}
-.tour{
-padding:17px;
-border:1px solid var(--line);
-border-radius:19px;
-background:#10172a
-}
-.tourTop,.row{
-display:flex;
-justify-content:space-between;
-gap:10px;
-align-items:center
-}
-.badge{
-font-size:10px;
-color:#c5d4f5;
-background:#1a2642;
-border-radius:8px;
-padding:6px 8px
-}
-.open{
-font-size:10px;
-color:var(--g);
-font-weight:900
-}
-.tour h3{margin:15px 0 6px}
-.meta{
-color:var(--mut);
-font-size:12px;
-line-height:1.8
-}
-.tourFoot{
-border-top:1px solid #26304a;
-margin-top:13px;
-padding-top:13px
-}
-.tourFoot b{font-size:18px}
-.tourFoot small{
-display:block;
-color:var(--mut);
-font-size:10px
-}
-
-.steps{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:12px
-}
-.step{
-padding:18px;
-border:1px solid var(--line);
-border-radius:18px;
-background:#0e1426
-}
-.num{
-width:31px;
-height:31px;
-display:grid;
-place-items:center;
-background:#6c53e8;
-border-radius:10px;
-font-weight:900
-}
-.step p{
-color:var(--mut);
-font-size:12px;
-line-height:1.6
-}
-
-.dashboard{padding:26px 0}
-.dashHead{
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:15px;
-margin-bottom:15px
-}
-.dashTitle h2{margin:0}
-.dashTitle p{
-margin:5px 0;
-color:var(--mut)
-}
-.dashGrid{
-display:grid;
-grid-template-columns:1.1fr .9fr;
-gap:13px
-}
-.balance{padding:22px}
-.balance strong{font-size:34px}
-.balanceActions{
-display:flex;
-gap:8px;
-margin-top:17px
-}
-.list{padding:18px}
-.list h3{margin-top:0}
-.item{
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:12px 0;
-border-bottom:1px solid #252f49
-}
-.item:last-child{border-bottom:0}
-.item small{
-color:var(--mut);
-display:block;
-margin-top:3px
-}
-.green{color:var(--g)}
-.red{color:#ff7a8e}
-.empty{
-padding:28px;
-text-align:center;
-color:var(--mut);
-border:1px dashed #34415f;
-border-radius:17px
-}
-
-footer{
-border-top:1px solid #202943;
-padding:28px 0 95px;
-color:#77839f;
-font-size:12px;
-margin-top:20px
-}
-
-.bottom{display:none}
-
-.amountGrid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:8px;
-margin:12px 0
-}
-.amountGrid button,.payMethods div{
-border:1px solid #2d3958;
-background:#11192e;
-color:#eaf0ff;
-border-radius:12px;
-padding:11px;
-text-align:center;
-font-weight:800
-}
-.amountGrid button:hover,.payMethods div:hover{
-border-color:#7c5cff
-}
-.payMethods{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:7px;
-margin-top:10px
-}
-.payMethods div{
-font-size:11px;
-padding:9px
-}
-
-.modal{
-position:fixed;
-inset:0;
-z-index:80;
-display:none;
-place-items:center;
-background:#000b;
-padding:18px
-}
-.modal.show{display:grid}
-.modalBox{
-width:min(450px,100%);
-padding:23px;
-background:#11182c;
-border:1px solid #34405f;
-border-radius:22px
-}
-.modalBox h2{margin-top:0}
-.modalBox input{
-width:100%;
-padding:13px;
-border-radius:12px;
-border:1px solid #34405e;
-background:#0a1020;
-color:#fff;
-margin:7px 0 13px;
-outline:none
-}
-.x{
-float:right;
-border:0;
-background:none;
-color:#b5c0d6;
-font-size:23px
-}
-.toast{
-position:fixed;
-right:18px;
-bottom:22px;
-z-index:100;
-background:#17223a;
-border:1px solid #3a4868;
-padding:13px 15px;
-border-radius:12px;
-display:none
-}
-.toast.show{display:block}
-
-@media(max-width:900px){
-.links{display:none}
-.heroGrid,.dashGrid{grid-template-columns:1fr}
-.grid4{grid-template-columns:repeat(2,1fr)}
-.tours{grid-template-columns:1fr 1fr}
-.steps{grid-template-columns:1fr 1fr}
-}
-
-@media(max-width:600px){
-html,body{
-max-width:100%;
-overflow-x:hidden
-}
-.wrap{padding:0 14px}
-.nav{height:62px}
-.walletPill,.profilePill{display:none}
-.hero{padding-top:24px}
-.heroMain{padding:25px}
-.hero h1{font-size:52px}
-.featured{padding:21px}
-.grid4,.tours,.steps{
-grid-template-columns:1fr 1fr
-}
-.tour:nth-child(3n){grid-column:auto}
-.game{
-min-height:118px;
-padding:14px
-}
-.bottom{
-position:fixed;
-display:grid;
-grid-template-columns:repeat(5,minmax(0,1fr));
-left:0;
-right:0;
-bottom:0;
-z-index:40;
-background:rgba(8,13,27,.96);
-border-top:1px solid #27314a;
-padding:7px 2px calc(7px + env(safe-area-inset-bottom));
-backdrop-filter:blur(15px);
-height:auto;
-min-height:68px;
-overflow:hidden
-}
-.bottom button{
-width:100%;
-min-width:0;
-height:54px;
-padding:2px 0;
-border:0;
-background:none;
-color:#8f9bb6;
-font-size:10px!important;
-line-height:1.1;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-gap:2px;
-white-space:nowrap;
-overflow:hidden
-}
-.bottom button.active{color:#fff}
-.bottom span{
-display:block;
-font-size:17px!important;
-line-height:18px;
-margin:0;
-white-space:nowrap
-}
-footer{padding-bottom:88px}
-}
-
-.adminGrid{
-display:grid;
-grid-template-columns:380px 1fr;
-gap:14px
-}
-.adminForm,.adminList{padding:20px}
-.adminForm input,.adminForm select,.adminForm textarea{
-width:100%;
-padding:12px;
-border-radius:11px;
-border:1px solid #34405e;
-background:#0a1020;
-color:#fff;
-margin:6px 0 11px;
-outline:none
-}
-.adminForm label{
-display:block;
-color:#aeb9d1;
-font-size:11px;
-font-weight:800;
-margin-top:4px
-}
-.adminStats{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:9px;
-margin-bottom:14px
-}
-.adminStat{
-padding:14px;
-border:1px solid var(--line);
-border-radius:15px;
-background:#0e1426
-}
-.adminStat b{font-size:21px}
-.adminRow{
-padding:14px 0;
-border-bottom:1px solid #26304a
-}
-.adminRow:last-child{border-bottom:0}
-.adminActions{
-display:flex;
-gap:7px;
-flex-wrap:wrap;
-margin-top:9px
-}
-.statusSelect{
-padding:7px 9px;
-border-radius:9px;
-border:1px solid #34405e;
-background:#11192e;
-color:#fff;
-font-size:11px
-}
-@media(max-width:900px){
-.adminGrid{grid-template-columns:1fr}
-}
-
-.resultBox{
-margin-top:14px;
-padding:18px
-}
-.resultForm{
-display:grid;
-grid-template-columns:1.5fr .8fr .8fr auto;
-gap:8px;
-align-items:end
-}
-.resultForm input{
-width:100%;
-padding:11px;
-border-radius:10px;
-border:1px solid #34405e;
-background:#0a1020;
-color:#fff;
-outline:none
-}
-.resultTable{
-width:100%;
-border-collapse:collapse;
-margin-top:12px;
-font-size:12px
-}
-.resultTable th,.resultTable td{
-text-align:left;
-padding:10px 8px;
-border-bottom:1px solid #27314b
-}
-.resultTable th{
-color:#8f9bb6;
-font-size:10px;
-text-transform:uppercase
-}
-.rank{
-font-weight:950;
-color:#dfe7ff
-}
-.winner{color:#ffd75c}
-.resultActions{
-display:flex;
-gap:7px;
-flex-wrap:wrap;
-margin-top:12px
-}
-@media(max-width:700px){
-.resultForm{grid-template-columns:1fr 1fr}
-.resultForm .resultName{grid-column:1/-1}
-.resultForm button{grid-column:1/-1}
-}
-
-.historyGrid{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:12px
-}
-.historyCard{
-padding:16px;
-border:1px solid var(--line);
-border-radius:18px;
-background:#10172a
-}
-.historyCard b{font-size:18px}
-.notice{
-padding:12px 14px;
-border:1px solid #30405f;
-border-radius:14px;
-background:#0d1427;
-color:#b8c5df;
-font-size:12px;
-line-height:1.5
-}
-.teamGrid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px
-}
-.teamBox{
-padding:14px;
-border:1px solid #2b3654;
-border-radius:15px;
-background:#0d1426
-}
-.roomBox{
-padding:16px;
-border:1px solid #334363;
-border-radius:16px;
-background:#0b1224
-}
-.roomCode{
-font-size:22px;
-font-weight:950;
-letter-spacing:.08em
-}
-.notifDot{
-display:inline-block;
-width:7px;
-height:7px;
-border-radius:50%;
-background:#ff5d76;
-margin-left:4px
-}
-.settingsGrid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:12px
-}
-.setting{
-padding:16px;
-border:1px solid var(--line);
-border-radius:17px;
-background:#10172a
-}
-.setting label{
-display:flex;
-justify-content:space-between;
-gap:10px;
-align-items:center
-}
-.toggle{
-width:42px;
-height:24px;
-border-radius:99px;
-border:1px solid #3a4868;
-background:#18213a;
-position:relative
-}
-.toggle i{
-display:block;
-width:18px;
-height:18px;
-border-radius:50%;
-background:#8e9bb8;
-margin:2px;
-transition:.2s
-}
-.toggle.on{background:#5b45ca}
-.toggle.on i{
-transform:translateX(18px);
-background:#fff
-}
-@media(max-width:700px){
-.historyGrid,.settingsGrid,.teamGrid{
-grid-template-columns:1fr
-}
-}
+:root{--bg:#070a14;--p:#10162a;--p2:#151d35;--line:#283351;--txt:#f7f8ff;--mut:#9ca8c4;--a:#7c5cff;--c:#16d9ff;--g:#39e58c;--r:#ff5d76}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 15% -5%,#27204d 0,#0a0d1b 38%,#070a14 78%);color:var(--txt);font:14px system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}button,input{font:inherit}button{cursor:pointer}
+.wrap{max-width:1200px;margin:auto;padding:0 18px}.top{position:sticky;top:0;z-index:30;background:#080b18df;backdrop-filter:blur(18px);border-bottom:1px solid #202943}.nav{height:68px;display:flex;align-items:center;gap:22px}.logo{font-weight:950;letter-spacing:.1em;font-size:25px;background:linear-gradient(90deg,#fff,#a88dff,#43e8ff);-webkit-background-clip:text;color:transparent}.links{display:flex;gap:20px;flex:1}.links a{color:#aeb9d1;text-decoration:none;font-size:13px}.links a:hover{color:#fff}.navRight{display:flex;gap:8px;align-items:center}.walletPill,.profilePill{border:1px solid var(--line);background:#0e1427;border-radius:12px;padding:9px 11px}.walletPill{color:#ffd75c}.btn{border:0;border-radius:12px;padding:11px 15px;color:#fff;font-weight:850;background:linear-gradient(135deg,var(--a),#4c91ff);box-shadow:0 8px 25px #604cff25}.btn.secondary{background:#141d34;border:1px solid #2d3958;box-shadow:none}.btn.danger{background:#441928;border:1px solid #713046;box-shadow:none}.btn.full{width:100%;margin-top:10px}.btn.sm{padding:8px 11px;font-size:12px}
+.page{display:none}.page.active{display:block}.hero{padding:38px 0 18px}.heroGrid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}.card{border:1px solid var(--line);background:linear-gradient(145deg,#151c33,#0e1425);border-radius:24px}.heroMain{padding:34px;min-height:450px;background:linear-gradient(135deg,#221d4d,#11172d 60%,#0d1323);position:relative;overflow:hidden}.heroMain:after{content:"";position:absolute;width:360px;height:360px;right:-130px;top:-140px;border-radius:50%;background:#16d9ff17}.eyebrow{color:#5de8ff;font-weight:900;letter-spacing:.15em;font-size:12px}.hero h1{font-size:clamp(42px,7vw,72px);line-height:.95;margin:13px 0}.hero h1 span{color:#55e6ff}.hero p{color:#abb7d0;line-height:1.7;max-width:650px;font-size:16px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:26px}.stat{background:#0b1121;border:1px solid #27324d;border-radius:15px;padding:14px}.stat b{font-size:20px}.stat small{display:block;color:var(--mut);margin-top:3px}.featured{padding:24px}.tag{display:inline-block;border-radius:99px;padding:6px 9px;background:#30224e;color:#d7cbff;font-size:11px;font-weight:900}.featured h2{font-size:27px;margin:18px 0 6px}.mut{color:var(--mut)}.prize{font-size:35px;font-weight:950;margin:22px 0}.bar{height:8px;background:#26304a;border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;width:72%;background:linear-gradient(90deg,var(--a),var(--c))}
+section{padding:25px 0}.head{display:flex;justify-content:space-between;gap:12px;align-items:end;margin-bottom:15px}.head h2{margin:0;font-size:24px}.head p{margin:4px 0 0;color:var(--mut);font-size:12px}.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.game{padding:17px;border:1px solid var(--line);border-radius:18px;background:#10172a;min-height:128px}.game .ico{font-size:30px}.game h3{margin:9px 0 4px}.game small{color:var(--mut)}
+.filters{display:flex;gap:7px;overflow:auto;padding-bottom:3px}.chip{border:1px solid #2b3654;background:#10172a;color:#aeb9d1;border-radius:99px;padding:8px 12px;white-space:nowrap}.chip.active{background:#6c53e8;color:#fff}.tours{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}.tour{padding:17px;border:1px solid var(--line);border-radius:19px;background:#10172a}.tourTop,.row{display:flex;justify-content:space-between;gap:10px;align-items:center}.badge{font-size:10px;color:#c5d4f5;background:#1a2642;border-radius:8px;padding:6px 8px}.open{font-size:10px;color:var(--g);font-weight:900}.tour h3{margin:15px 0 6px}.meta{color:var(--mut);font-size:12px;line-height:1.8}.tourFoot{border-top:1px solid #26304a;margin-top:13px;padding-top:13px}.tourFoot b{font-size:18px}.tourFoot small{display:block;color:var(--mut);font-size:10px}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.step{padding:18px;border:1px solid var(--line);border-radius:18px;background:#0e1426}.num{width:31px;height:31px;display:grid;place-items:center;background:#6c53e8;border-radius:10px;font-weight:900}.step p{color:var(--mut);font-size:12px;line-height:1.6}
+.dashboard{padding:26px 0}.dashHead{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:15px}.dashTitle h2{margin:0}.dashTitle p{margin:5px 0;color:var(--mut)}.dashGrid{display:grid;grid-template-columns:1.1fr .9fr;gap:13px}.balance{padding:22px}.balance strong{font-size:34px}.balanceActions{display:flex;gap:8px;margin-top:17px}.list{padding:18px}.list h3{margin-top:0}.item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #252f49}.item:last-child{border-bottom:0}.item small{color:var(--mut);display:block;margin-top:3px}.green{color:var(--g)}.red{color:#ff7a8e}.empty{padding:28px;text-align:center;color:var(--mut);border:1px dashed #34415f;border-radius:17px}
+footer{border-top:1px solid #202943;padding:28px 0 95px;color:#77839f;font-size:12px;margin-top:20px}
+.bottom{display:none}.amountGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.amountGrid button,.payMethods div{border:1px solid #2d3958;background:#11192e;color:#eaf0ff;border-radius:12px;padding:11px;text-align:center;font-weight:800}.amountGrid button:hover,.payMethods div:hover{border-color:#7c5cff}.payMethods{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px}.payMethods div{font-size:11px;padding:9px}.modal{position:fixed;inset:0;z-index:80;display:none;place-items:center;background:#000b;padding:18px}.modal.show{display:grid}.modalBox{width:min(450px,100%);padding:23px;background:#11182c;border:1px solid #34405f;border-radius:22px}.modalBox h2{margin-top:0}.modalBox input{width:100%;padding:13px;border-radius:12px;border:1px solid #34405e;background:#0a1020;color:#fff;margin:7px 0 13px;outline:none}.x{float:right;border:0;background:none;color:#b5c0d6;font-size:23px}.toast{position:fixed;right:18px;bottom:22px;z-index:100;background:#17223a;border:1px solid #3a4868;padding:13px 15px;border-radius:12px;display:none}.toast.show{display:block}
+@media(max-width:900px){.links{display:none}.heroGrid,.dashGrid{grid-template-columns:1fr}.grid4{grid-template-columns:repeat(2,1fr)}.tours{grid-template-columns:1fr 1fr}.steps{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){html,body{max-width:100%;overflow-x:hidden}.wrap{padding:0 14px}.nav{height:62px}.walletPill,.profilePill{display:none}.hero{padding-top:24px}.heroMain{padding:25px}.hero h1{font-size:52px}.featured{padding:21px}.grid4,.tours,.steps{grid-template-columns:1fr 1fr}.tour:nth-child(3n){grid-column:auto}.game{min-height:118px;padding:14px}.bottom{position:fixed;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));left:0;right:0;bottom:0;z-index:40;background:rgba(8,13,27,.96);border-top:1px solid #27314a;padding:7px 2px calc(7px + env(safe-area-inset-bottom));backdrop-filter:blur(15px);height:auto;min-height:68px;overflow:hidden}.bottom button{width:100%;min-width:0;height:54px;padding:2px 0;border:0;background:none;color:#8f9bb6;font-size:10px!important;line-height:1.1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;white-space:nowrap;overflow:hidden}.bottom button.active{color:#fff}.bottom span{display:block;font-size:17px!important;line-height:18px;margin:0;white-space:nowrap}footer{padding-bottom:88px}}
+.adminGrid{display:grid;grid-template-columns:380px 1fr;gap:14px}.adminForm,.adminList{padding:20px}.adminForm input,.adminForm select,.adminForm textarea{width:100%;padding:12px;border-radius:11px;border:1px solid #34405e;background:#0a1020;color:#fff;margin:6px 0 11px;outline:none}.adminForm label{display:block;color:#aeb9d1;font-size:11px;font-weight:800;margin-top:4px}.adminStats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:14px}.adminStat{padding:14px;border:1px solid var(--line);border-radius:15px;background:#0e1426}.adminStat b{font-size:21px}.adminRow{padding:14px 0;border-bottom:1px solid #26304a}.adminRow:last-child{border-bottom:0}.adminActions{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.statusSelect{padding:7px 9px;border-radius:9px;border:1px solid #34405e;background:#11192e;color:#fff;font-size:11px}.adminTop{margin-bottom:18px}
+.resultBox{margin-top:14px;padding:18px}.resultForm{display:grid;grid-template-columns:1.5fr .8fr .8fr auto;gap:8px;align-items:end}.resultForm input{width:100%;padding:11px;border-radius:10px;border:1px solid #34405e;background:#0a1020;color:#fff;outline:none}.resultTable{width:100%;border-collapse:collapse;margin-top:12px;font-size:12px}.resultTable th,.resultTable td{text-align:left;padding:10px 8px;border-bottom:1px solid #27314b}.resultTable th{color:#8f9bb6;font-size:10px;text-transform:uppercase}.rank{font-weight:950;color:#dfe7ff}.winner{color:#ffd75c}.resultActions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+.historyGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.historyCard{padding:16px;border:1px solid var(--line);border-radius:18px;background:#10172a}.historyCard h3{margin:0 0 5px}.historyCard small{color:var(--mut)}.notifDot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#ff5d76;margin-left:4px;vertical-align:top;display:none}.notifDot.show{display:inline-block}
+@media(max-width:900px){.adminGrid{grid-template-columns:1fr}}@media(max-width:800px){.historyGrid{grid-template-columns:1fr 1fr}}@media(max-width:700px){.resultForm{grid-template-columns:1fr 1fr}.resultForm .resultName{grid-column:1/-1}.resultForm button{grid-column:1/-1}}@media(max-width:600px){.historyGrid{grid-template-columns:1fr}}
 </style>
 </head>
-
 <body>
 
 <header class="top">
 <div class="wrap nav">
-
 <div class="logo">ENTSONE</div>
-
 <nav class="links">
-<a href="#" onclick="page('home')">Home</a>
-<a href="#" onclick="page('games')">Games</a>
-<a href="#" onclick="page('tournaments')">Tournaments</a>
-<a href="#" onclick="page('wallet')">Wallet</a>
+<a href="#" onclick="page('home');return false">Home</a>
+<a href="#" onclick="page('games');return false">Games</a>
+<a href="#" onclick="page('tournaments');return false">Tournaments</a>
+<a href="#" onclick="page('wallet');return false">Wallet</a>
 </nav>
-
 <div class="navRight">
 <button class="btn secondary sm" onclick="page('admin')">🛠️ Admin</button>
-
-<button class="btn secondary sm" onclick="page('notifications')">
-🔔<span id="notifCount" class="notifDot"></span>
-</button>
-
-<div class="walletPill">
-💰 <span id="navBalance">₹0</span>
+<button class="btn secondary sm" onclick="page('notifications')">🔔<span id="notifCount" class="notifDot"></span></button>
+<div class="walletPill">💰 <span id="navBalance">₹0</span></div>
+<button class="btn sm" id="authBtn" onclick="openAuth()">Login / Sign Up</button>
 </div>
-
-<button class="btn sm" id="authBtn" onclick="openAuth()">
-Login / Sign Up
-</button>
-</div>
-
 </div>
 </header>
 
 <main>
 
-<div id="home" class="page active">
-
-<section class="hero">
+<section id="home" class="page active">
+<div class="hero">
 <div class="wrap heroGrid">
-
-<div class="card heroMain">
-
+<section class="heroMain card">
 <div class="eyebrow">ENTSONE ESPORTS ARENA</div>
-
-<h1>
-PLAY.<br>
-COMPETE.<br>
-<span>WIN.</span>
-</h1>
-
-<p>
-One platform for competitive gaming tournaments.
-Find your game, join a contest, play your match,
-follow results and manage your tournament balance.
-</p>
-
+<h1>PLAY.<br><span>COMPETE.</span><br>DOMINATE.</h1>
+<p>Compete in exciting esports tournaments, track your results and build your player profile.</p>
 <div class="actions">
-<button class="btn" onclick="page('tournaments')">
-Explore Tournaments
-</button>
-
-<button class="btn secondary" onclick="page('games')">
-Browse Games
-</button>
+<button class="btn" onclick="page('tournaments')">Explore Tournaments →</button>
+<button class="btn secondary" onclick="page('games')">Browse Games</button>
 </div>
-
 <div class="stats">
-<div class="stat">
-<b>10+</b>
-<small>Games</small>
-</div>
-
-<div class="stat">
-<b>24/7</b>
-<small>Events</small>
-</div>
-
-<div class="stat">
-<b>Live</b>
-<small>Results</small>
-</div>
-</div>
-
-</div>
-
-<div class="card featured">
-
-<span class="tag">🔥 FEATURED</span>
-
-<h2>ENTSONE Battle Cup</h2>
-
-<p class="mut">
-Free Fire · Squad · Registration Open
-</p>
-
-<div class="prize">₹10,000</div>
-
-<div class="row mut" style="font-size:11px">
-<span>Prize Pool</span>
-<span>72 / 100 Slots</span>
-</div>
-
-<div class="bar">
-<i></i>
-</div>
-
-<div class="row" style="margin-top:20px">
-
-<div>
-<small class="mut">Entry</small><br>
-<b>₹49</b>
-</div>
-
-<div>
-<small class="mut">Starts</small><br>
-<b>9:00 PM</b>
-</div>
-
-</div>
-
-<button class="btn full"
-onclick="openTournament('ENTSONE Battle Cup','Free Fire · Squad','₹10,000','₹49')">
-View Tournament
-</button>
-
-</div>
-
+<div class="stat"><b>10+</b><small>Games</small></div>
+<div class="stat"><b>24/7</b><small>Tournament Access</small></div>
+<div class="stat"><b>100%</b><small>Competitive</small></div>
 </div>
 </section>
 
-<section>
+<section class="featured card">
+<span class="tag">🔥 FEATURED TOURNAMENT</span>
+<h2>FREE FIRE ARENA CUP</h2>
+<div class="mut">Free Fire · Squad</div>
+<div class="prize">₹700</div>
+<div class="row"><span class="mut">Prize Pool</span><b>50 Slots</b></div>
+<div class="bar" style="margin:12px 0 16px"><i></i></div>
+<div class="meta">Entry Fee: ₹20<br>Start: Tomorrow 9 PM</div>
+<button class="btn full" onclick="openTournament('FREE FIRE ARENA CUP','Free Fire · Squad','₹700','₹20')">View Tournament</button>
+</section>
+</div>
+</div>
 <div class="wrap">
 
+<section>
 <div class="head">
 <div>
 <h2>Popular Games</h2>
-<p>Competitive titles available on ENTSONE.</p>
+<p>Choose your battlefield</p>
 </div>
-
-<button class="btn secondary sm" onclick="page('games')">
-View All
-</button>
+<button class="btn secondary sm" onclick="page('games')">View All</button>
 </div>
-
-<div class="grid4">
-
-<div class="game">
-<div class="ico">🔥</div>
-<h3>Free Fire</h3>
-<small>Solo · Duo · Squad</small>
-</div>
-
-<div class="game">
-<div class="ico">🎯</div>
-<h3>BGMI</h3>
-<small>Solo · Duo · Squad</small>
-</div>
-
-<div class="game">
-<div class="ico">⚔️</div>
-<h3>ScarFall</h3>
-<small>Solo · Squad</small>
-</div>
-
-<div class="game">
-<div class="ico">💥</div>
-<h3>COD Mobile</h3>
-<small>MP · BR · Duo</small>
-</div>
-
-</div>
-</div>
+<div class="grid4" id="homeGames"></div>
 </section>
 
 <section>
-<div class="wrap">
-
 <div class="head">
 <div>
 <h2>Upcoming Tournaments</h2>
-<p>Choose an event and start your registration.</p>
+<p>Find your next challenge</p>
+</div>
+<button class="btn secondary sm" onclick="page('tournaments')">View All</button>
+</div>
+<div id="homeTours" class="tours"></div>
+</section>
+
+<section>
+<div class="head">
+<div>
+<h2>How ENTSONE Works</h2>
+<p>Simple, fast and competitive</p>
 </div>
 </div>
 
-<div class="tours" id="homeTours"></div>
+<div class="steps">
+<div class="step">
+<div class="num">1</div>
+<h3>Create Account</h3>
+<p>Sign in with mobile OTP or email OTP.</p>
+</div>
 
+<div class="step">
+<div class="num">2</div>
+<h3>Choose Tournament</h3>
+<p>Pick a game and tournament that fits you.</p>
+</div>
+
+<div class="step">
+<div class="num">3</div>
+<h3>Join Match</h3>
+<p>Register your team or player profile.</p>
+</div>
+
+<div class="step">
+<div class="num">4</div>
+<h3>Play & Rank</h3>
+<p>Results and leaderboard track your performance.</p>
+</div>
 </div>
 </section>
 
 </div>
+</section>
 
-<div id="games" class="page">
-<section class="dashboard">
+
+<section id="games" class="page">
 <div class="wrap">
-
-<div class="dashHead">
-<div class="dashTitle">
-<h2>Games</h2>
-<p>Choose a title to view its tournaments.</p>
+<section>
+<div class="head">
+<div>
+<h2>All Games</h2>
+<p>Choose your game</p>
 </div>
 </div>
 
 <div class="grid4" id="allGames"></div>
-
-</div>
 </section>
 </div>
+</section>
 
-<div id="tournaments" class="page">
-<section class="dashboard">
+
+<section id="tournaments" class="page">
 <div class="wrap">
 
-<div class="dashHead">
-<div class="dashTitle">
+<section>
+<div class="head">
+<div>
 <h2>Tournaments</h2>
-<p>Live and upcoming competitive events.</p>
+<p>Compete in upcoming esports matches</p>
 </div>
 </div>
 
 <div class="filters">
-
-<button class="chip active"
-onclick="filterTours('all',this)">
-All
-</button>
-
-<button class="chip"
-onclick="filterTours('Free Fire',this)">
-Free Fire
-</button>
-
-<button class="chip"
-onclick="filterTours('BGMI',this)">
-BGMI
-</button>
-
-<button class="chip"
-onclick="filterTours('COD Mobile',this)">
-COD Mobile
-</button>
-
-<button class="chip"
-onclick="filterTours('Other',this)">
-Other
-</button>
-
+<button class="chip active" onclick="filterTours('ALL',this)">All</button>
+<button class="chip" onclick="filterTours('Free Fire',this)">Free Fire</button>
+<button class="chip" onclick="filterTours('BGMI',this)">BGMI</button>
+<button class="chip" onclick="filterTours('ScarFall',this)">ScarFall</button>
+<button class="chip" onclick="filterTours('COD Mobile',this)">COD Mobile</button>
 </div>
 
-<div class="tours" id="allTours"></div>
+<div id="tourGrid" class="tours"></div>
+</section>
 
 </div>
 </section>
-</div>
 
-<div id="wallet" class="page">
-<section class="dashboard">
-<div class="wrap">
+
+<section id="wallet" class="page">
+<div class="wrap dashboard">
 
 <div class="dashHead">
 <div class="dashTitle">
 <h2>Wallet</h2>
-<p>Manage your tournament balance and transaction history.</p>
+<p>Demo wallet — no real money transactions</p>
 </div>
-
-<button class="btn" onclick="openMoney('add')">
-+ Add Money
-</button>
 </div>
 
 <div class="dashGrid">
 
-<div class="card balance">
-
-<small class="mut">Available Balance</small>
-<br>
-
+<div class="balance card">
+<div class="mut">Available Balance</div>
 <strong id="walletBalance">₹0</strong>
 
 <div class="balanceActions">
-<button class="btn sm" onclick="openMoney('add')">
-Add Money
-</button>
-
-<button class="btn secondary sm"
-onclick="openMoney('withdraw')">
-Withdraw
-</button>
+<button class="btn" onclick="openMoney('add')">＋ Add Money</button>
+<button class="btn secondary" onclick="openMoney('withdraw')">Withdraw</button>
+</div>
 </div>
 
-<p class="mut" style="font-size:12px;line-height:1.6">
-Production payment and withdrawal processing will require
-a verified payment provider, KYC where applicable,
-and server-side transaction validation.
-</p>
-
-</div>
-
-<div class="card list">
-
-<h3>Recent Transactions</h3>
-
+<div class="list card">
+<h3>Transactions</h3>
 <div id="transactions"></div>
-
 </div>
 
 </div>
-
 </div>
 </section>
-</div>
 
-<div id="profile" class="page">
-<section class="dashboard">
-<div class="wrap">
+
+<section id="profile" class="page">
+<div class="wrap dashboard">
 
 <div class="dashHead">
-
 <div class="dashTitle">
 <h2>Profile</h2>
-<p id="profileSub">
-Sign in to access your player profile.
-</p>
+<p>Your ENTSONE player profile</p>
 </div>
 
-<button class="btn secondary sm" onclick="openAuth()">
-Login / Sign Up
-</button>
-
+<button class="btn sm" onclick="openAuth()">Login / Sign Up</button>
 </div>
 
 <div class="dashGrid">
 
 <div class="card balance">
-
-<h3 id="profileName">Guest Player</h3>
-
-<p class="mut" id="profileMobile">
-Not signed in
-</p>
+<h2 id="profileName">Guest Player</h2>
+<p class="mut" id="profileMobile">Not signed in</p>
 
 <div class="stats">
-
 <div class="stat">
 <b id="pJoined">0</b>
-<small>Tournaments</small>
+<small>Joined</small>
 </div>
 
 <div class="stat">
@@ -1105,197 +244,150 @@ Not signed in
 
 <div class="stat">
 <b id="pEarn">₹0</b>
-<small>Winnings</small>
+<small>Earnings</small>
 </div>
-
 </div>
-
-<div class="actions">
-
-<button class="btn secondary sm"
-onclick="page('history')">
-📊 History
-</button>
-
-<button class="btn secondary sm"
-onclick="page('notifications')">
-🔔 Notifications
-</button>
-
-<button class="btn secondary sm"
-onclick="page('settings')">
-⚙️ Settings
-</button>
-
-</div>
-
 </div>
 
 <div class="card list">
-
 <h3>My Tournaments</h3>
-
-<div id="myTournaments" class="empty">
-No tournaments joined yet.
-</div>
-
+<div id="myTournaments"></div>
 </div>
 
 </div>
 </div>
 </section>
-</div>
 
-<div id="history" class="page">
-<section class="dashboard">
+
+<section id="history" class="page">
 <div class="wrap">
 
-<div class="dashHead">
-<div class="dashTitle">
+<section>
+<div class="head">
+<div>
 <h2>Tournament History</h2>
-<p>Your joined, ongoing and completed demo matches.</p>
+<p>Your joined tournaments and results</p>
 </div>
 </div>
 
-<div class="historyGrid" id="historyCards"></div>
-
-<div class="card list" style="margin-top:13px">
-<h3>Match History</h3>
-<div id="historyList"></div>
-</div>
+<div id="historyGrid" class="historyGrid"></div>
+</section>
 
 </div>
 </section>
-</div>
 
-<div id="notifications" class="page">
-<section class="dashboard">
+
+<section id="notifications" class="page">
 <div class="wrap">
 
-<div class="dashHead">
-
-<div class="dashTitle">
+<section>
+<div class="head">
+<div>
 <h2>Notifications</h2>
-<p>Tournament updates and platform announcements.</p>
+<p>Tournament and account updates</p>
 </div>
 
-<button class="btn secondary sm"
-onclick="markNotificationsRead()">
+<button class="btn secondary sm" onclick="markNotificationsRead()">
 Mark all read
 </button>
+</div>
 
+<div id="notificationList" class="card list"></div>
+</section>
+
+</div>
+</section>
+
+
+<section id="settings" class="page">
+<div class="wrap">
+
+<section>
+<div class="head">
+<div>
+<h2>Settings</h2>
+<p>ENTSONE account settings</p>
+</div>
 </div>
 
 <div class="card list">
-<div id="notificationList"></div>
+
+<div class="item">
+<div>
+<b>Account</b>
+<small>Mobile/email OTP login</small>
+</div>
+<button class="btn secondary sm" onclick="openAuth()">Manage</button>
+</div>
+
+<div class="item">
+<div>
+<b>Notifications</b>
+<small>Tournament updates</small>
+</div>
+<button class="btn secondary sm" onclick="page('notifications')">Open</button>
+</div>
+
+<div class="item">
+<div>
+<b>Logout</b>
+<small>End current session</small>
+</div>
+<button class="btn danger sm" onclick="logoutUser()">Logout</button>
 </div>
 
 </div>
 </section>
-</div>
-
-<div id="settings" class="page">
-<section class="dashboard">
-<div class="wrap">
-
-<div class="dashHead">
-<div class="dashTitle">
-<h2>Settings</h2>
-<p>Manage your demo profile preferences.</p>
-</div>
-</div>
-
-<div class="settingsGrid">
-
-<div class="setting">
-<label>
-<span>Match reminders</span>
-<button id="toggleReminders"
-class="toggle on"
-onclick="toggleSetting('reminders')">
-<i></i>
-</button>
-</label>
-
-<p class="mut">
-Show reminders for upcoming tournaments.
-</p>
-</div>
-
-<div class="setting">
-<label>
-<span>Result alerts</span>
-<button id="toggleResults"
-class="toggle on"
-onclick="toggleSetting('results')">
-<i></i>
-</button>
-</label>
-
-<p class="mut">
-Show published leaderboard notifications.
-</p>
-</div>
-
-<div class="setting">
-<h3>Profile</h3>
-
-<button class="btn secondary sm"
-onclick="openAuth()">
-Edit account details
-</button>
-</div>
-
-<div class="setting">
-<h3>Demo data</h3>
-
-<button class="btn danger sm"
-onclick="resetDemoData()">
-Reset Demo Data
-</button>
-</div>
-
-</div>
 
 </div>
 </section>
-  </div>
-  <div id="admin" class="page">
-<section class="dashboard">
+
+
+<section id="mytournaments" class="page">
 <div class="wrap">
 
-<div class="dashHead">
-<div class="dashTitle">
-<h2>Admin Panel</h2>
-<p>Create, edit, manage tournaments and publish results.</p>
+<section>
+<div class="head">
+<div>
+<h2>My Tournaments</h2>
+<p>Tournaments you have joined</p>
+</div>
 </div>
 
-<button class="btn secondary sm"
-onclick="resetAdminForm()">
-+ New Tournament
-</button>
+<div id="myTournamentPage" class="tours"></div>
+</section>
+
+</div>
+</section>
+
+
+<section id="admin" class="page">
+<div class="wrap dashboard">
+
+<div class="adminTop">
+<div class="dashHead">
+<div class="dashTitle">
+<h2>🛠️ Admin Panel</h2>
+<p>Manage ENTSONE tournaments and results</p>
+</div>
+</div>
 </div>
 
 <div class="adminStats">
-
 <div class="adminStat">
-<small class="mut">TOTAL</small>
-<br>
 <b id="adminTotal">0</b>
+<div class="mut">Total Tournaments</div>
 </div>
 
 <div class="adminStat">
-<small class="mut">OPEN</small>
-<br>
 <b id="adminOpen">0</b>
+<div class="mut">Open</div>
 </div>
 
 <div class="adminStat">
-<small class="mut">COMPLETED</small>
-<br>
 <b id="adminCompleted">0</b>
+<div class="mut">Completed</div>
 </div>
-
 </div>
 
 <div class="adminGrid">
@@ -1305,7 +397,7 @@ onclick="resetAdminForm()">
 <h3 id="adminFormTitle">Create Tournament</h3>
 
 <label>Tournament Name</label>
-<input id="aName" placeholder="e.g. Free Fire Night Cup">
+<input id="aName" placeholder="Tournament name">
 
 <label>Game</label>
 <select id="aGame">
@@ -1313,9 +405,6 @@ onclick="resetAdminForm()">
 <option>BGMI</option>
 <option>ScarFall</option>
 <option>COD Mobile</option>
-<option>8 Ball Pool</option>
-<option>Ludo</option>
-<option>Other</option>
 </select>
 
 <label>Mode</label>
@@ -1323,20 +412,19 @@ onclick="resetAdminForm()">
 <option>Solo</option>
 <option>Duo</option>
 <option>Squad</option>
-<option>1v1</option>
 </select>
 
 <label>Prize Pool</label>
-<input id="aPrize" placeholder="₹5,000">
+<input id="aPrize" type="number" min="0" placeholder="500">
 
 <label>Entry Fee</label>
-<input id="aEntry" placeholder="₹49">
+<input id="aEntry" type="number" min="0" placeholder="20">
 
 <label>Slots</label>
-<input id="aSlots" type="number" min="2" value="50">
+<input id="aSlots" type="number" min="1" placeholder="50">
 
 <label>Start Time</label>
-<input id="aStart" placeholder="Tomorrow 9:00 PM">
+<input id="aStart" placeholder="Tomorrow 9 PM">
 
 <label>Status</label>
 <select id="aStatus">
@@ -1346,24 +434,20 @@ onclick="resetAdminForm()">
 <option>COMPLETED</option>
 </select>
 
-<button id="adminSaveBtn"
-class="btn full"
-onclick="saveAdminTournament()">
-Create Tournament
-</button>
-
-<button id="adminCancelBtn"
-class="btn secondary full"
-style="display:none"
-onclick="resetAdminForm()">
-Cancel Edit
-</button>
+<div class="adminActions">
+<button class="btn" onclick="saveAdminTournament()">Save Tournament</button>
+<button class="btn secondary" onclick="resetAdminForm()">Clear</button>
+</div>
 
 </div>
 
+
 <div class="card adminList">
 
-<h3>Manage Tournaments</h3>
+<div class="row">
+<h3 style="margin:0">Tournament Management</h3>
+<button class="btn secondary sm" onclick="loadBackendTournaments()">↻ Refresh</button>
+</div>
 
 <div id="adminTournamentList"></div>
 
@@ -1371,468 +455,256 @@ Cancel Edit
 
 </div>
 
+
 <div class="card resultBox">
 
-<div class="dashHead">
-
+<div class="row">
 <div>
-<h3 style="margin:0">Tournament Results</h3>
-<p class="mut" style="margin:5px 0 0">
-Add placement and kills, calculate points and publish leaderboard.
-</p>
+<h3 style="margin:0">Results & Leaderboard</h3>
+<div class="mut" style="font-size:11px;margin-top:4px">
+Add player results and publish leaderboard
+</div>
+</div>
 </div>
 
-</div>
-
-<div class="notice">
-<strong>Scoring:</strong>
-Placement points + kills.
-1st = 12, 2nd = 9, 3rd = 7, 4th = 5,
-5th = 4, 6th = 3, 7th = 2, 8th = 1.
-Each kill = 1 point.
-</div>
-
-<div style="margin-top:14px">
-
-<label class="mut"
-style="font-size:11px;font-weight:800">
-Tournament
-</label>
-
-<select id="rTournament"
-class="statusSelect"
-style="width:100%;padding:11px;margin-top:6px"
-onchange="renderResultTable()">
-</select>
-
-</div>
-
-<div class="resultForm" style="margin-top:12px">
+<div class="resultForm">
 
 <div class="resultName">
-<label class="mut"
-style="font-size:11px;font-weight:800">
-Player / Team
-</label>
-
-<input id="rName"
-placeholder="Player or team name">
+<label class="mut" style="font-size:11px">Tournament</label>
+<select id="rTournament" class="statusSelect" style="width:100%;height:42px"></select>
 </div>
 
 <div>
-<label class="mut"
-style="font-size:11px;font-weight:800">
-Placement
-</label>
-
-<input id="rPlace"
-type="number"
-min="1"
-placeholder="1">
+<label class="mut" style="font-size:11px">Player</label>
+<input id="rName" placeholder="Player name">
 </div>
 
 <div>
-<label class="mut"
-style="font-size:11px;font-weight:800">
-Kills
-</label>
-
-<input id="rKills"
-type="number"
-min="0"
-placeholder="5">
+<label class="mut" style="font-size:11px">Position</label>
+<input id="rPlace" type="number" min="1" placeholder="1">
 </div>
 
-<button class="btn sm"
-onclick="addResult()">
-Add Result
-</button>
+<div>
+<label class="mut" style="font-size:11px">Kills</label>
+<input id="rKills" type="number" min="0" placeholder="5">
+</div>
 
+<button class="btn" onclick="addResult()">Add Result</button>
+
+</div>
+
+<div class="resultActions">
+<button class="btn secondary sm" onclick="renderResultTable()">Refresh Results</button>
+<button class="btn sm" onclick="publishResults()">Publish Results</button>
 </div>
 
 <div id="resultAdminTable"></div>
 
-<div class="resultActions">
-
-<button class="btn secondary sm"
-onclick="clearResults()">
-Clear Results
-</button>
-
-<button class="btn sm"
-onclick="publishResults()">
-Publish Results
-</button>
-
-</div>
-
 </div>
 
 </div>
 </section>
-</div>
-
-<div id="adminResults" class="page">
-<section class="dashboard">
-<div class="wrap">
-
-<div class="dashHead">
-<div class="dashTitle">
-<h2>Published Results</h2>
-<p>Completed tournament leaderboards.</p>
-</div>
-</div>
-
-<div class="card list">
-<div id="publicResults"></div>
-</div>
-
-</div>
-</section>
-</div>
-
 </main>
-
-<nav class="bottom">
-
-<button onclick="page('home')">
-<span>⌂</span>
-Home
-</button>
-
-<button onclick="page('games')">
-<span>🎮</span>
-Games
-</button>
-
-<button onclick="page('tournaments')">
-<span>🏆</span>
-Tournaments
-</button>
-
-<button onclick="page('wallet')">
-<span>💰</span>
-Wallet
-</button>
-
-<button onclick="page('profile')">
-<span>👤</span>
-Profile
-</button>
-
-</nav>
 
 <footer>
 <div class="wrap">
-<div style="font-weight:900;color:#c9d3ea;font-size:15px">
-ENTSONE
-</div>
-
-<div style="margin-top:7px">
-Competitive gaming tournament platform.
-</div>
-
-<div style="margin-top:8px">
-Demo environment — wallet/payment and authentication
-are not production financial services.
-</div>
+<b style="color:#dfe7ff">ENTSONE</b> — eSports Tournament Platform.
+Real OTP, payment gateway, wallet ledger, database and admin services must be connected server-side before accepting real money.
 </div>
 </footer>
 
-<!-- AUTH MODAL -->
+<nav class="bottom">
+<button onclick="page('home')">🏠<span>Home</span></button>
+<button onclick="page('games')">🎮<span>Games</span></button>
+<button onclick="page('tournaments')">🏆<span>Tournaments</span></button>
+<button onclick="page('wallet')">💰<span>Wallet</span></button>
+<button onclick="page('profile')">👤<span>Profile</span></button>
+<button onclick="page('admin')">🛠️<span>Admin</span></button>
+</nav>
 
-<div id="auth" class="modal">
-
+<div class="modal" id="auth">
 <div class="modalBox">
+<button class="x" onclick="closeModal('auth')">×</button>
+<h2>ENTSONE Login / Sign Up</h2>
+<p class="mut">Use mobile OTP or email OTP. No password.</p>
 
-<button class="x"
-onclick="closeModal('auth')">
-×
-</button>
-
-<h2>Login / Sign Up</h2>
-
-<p class="mut">
-Enter your details to continue.
-</p>
-
-<label class="mut"
-style="font-size:11px;font-weight:800">
-Player Name
-</label>
-
-<input
-id="name"
-placeholder="Your name">
-
-<label class="mut"
-style="font-size:11px;font-weight:800">
-Mobile Number
-</label>
-
-<input
-id="phone"
-inputmode="numeric"
-maxlength="10"
-placeholder="10-digit mobile number">
-
-<div class="notice">
-OTP authentication will be connected to the backend/provider
-in the authentication stage. This demo does not verify a real OTP.
-</div>
-
-<button class="btn full"
-onclick="sendOtp()">
-Continue
-</button>
-
-</div>
-
-</div>
-
-<!-- TOURNAMENT MODAL -->
-
-<div id="tourModal" class="modal">
-
-<div class="modalBox">
-
-<button class="x"
-onclick="closeModal('tourModal')">
-×
-</button>
-
-<span class="tag">TOURNAMENT</span>
-
-<h2 id="tmName">Tournament</h2>
-
-<p class="mut" id="tmGame">
-Game · Mode
-</p>
-
-<div class="row"
-style="margin:18px 0">
-
-<div>
-<small class="mut">Prize Pool</small>
-<br>
-<b id="tmPrize">₹0</b>
-</div>
-
-<div>
-<small class="mut">Entry</small>
-<br>
-<b id="tmEntry">₹0</b>
-</div>
-
-</div>
-
-<div class="teamGrid">
-
-<div class="teamBox">
-<small class="mut">Slots</small>
-<br>
-<b id="tmSlots">100 Slots</b>
-</div>
-
-<div class="teamBox">
-<small class="mut">Starts</small>
-<br>
-<b id="tmStart">Scheduled</b>
-</div>
-
-</div>
-
-<div style="margin-top:15px">
-
-<label class="mut"
-style="font-size:11px;font-weight:800">
-Mode
-</label>
-
-<select id="joinMode"
-class="statusSelect"
-style="width:100%;margin-top:6px;padding:11px">
-
-<option>Solo</option>
-<option>Duo</option>
-<option>Squad</option>
-
+<select id="authChannel" class="statusSelect" style="width:100%;padding:11px;margin-bottom:8px" onchange="toggleAuthChannel()">
+<option value="phone">Mobile OTP</option>
+<option value="email">Email OTP</option>
 </select>
 
-<label class="mut"
-style="font-size:11px;font-weight:800;display:block;margin-top:12px">
-Team Name
-</label>
+<input id="phone" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number">
+<input id="email" type="email" placeholder="Email address" style="display:none">
+<input id="name" placeholder="Name (for new account)">
 
-<input id="teamName"
-placeholder="For Duo/Squad">
-
+<div class="row" style="gap:8px">
+<input id="otp" inputmode="numeric" maxlength="6" placeholder="6-digit OTP" style="margin:0">
+<button class="btn secondary" onclick="requestOtp()">Send OTP</button>
 </div>
 
-<div class="notice"
-style="margin-top:13px">
+<button class="btn full" style="margin-top:9px" onclick="verifyOtp()">Verify & Login</button>
 
-<b>Rules</b>
-
-<div id="tmRules" style="margin-top:5px">
-Match format and scoring details.
-</div>
-
-</div>
-
-<button class="btn full"
-onclick="joinTournament()">
-Join Tournament
-</button>
-
-<button id="roomBtn"
-class="btn secondary full"
-style="display:none"
-onclick="openRoomForSelected()">
-🔐 View Room Details
-</button>
-
-</div>
-
-</div>
-
-<!-- MONEY MODAL -->
-
-<div id="money" class="modal">
-
-<div class="modalBox">
-
-<button class="x"
-onclick="closeModal('money')">
-×
-</button>
-
-<h2 id="moneyTitle">Add Money</h2>
-
-<p class="mut">
-Demo wallet flow only. No real money is processed.
+<p id="otpHint" class="mut" style="font-size:11px">
+Development mode: OTP delivery is provider-ready but no real SMS/email is sent yet.
 </p>
+</div>
+</div>
 
-<input
-id="amount"
-type="number"
-min="10"
-placeholder="Enter amount">
+
+<div class="modal" id="money">
+<div class="modalBox">
+<button class="x" onclick="closeModal('money')">×</button>
+<div class="tag">WALLET</div>
+<h2 id="moneyTitle">Add Money</h2>
+<p class="mut">Choose an amount to continue.</p>
 
 <div class="amountGrid">
-
-<button onclick="setAmount(50)">₹50</button>
 <button onclick="setAmount(100)">₹100</button>
 <button onclick="setAmount(250)">₹250</button>
 <button onclick="setAmount(500)">₹500</button>
-
+<button onclick="setAmount(1000)">₹1,000</button>
 </div>
+
+<input id="amount" inputmode="decimal" placeholder="₹ Enter amount">
 
 <div class="payMethods">
-
 <div>UPI</div>
-<div>Card</div>
-<div>NetBanking</div>
-
+<div>Cards</div>
+<div>Net Banking</div>
 </div>
 
-<button class="btn full"
-onclick="moneyAction()">
-Continue
-</button>
+<button class="btn full" onclick="moneyAction()">Continue to Payment</button>
 
+<p class="mut" style="font-size:11px">
+Demo mode: no real money is charged. A verified payment gateway will be connected later.
+</p>
+</div>
 </div>
 
-</div>
 
-<!-- ROOM MODAL -->
-
-<div id="roomModal" class="modal">
-
+<div class="modal" id="tourModal">
 <div class="modalBox">
+<button class="x" onclick="closeModal('tourModal')">×</button>
+<span class="tag">TOURNAMENT DETAILS</span>
 
-<button class="x"
-onclick="closeModal('roomModal')">
-×
-</button>
+<h2 id="tmName">Tournament</h2>
+<p class="mut" id="tmGame"></p>
 
-<span class="tag">MATCH ROOM</span>
+<div class="row">
+<div>
+<small class="mut">Prize</small><br>
+<b id="tmPrize"></b>
+</div>
 
-<h2 id="roomTitle">
-Tournament Room
-</h2>
+<div>
+<small class="mut">Entry</small><br>
+<b id="tmEntry"></b>
+</div>
+</div>
 
-<p class="mut">
-Room details are shown after joining the demo tournament.
+<div class="row" style="margin-top:14px">
+<div>
+<small class="mut">Slots</small><br>
+<b id="tmSlots">100</b>
+</div>
+
+<div>
+<small class="mut">Start</small><br>
+<b id="tmStart">—</b>
+</div>
+</div>
+
+<div class="card" style="margin-top:14px;padding:13px;background:#0b1224">
+<b>Rules & Scoring</b>
+<p class="mut" id="tmRules" style="font-size:12px;line-height:1.5;margin-bottom:0">
+Follow the selected game rules. Results and leaderboard will be recorded after the match.
 </p>
-
-<div class="roomBox">
-
-<small class="mut">
-ROOM ID
-</small>
-
-<div class="roomCode"
-id="roomId">
-ENT-1000
 </div>
 
-<br>
+<div id="teamJoinBox" class="card" style="margin-top:14px;padding:14px;background:#0b1224">
+<b>Registration</b>
 
-<small class="mut">
-PASSWORD
-</small>
+<div class="teamGrid" style="margin-top:8px">
 
-<div class="roomCode"
-id="roomPass">
-KHL100
+<div>
+<label class="mut" style="font-size:11px">Mode</label>
+<select id="joinMode" class="statusSelect" style="width:100%;padding:10px">
+<option>Solo</option>
+<option>Duo</option>
+<option>Squad</option>
+</select>
+</div>
+
+<div>
+<label class="mut" style="font-size:11px">Team name</label>
+<input id="teamName" placeholder="Optional team name" style="margin:0;padding:10px">
 </div>
 
 </div>
+</div>
 
-<button class="btn full"
-onclick="closeModal('roomModal')">
-Done
+<button class="btn full" onclick="joinTournament()">Join Tournament</button>
+
+<button id="roomBtn" class="btn secondary full" onclick="openRoomForSelected()" style="display:none">
+🔐 View Match Room
 </button>
 
-</div>
-
-</div>
-
-<!-- RESULTS MODAL -->
-
-<div id="resultsModal" class="modal">
-
-<div class="modalBox"
-style="width:min(700px,100%)">
-
-<button class="x"
-onclick="closeModal('resultsModal')">
-×
-</button>
-
-<span class="tag">
-FINAL RESULTS
-</span>
-
-<h2 id="resTitle">
-Tournament Results
-</h2>
-
-<p class="mut" id="resSub">
-Final leaderboard
+<p class="mut" style="font-size:11px">
+Demo tournament flow: real entry-fee payment will not be processed in this demo.
 </p>
+</div>
+</div>
+
+
+<div class="modal" id="resultsModal">
+<div class="modalBox">
+<button class="x" onclick="closeModal('resultsModal')">×</button>
+<span class="tag">MATCH RESULTS</span>
+<h2 id="resTitle">Tournament Results</h2>
+<p class="mut" id="resSub">Final leaderboard</p>
 
 <div id="publicResults"></div>
 
+<button class="btn secondary full" onclick="closeModal('resultsModal')">
+Close
+</button>
+</div>
 </div>
 
+
+<div class="modal" id="roomModal">
+<div class="modalBox">
+<button class="x" onclick="closeModal('roomModal')">×</button>
+<span class="tag">MATCH ROOM</span>
+
+<h2 id="roomTitle">Match Room</h2>
+
+<p class="mut">
+Demo room details. In production these should be revealed by the secure backend at the configured time.
+</p>
+
+<div class="roomBox">
+<small class="mut">ROOM ID</small>
+<div class="roomCode" id="roomId">—</div>
+
+<small class="mut" style="display:block;margin-top:12px">
+PASSWORD
+</small>
+
+<div class="roomCode" id="roomPass">—</div>
 </div>
 
-<div id="toast" class="toast"></div>
+<button class="btn secondary full" onclick="closeModal('roomModal')">
+Close
+</button>
+</div>
+</div>
+
+
+<div class="toast" id="toast"></div>
+
 <script>
-
-const API_BASE="https://entsoneapi.onrender.com";
+  const API_BASE="https://entsoneapi.onrender.com";
 
 const games=[
 ["🔥","Free Fire","Solo · Duo · Squad"],
@@ -1840,41 +712,84 @@ const games=[
 ["⚔️","ScarFall","Solo · Squad"],
 ["💥","COD Mobile","MP · BR · Duo"],
 ["🎱","8 Ball Pool","1v1"],
-["🎲","Ludo","1v1 · 2v2"],
-["🏎️","CarX Street","Race"],
-["⚽","eFootball","1v1"],
-["🥊","Real Boxing","1v1"],
-["🏹","Clash Royale","1v1"]
+["🃏","Ludo","1v1 · 2v2 · 4 Players"],
+["🏎️","Asphalt","Racing"],
+["⚽","EA Sports FC","Football"],
+["🥊","WWE 2K","Fighting"],
+["🏹","Clash Royale","Strategy"]
 ];
 
 const defaultTours=[
-["Free Fire Arena Cup","Free Fire · Squad","Free Fire","₹700","₹20","50 Slots · Tomorrow 9:00 PM","OPEN"],
-["BGMI Championship","BGMI · Squad","BGMI","₹10,000","₹49","100 Slots · Tomorrow 8:00 PM","OPEN"],
-["COD Mobile Rush","COD Mobile · Duo","COD Mobile","₹5,000","₹29","64 Slots · Tomorrow 7:30 PM","OPEN"],
-["Pool Masters","8 Ball Pool · 1v1","Other","₹2,500","₹19","32 Slots · Saturday 6:00 PM","OPEN"],
-["Ludo Knockout","Ludo · 1v1","Other","₹3,000","₹29","64 Slots · Sunday 5:00 PM","UPCOMING"],
+["FREE FIRE ARENA CUP","Free Fire · Squad","Free Fire","₹700","₹20","50 Slots · Tomorrow 9 PM","OPEN"],
+["BGMI NIGHT BATTLE","BGMI · Squad","BGMI","₹1,500","₹29","100 Slots · Friday 8 PM","UPCOMING"],
+["SCARFALL CLASH","ScarFall · Squad","ScarFall","₹2,000","₹25","64 Slots · Saturday 7 PM","OPEN"],
+["COD MOBILE WARZONE","COD Mobile · Squad","COD Mobile","₹5,000","₹29","64 Slots · Tomorrow 7:30 PM","OPEN"],
+["Pool Masters","8 Ball Pool · 1v1","Other","₹2,500","₹19","32 Slots · Saturday 6 PM","OPEN"],
+["Ludo Knockout","Ludo · 1v1","Other","₹3,000","₹29","64 Slots · Sunday 5 PM","UPCOMING"],
 ["Night Duo Wars","Free Fire · Duo","Free Fire","₹7,500","₹39","50 Teams · Sunday 9:30 PM","UPCOMING"]
 ];
 
-let tours=
-JSON.parse(localStorage.getItem("entsoneTours")||"null")||
-defaultTours;
+let tours=JSON.parse(localStorage.getItem("entsoneTours")||"null")||defaultTours;
+let backendTournamentMode=false;
+
+function saveTours(){
+localStorage.setItem("entsoneTours",JSON.stringify(tours));
+}
+
+function tournamentRowFromApi(t){
+return [
+t.name,
+`${t.game} · ${t.mode||""}`,
+t.game,
+`₹${Number(t.prize_pool||0).toLocaleString("en-IN")}`,
+`₹${Number(t.entry_fee||0).toLocaleString("en-IN")}`,
+`${t.slots||0} Slots · ${t.start_label||"Scheduled"}`,
+t.status||"UPCOMING",
+t.id
+];
+}
+
+async function loadBackendTournaments(){
+try{
+const r=await fetch(`${API_BASE}/api/tournaments`);
+const d=await r.json();
+
+if(!r.ok||!d.success||!Array.isArray(d.tournaments)){
+throw new Error("Tournament API failed");
+}
+
+if(d.tournaments.length){
+tours=d.tournaments.map(tournamentRowFromApi);
+backendTournamentMode=true;
+saveTours();
+
+renderHomeTours();
+renderTours("all");
+renderAdmin();
+}
+}catch(e){
+console.warn("Backend tournament load skipped:",e.message);
+}
+}
 
 let selectedTour=null;
 let moneyMode="add";
 
-let user=
-JSON.parse(localStorage.getItem("entsoneUser")||"null");
+let user=JSON.parse(
+localStorage.getItem("entsoneUser")||"null"
+);
 
-let joinedTours=
-JSON.parse(localStorage.getItem("entsoneJoined")||"[]");
+let joinedTours=JSON.parse(
+localStorage.getItem("entsoneJoined")||"[]"
+);
 
-let results=
-JSON.parse(localStorage.getItem("entsoneResults")||"{}");
+let results=JSON.parse(
+localStorage.getItem("entsoneResults")||"{}"
+);
 
-let notifications=
-JSON.parse(localStorage.getItem("entsoneNotifications")||"null")||
-[
+let notifications=JSON.parse(
+localStorage.getItem("entsoneNotifications")||"null"
+)||[
 {
 id:1,
 title:"Welcome to ENTSONE",
@@ -1891,18 +806,10 @@ time:"Today"
 }
 ];
 
-let settings=
-JSON.parse(
+let settings=JSON.parse(
 localStorage.getItem("entsoneSettings")||
 '{"reminders":true,"results":true}'
 );
-
-function saveTours(){
-localStorage.setItem(
-"entsoneTours",
-JSON.stringify(tours)
-);
-}
 
 function saveNotifications(){
 localStorage.setItem(
@@ -1915,13 +822,6 @@ function saveSettings(){
 localStorage.setItem(
 "entsoneSettings",
 JSON.stringify(settings)
-);
-}
-
-function saveResults(){
-localStorage.setItem(
-"entsoneResults",
-JSON.stringify(results)
 );
 }
 
@@ -1938,9 +838,15 @@ m=>({
 );
 }
 
-function placementPoints(pos){
+function saveResults(){
+localStorage.setItem(
+"entsoneResults",
+JSON.stringify(results)
+);
+}
 
-return({
+function placementPoints(pos){
+return {
 1:12,
 2:9,
 3:7,
@@ -1949,329 +855,336 @@ return({
 6:3,
 7:2,
 8:1
-}[Number(pos)]||0);
-
+}[Number(pos)]||0;
 }
 
 function totalPoints(pos,kills){
-
 return placementPoints(pos)+(Number(kills)||0);
-
-}
-
-async function api(path,options={}){
-
-try{
-
-const res=await fetch(
-API_BASE+path,
-{
-headers:{
-"Content-Type":"application/json",
-...(options.headers||{})
-},
-...options
-}
-);
-
-const data=await res.json().catch(()=>({}));
-
-if(!res.ok){
-
-throw new Error(
-data.message||
-data.error||
-"API request failed"
-);
-
-}
-
-return data;
-
-}catch(err){
-
-console.error("API ERROR",err);
-
-throw err;
-
-}
-
-}
-
-function toast(message){
-
-const t=document.getElementById("toast");
-
-t.textContent=message;
-
-t.classList.add("show");
-
-clearTimeout(window.__toastTimer);
-
-window.__toastTimer=
-setTimeout(
-()=>t.classList.remove("show"),
-3000
-);
-
-}
-
-function page(id){
-
-document
-.querySelectorAll(".page")
-.forEach(x=>x.classList.remove("active"));
-
-const target=document.getElementById(id);
-
-if(target){
-
-target.classList.add("active");
-
-}
-
-window.scrollTo(0,0);
-
-renderProfile();
-
-if(id==="games")renderGames();
-
-if(id==="tournaments")renderTours("all");
-
-if(id==="home")renderHomeTours();
-
-if(id==="wallet")renderWallet();
-
-if(id==="admin")renderAdmin();
-
-if(id==="history")renderHistory();
-
-if(id==="notifications")renderNotifications();
-
-if(id==="settings")renderSettings();
-
-history.replaceState(
-null,
-"",
-"#"+id
-);
-
 }
 
 function cardTour(t){
+let status=t[6]||"OPEN";
 
-const st=t[6]||"OPEN";
+let statusClass=
+status==="COMPLETED"?"badge":
+status==="ONGOING"?"badge":
+"open";
 
-const done=st==="COMPLETED";
-
-const safe=t[0]
-.replace(/\\/g,"\\\\")
-.replace(/'/g,"\\'");
-
-const onclick=done
-?`viewResults('${safe}')`
-:`openTournament('${safe}','${t[1]}','${t[3]}','${t[4]}')`;
-
-const label=done
-?"View Results"
-:"View & Join";
-
-return`
-
-<article class="tour">
-
+return `
+<div class="tour">
 <div class="tourTop">
-
-<span class="badge">
-${escapeHtml(t[1])}
-</span>
-
-<span class="open">
-● ${escapeHtml(st)}
-</span>
-
+<span class="badge">${escapeHtml(t[2])}</span>
+<span class="${statusClass}">${escapeHtml(status)}</span>
 </div>
 
-<h3>
-${escapeHtml(t[0])}
-</h3>
+<h3>${escapeHtml(t[0])}</h3>
 
 <div class="meta">
-
+${escapeHtml(t[1])}<br>
 ${escapeHtml(t[5])}
-
-<br>
-
-${
-done
-?"Final results published."
-:
-st==="ONGOING"
-?"Match in progress."
-:
-"Registration open"
-}
-
 </div>
 
-<div class="tourFoot row">
-
+<div class="tourFoot">
+<div class="row">
 <div>
-
+<small>Prize Pool</small>
 <b>${escapeHtml(t[3])}</b>
-
-<small>
-Prize Pool
-</small>
-
 </div>
 
-<div>
-
+<div style="text-align:right">
+<small>Entry</small>
 <b>${escapeHtml(t[4])}</b>
-
-<small>
-Entry Fee
-</small>
-
+</div>
 </div>
 
-</div>
-
-<button
-class="btn full"
-onclick="${onclick}">
-${label}
+<div class="actions" style="margin-top:10px">
+<button class="btn sm"
+onclick="openTournament(
+'${String(t[0]).replace(/'/g,"\\'")}',
+'${String(t[1]).replace(/'/g,"\\'")}',
+'${String(t[3]).replace(/'/g,"\\'")}',
+'${String(t[4]).replace(/'/g,"\\'")}'
+)">
+View
 </button>
 
-</article>
+${status==="COMPLETED"
+?`<button class="btn secondary sm"
+onclick="viewResults('${String(t[0]).replace(/'/g,"\\'")}')">
+Results
+</button>`
+:""}
 
+</div>
+</div>
+</div>
 `;
-
 }
 
-function renderHomeTours(){
+function page(name){
+document.querySelectorAll(".page").forEach(
+x=>x.classList.remove("active")
+);
 
-const box=
-document.getElementById("homeTours");
+const el=document.getElementById(name);
 
-if(!box)return;
-
-box.innerHTML=
-tours
-.slice(0,3)
-.map(cardTour)
-.join("");
-
+if(el){
+el.classList.add("active");
+window.scrollTo({top:0,behavior:"smooth"});
 }
 
-function renderTours(filter){
+document.querySelectorAll(".bottom button").forEach(
+x=>x.classList.remove("active")
+);
 
-const box=
-document.getElementById("allTours");
+const map={
+home:0,
+games:1,
+tournaments:2,
+wallet:3,
+profile:4
+};
 
-if(!box)return;
-
-box.innerHTML=
-tours
-.filter(
-t=>filter==="all"||t[2]===filter
-)
-.map(cardTour)
-.join("");
-
+if(map[name]!==undefined){
+document.querySelectorAll(".bottom button")[map[name]]
+?.classList.add("active");
 }
 
-function filterTours(filter,button){
-
-document
-.querySelectorAll(".chip")
-.forEach(x=>x.classList.remove("active"));
-
-if(button){
-button.classList.add("active");
+if(name==="admin"){
+renderAdmin();
+renderResultSelector();
 }
 
-renderTours(filter);
-
+if(name==="history"){
+renderHistory();
 }
 
-function renderGames(){
-
-const box=
-document.getElementById("allGames");
-
-if(!box)return;
-
-box.innerHTML=
-games.map(g=>`
-
-<div class="game">
-
-<div class="ico">
-${g[0]}
-</div>
-
-<h3>
-${escapeHtml(g[1])}
-</h3>
-
-<small>
-${escapeHtml(g[2])}
-</small>
-
-</div>
-
-`).join("");
-
+if(name==="notifications"){
+renderNotifications();
 }
 
-function openAuth(){
-
-document
-.getElementById("auth")
-.classList.add("show");
-
+if(name==="settings"){
+renderSettings();
+}
 }
 
 function closeModal(id){
-
-const el=document.getElementById(id);
-
-if(el){
-el.classList.remove("show");
+document.getElementById(id)?.classList.remove("show");
 }
 
+function renderHomeTours(){
+const box=document.getElementById("homeTours");
+if(!box)return;
+
+box.innerHTML=tours
+.slice(0,3)
+.map(cardTour)
+.join("");
 }
 
-function sendOtp(){
+function renderTours(filter){
+const box=document.getElementById("allTours");
+if(!box)return;
 
-const phone=
-document
-.getElementById("phone")
-.value
-.replace(/\D/g,"");
+box.innerHTML=tours
+.filter(t=>filter==="all"||t[2]===filter)
+.map(cardTour)
+.join("");
+}
 
-const name=
-document
-.getElementById("name")
-.value
-.trim()||
-"ENTSONE Player";
+function filterTours(f,b){
+document.querySelectorAll(".chip")
+.forEach(x=>x.classList.remove("active"));
 
-if(phone.length!==10){
+if(b)b.classList.add("active");
 
-toast(
-"Enter a valid 10-digit mobile number"
+renderTours(f);
+}
+
+function renderGames(){
+const box=document.getElementById("allGames");
+if(!box)return;
+
+box.innerHTML=games.map(
+g=>`
+<div class="game">
+<div class="ico">${g[0]}</div>
+<h3>${g[1]}</h3>
+<small>${g[2]}</small>
+</div>
+`
+).join("");
+}
+
+function openAuth(){
+document.getElementById("auth")?.classList.add("show");
+}
+
+function toggleAuthChannel(){
+const c=document.getElementById("authChannel")?.value;
+
+if(!c)return;
+
+document.getElementById("phone").style.display=
+c==="phone"?"block":"none";
+
+document.getElementById("email").style.display=
+c==="email"?"block":"none";
+}
+
+async function requestOtp(){
+
+const c=document.getElementById("authChannel").value;
+
+const d=c==="phone"
+?document.getElementById("phone").value.replace(/\D/g,"")
+:document.getElementById("email").value.trim().toLowerCase();
+
+if(c==="phone"&&d.length!==10){
+toast("Enter a valid 10-digit mobile number");
+return;
+}
+
+if(
+c==="email"&&
+! /^\S+@\S+\.\S+$/.test(d)
+){
+toast("Enter a valid email address");
+return;
+}
+
+try{
+
+const r=await fetch(
+`${API_BASE}/api/auth/request-otp`,
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+channel:c,
+destination:d
+})
+}
 );
 
+const x=await r.json();
+
+if(!r.ok||!x.success){
+throw new Error(
+x.message||"OTP request failed"
+);
+}
+
+if(x.demo_code){
+
+document.getElementById("otp").value=
+x.demo_code;
+
+document.getElementById("otpHint").textContent=
+"Development OTP generated by ENTSONE backend. Verify it to continue.";
+
+toast("Demo OTP generated");
+
+}else{
+
+document.getElementById("otpHint").textContent=
+"OTP request created. Connect an approved SMS/email provider before production use.";
+
+toast("OTP request created");
+}
+
+}catch(e){
+
+console.error(e);
+toast("Could not request OTP");
+
+}
+}
+
+async function verifyOtp(){
+
+const c=
+document.getElementById("authChannel").value;
+
+const d=c==="phone"
+?document.getElementById("phone").value.replace(/\D/g,"")
+:document.getElementById("email").value.trim().toLowerCase();
+
+const otp=
+document.getElementById("otp").value.trim();
+
+const n=
+document.getElementById("name").value.trim()
+||"ENTSONE Player";
+
+if(!otp){
+toast("Enter the OTP");
 return;
+}
+
+try{
+
+const r=await fetch(
+`${API_BASE}/api/auth/verify-otp`,
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+channel:c,
+destination:d,
+otp
+})
+}
+);
+
+const x=await r.json();
+
+if(!r.ok||!x.success){
+throw new Error(
+x.message||"OTP verification failed"
+);
+}
+
+if(
+n&&
+x.user&&
+x.user.name==="ENTSONE Player"
+){
+
+try{
+
+await fetch(
+`${API_BASE}/api/users`,
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+name:n,
+email:x.user.email||undefined,
+phone:x.user.phone||undefined
+})
+}
+);
+
+}catch(_){}
 
 }
 
 user={
-name,
-phone,
+id:x.user.id,
+name:
+x.user.name&&
+x.user.name!=="ENTSONE Player"
+?x.user.name
+:n,
+phone:x.user.phone||null,
+email:x.user.email||null,
 joined:user?.joined||0,
 wins:user?.wins||0,
 earn:user?.earn||0
@@ -2282,122 +1195,203 @@ localStorage.setItem(
 JSON.stringify(user)
 );
 
+localStorage.setItem(
+"entsoneSession",
+x.session_token
+);
+
 closeModal("auth");
+
+document.getElementById("authBtn").textContent=
+(user.name||"Player").split(" ")[0]+" ✓";
+
+await syncRegistrations();
 
 renderProfile();
 
-document.getElementById("authBtn")
-.textContent=
-name.split(" ")[0];
+toast("Login successful");
 
-toast(
-"Account details saved. OTP verification will use the backend authentication system."
+}catch(e){
+
+console.error(e);
+toast(e.message||"OTP verification failed");
+
+}
+}
+
+async function sendOtp(){
+await requestOtp();
+}
+  async function syncRegistrations(){
+if(!user?.id)return;
+try{
+let r=await fetch(`${API_BASE}/api/users/${user.id}/registrations`);
+let d=await r.json();
+if(!r.ok||!d.success)return;
+
+joinedTours=d.registrations.map(x=>({
+name:x.name,
+game:x.game,
+entry:`₹${Number(x.entry_fee||0).toLocaleString('en-IN')}`,
+prize:`₹${Number(x.prize_pool||0).toLocaleString('en-IN')}`,
+status:
+x.status==='COMPLETED'
+?'Completed'
+:x.status==='ONGOING'
+?'Ongoing'
+:'Upcoming',
+mode:x.mode,
+team:x.team_name||user.name,
+joinedAt:x.created_at,
+result:null,
+tournamentId:x.tournament_id
+}));
+
+await syncUserResults();
+
+localStorage.setItem(
+"entsoneJoined",
+JSON.stringify(joinedTours)
 );
 
+renderHistory();
+renderProfile();
+
+}catch(e){
+console.warn(
+"Registration sync skipped",
+e.message
+);
+}
+}
+
+async function syncUserResults(){
+if(!user?.id)return;
+
+try{
+
+let r=await fetch(
+`${API_BASE}/api/users/${user.id}/results`
+);
+
+let d=await r.json();
+
+if(!r.ok||!d.success)return;
+
+joinedTours=joinedTours.map(x=>{
+
+let rr=d.results.find(
+z=>Number(z.tournament_id)===
+Number(x.tournamentId)
+);
+
+return rr
+?{
+...x,
+status:"Completed",
+result:{
+rank:Number(rr.position||0),
+points:Number(rr.points||0),
+kills:Number(rr.kills||0),
+placement:Number(rr.position||0)
+}
+}
+:x;
+
+});
+
+localStorage.setItem(
+"entsoneJoined",
+JSON.stringify(joinedTours)
+);
+
+renderHistory();
+renderProfile();
+
+}catch(e){
+console.warn(
+"Result sync skipped",
+e.message
+);
+}
 }
 
 function openTournament(n,g,p,e){
 
-const t=
-tours.find(x=>x[0]===n);
+let t=tours.find(
+x=>x[0]===n
+);
 
 selectedTour={
 n,
 g,
 p,
 e,
-meta:t?t[5]:""
+meta:t?t[5]:"",
+id:t?t[7]:null
 };
 
-document.getElementById("tmName")
-.textContent=n;
+document.getElementById("tmName").textContent=n;
+document.getElementById("tmGame").textContent=g;
+document.getElementById("tmPrize").textContent=p;
+document.getElementById("tmEntry").textContent=e;
 
-document.getElementById("tmGame")
-.textContent=g;
-
-document.getElementById("tmPrize")
-.textContent=p;
-
-document.getElementById("tmEntry")
-.textContent=e;
-
-document.getElementById("tmSlots")
-.textContent=
+document.getElementById("tmSlots").textContent=
 (t&&t[5]
 ?t[5].match(/\d+/)?.[0]
 :"100")
 +" Slots";
 
-document.getElementById("tmStart")
-.textContent=
+document.getElementById("tmStart").textContent=
 t&&t[5]
 ?t[5].replace(/\d+ Slots · /,"")
 :"Scheduled";
 
-document.getElementById("tmRules")
-.textContent=
+document.getElementById("tmRules").textContent=
 (
 g.includes("Squad")
 ?"Squad match · team registration · placement + performance scoring."
-:
-g.includes("Duo")
+:g.includes("Duo")
 ?"Duo match · team registration · placement + performance scoring."
-:
-"Match format · performance determines leaderboard position."
+:"Match format · performance determines leaderboard position."
 )
-+
-" Final results are published after the match.";
++" Final results are published after the match.";
 
-const joined=
+let joined=
 joinedTours.find(
 x=>x.name===n
 );
 
-document.getElementById("roomBtn")
-.style.display=
+document.getElementById("roomBtn").style.display=
 joined?"block":"none";
 
 if(joined){
 
-document.getElementById("teamName")
-.value=
+document.getElementById("teamName").value=
 joined.team||"";
 
-if(document.getElementById("joinMode")){
-
-document.getElementById("joinMode")
-.value=
+if(document.getElementById("joinMode"))
+document.getElementById("joinMode").value=
 joined.mode||"Solo";
-
-}
 
 }else{
 
-document.getElementById("teamName")
-.value="";
+document.getElementById("teamName").value="";
 
 }
 
 document
 .getElementById("tourModal")
 .classList.add("show");
-
 }
 
 async function joinTournament(){
 
 if(!user){
-
 closeModal("tourModal");
-
 openAuth();
-
-toast(
-"Login required before joining"
-);
-
+toast("Login required before joining");
 return;
-
 }
 
 if(!selectedTour)return;
@@ -2407,85 +1401,71 @@ joinedTours.some(
 x=>x.name===selectedTour.n
 )
 ){
-
 closeModal("tourModal");
-
-toast(
-"You already joined this tournament"
-);
-
+toast("You already joined this tournament");
 return;
-
 }
 
-const mode=
-document.getElementById("joinMode")?.value||
-"Solo";
+let mode=
+document.getElementById("joinMode")?.value
+||"Solo";
 
-const team=
+let team=
 (
-document
-.getElementById("teamName")
-?.value||""
+document.getElementById("teamName")?.value
+||""
 ).trim();
 
-const entry={
-
-name:selectedTour.n,
-
-game:selectedTour.g,
-
-entry:selectedTour.e,
-
-prize:selectedTour.p,
-
-status:"Upcoming",
-
-mode,
-
-team:team||user.name,
-
-joinedAt:new Date().toLocaleString(),
-
-result:null
-
-};
-
-const backendId=
-selectedTour.id;
-
-if(backendId){
+if(selectedTour.id){
 
 try{
 
-await api(
-"/api/tournament-registrations",
+let r=await fetch(
+`${API_BASE}/api/tournament-registrations`,
 {
 method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
 body:JSON.stringify({
-
-tournament_id:Number(backendId),
-
-user_id:Number(user.id||0),
-
-team_name:team||user.name,
-
-mode
-
+tournament_id:selectedTour.id,
+user_id:user.id,
+mode,
+team_name:team||user.name
 })
 }
 );
 
-}catch(err){
+let d=await r.json();
 
-console.warn(
-"Backend registration failed:",
-err.message
+if(!r.ok||!d.success)
+throw new Error(
+d.message||"Registration failed"
 );
 
+}catch(e){
+
+toast(
+e.message||
+"Could not join tournament"
+);
+
+return;
+}
 }
 
-}
+let entry={
+name:selectedTour.n,
+game:selectedTour.g,
+entry:selectedTour.e,
+prize:selectedTour.p,
+status:"Upcoming",
+mode,
+team:team||user.name,
+joinedAt:new Date().toLocaleString(),
+result:null,
+tournamentId:selectedTour.id||null
+};
 
 joinedTours.unshift(entry);
 
@@ -2502,17 +1482,11 @@ JSON.stringify(user)
 );
 
 notifications.unshift({
-
 id:Date.now(),
-
 title:"Tournament joined",
-
 text:`You joined ${selectedTour.n}.`,
-
 read:false,
-
 time:"Just now"
-
 });
 
 saveNotifications();
@@ -2520,20 +1494,20 @@ saveNotifications();
 closeModal("tourModal");
 
 renderProfile();
-
 renderHistory();
 
 page("history");
 
 toast(
-"Tournament added to your history."
+selectedTour.id
+?"Tournament registration saved to database."
+:"Tournament added to your history."
 );
-
 }
 
 function renderProfile(){
 
-const u=user||{};
+let u=user||{};
 
 document.getElementById("profileName")
 .textContent=
@@ -2563,70 +1537,46 @@ u.name
 ?(u.name.split(" ")[0]+" ✓")
 :"Login / Sign Up";
 
-const box=
+let box=
 document.getElementById("myTournaments");
-
-if(!box)return;
 
 if(!joinedTours.length){
 
 box.innerHTML=
 '<div class="empty">No tournaments joined yet.</div>';
 
-return;
-
-}
+}else{
 
 box.innerHTML=
 joinedTours
 .slice(0,8)
 .map(x=>`
-
 <div style="padding:12px 0;border-bottom:1px solid #25304a">
-
 <div class="row">
-
 <div>
-
-<b>
-${escapeHtml(x.name)}
-</b>
-
-<small class="mut">
-${escapeHtml(x.game)}
-</small>
-
+<b>${x.name}</b>
+<small class="mut">${x.game}</small>
+</div>
+<span class="badge">${x.status}</span>
 </div>
 
-<span class="badge">
-${escapeHtml(x.status)}
-</span>
-
+<div class="meta" style="margin-top:6px">
+Entry ${x.entry} · Prize ${x.prize}
 </div>
-
-<div class="meta"
-style="margin-top:6px">
-
-Entry ${escapeHtml(x.entry)}
-·
-Prize ${escapeHtml(x.prize)}
-
 </div>
-
-</div>
-
 `)
 .join("");
 
 }
+}
 
-function openMoney(mode){
+function openMoney(m){
 
-moneyMode=mode;
+moneyMode=m;
 
 document.getElementById("moneyTitle")
 .textContent=
-mode==="add"
+m==="add"
 ?"Add Money"
 :"Withdraw";
 
@@ -2636,37 +1586,27 @@ document.getElementById("amount")
 document
 .getElementById("money")
 .classList.add("show");
-
 }
 
-function setAmount(amount){
-
-document.getElementById("amount")
-.value=amount;
-
+function setAmount(a){
+document.getElementById("amount").value=a;
 }
 
 function moneyAction(){
 
-const amount=
+let a=
 Number(
 document.getElementById("amount").value
 );
 
-if(!amount||amount<=0){
-
+if(!a||a<=0){
 toast("Enter a valid amount");
-
 return;
-
 }
 
-if(amount<10){
-
+if(a<10){
 toast("Minimum amount is ₹10");
-
 return;
-
 }
 
 closeModal("money");
@@ -2674,7 +1614,6 @@ closeModal("money");
 toast(
 "Demo payment flow ready. No real money was charged."
 );
-
 }
 
 function renderWallet(){
@@ -2688,357 +1627,23 @@ document.getElementById("walletBalance")
 document.getElementById("transactions")
 .innerHTML=
 '<div class="empty">No transactions yet.</div>';
-
-}
-  <script>
-
-async function loadBackendTournaments(){
-
-try{
-
-const data=
-await api("/api/tournaments");
-
-if(
-data &&
-data.success &&
-Array.isArray(data.tournaments) &&
-data.tournaments.length
-){
-
-tours=
-data.tournaments.map(t=>[
-t.name,
-`${t.game} · ${t.mode}`,
-t.game,
-t.prize_pool,
-t.entry_fee,
-`${t.slots} Slots · ${t.start_label}`,
-t.status,
-t.id
-]);
-
-saveTours();
-
-renderHomeTours();
-renderTours("all");
-renderAdmin();
-
 }
 
-}catch(err){
+function toast(m){
 
-console.warn(
-"Backend tournaments not loaded:",
-err.message
+let t=
+document.getElementById("toast");
+
+t.textContent=m;
+t.classList.add("show");
+
+clearTimeout(window.__t);
+
+window.__t=
+setTimeout(
+()=>t.classList.remove("show"),
+3000
 );
-
-}
-
-}
-
-async function syncUserFromBackend(){
-
-if(!user)return;
-
-if(!user.id)return;
-
-try{
-
-const data=
-await api(
-"/api/users/"+Number(user.id)
-);
-
-if(
-data &&
-data.success &&
-data.user
-){
-
-user={
-...user,
-...data.user
-};
-
-localStorage.setItem(
-"entsoneUser",
-JSON.stringify(user)
-);
-
-renderProfile();
-
-}
-
-}catch(err){
-
-console.warn(
-"User sync failed:",
-err.message
-);
-
-}
-
-}
-
-async function requestBackendOtp(){
-
-if(!user?.phone)return;
-
-try{
-
-const data=
-await api(
-"/api/auth/request-otp",
-{
-method:"POST",
-body:JSON.stringify({
-phone:user.phone,
-email:user.email||null
-})
-}
-);
-
-if(data.success){
-
-toast(
-data.demo_otp
-?
-"Demo OTP: "+data.demo_otp
-:
-"OTP sent successfully."
-);
-
-}
-
-}catch(err){
-
-console.warn(
-"OTP request failed:",
-err.message
-);
-
-}
-
-}
-
-function showOtpBox(){
-
-const modal=
-document.querySelector("#auth .modalBox");
-
-if(!modal)return;
-
-modal.innerHTML=`
-
-<button class="x"
-onclick="closeModal('auth')">
-×
-</button>
-
-<h2>Verify OTP</h2>
-
-<p class="mut">
-Enter the OTP sent to your mobile number.
-</p>
-
-<input
-id="otpInput"
-inputmode="numeric"
-maxlength="6"
-placeholder="6-digit OTP">
-
-<button
-class="btn full"
-onclick="verifyOtpBackend()">
-Verify OTP
-</button>
-
-<button
-class="btn secondary full"
-onclick="closeModal('auth')">
-Cancel
-</button>
-
-`;
-
-}
-
-async function verifyOtpBackend(){
-
-const otp=
-document
-.getElementById("otpInput")
-?.value
-.trim();
-
-if(!otp){
-
-toast("Enter OTP");
-
-return;
-
-}
-
-try{
-
-const data=
-await api(
-"/api/auth/verify-otp",
-{
-method:"POST",
-body:JSON.stringify({
-
-phone:user?.phone||null,
-
-email:user?.email||null,
-
-otp
-
-})
-}
-);
-
-if(!data.success){
-
-toast(
-data.message||
-"OTP verification failed"
-);
-
-return;
-
-}
-
-if(data.user){
-
-user={
-...user,
-...data.user
-};
-
-}
-
-if(data.token){
-
-localStorage.setItem(
-"entsoneSession",
-data.token
-);
-
-}
-
-localStorage.setItem(
-"entsoneUser",
-JSON.stringify(user)
-);
-
-closeModal("auth");
-
-renderProfile();
-
-toast(
-"Login successful."
-);
-
-}catch(err){
-
-toast(
-err.message||
-"OTP verification failed"
-);
-
-}
-
-}
-
-async function loginWithBackend(){
-
-const phone=
-document
-.getElementById("phone")
-?.value
-.replace(/\D/g,"");
-
-const name=
-document
-.getElementById("name")
-?.value
-.trim()||
-"ENTSONE Player";
-
-if(phone.length!==10){
-
-toast(
-"Enter a valid 10-digit mobile number"
-);
-
-return;
-
-}
-
-try{
-
-const data=
-await api(
-"/api/users",
-{
-method:"POST",
-body:JSON.stringify({
-name,
-phone
-})
-}
-);
-
-if(
-data &&
-data.success &&
-data.user
-){
-
-user={
-...data.user,
-name:data.user.name||name,
-phone:data.user.phone||phone
-};
-
-localStorage.setItem(
-"entsoneUser",
-JSON.stringify(user)
-);
-
-await requestBackendOtp();
-
-showOtpBox();
-
-return;
-
-}
-
-}catch(err){
-
-console.warn(
-"Backend user creation failed:",
-err.message
-);
-
-}
-
-}
-
-function replaceDemoAuth(){
-
-const btn=
-document.querySelector(
-'#auth .btn.full'
-);
-
-if(!btn)return;
-
-btn.onclick=
-loginWithBackend;
-
 }
 
 async function restoreSession(){
@@ -3052,26 +1657,25 @@ if(!token)return;
 
 try{
 
-const data=
-await api(
-"/api/auth/session",
+const r=await fetch(
+`${API_BASE}/api/auth/session`,
 {
 headers:{
-Authorization:
-"Bearer "+token
+Authorization:`Bearer ${token}`
 }
 }
 );
 
-if(
-data &&
-data.success &&
-data.user
-){
+const d=await r.json();
+
+if(!r.ok||!d.success)
+throw new Error("Session expired");
 
 user={
-...user,
-...data.user
+...d.user,
+joined:user?.joined||0,
+wins:user?.wins||0,
+earn:user?.earn||0
 };
 
 localStorage.setItem(
@@ -3079,57 +1683,11 @@ localStorage.setItem(
 JSON.stringify(user)
 );
 
+await syncRegistrations();
+
 renderProfile();
 
-}
-
-}catch(err){
-
-console.warn(
-"Session restore failed:",
-err.message
-);
-
-localStorage.removeItem(
-"entsoneSession"
-);
-
-}
-
-}
-
-async function logout(){
-
-const token=
-localStorage.getItem(
-"entsoneSession"
-);
-
-if(token){
-
-try{
-
-await api(
-"/api/auth/logout",
-{
-method:"POST",
-headers:{
-Authorization:
-"Bearer "+token
-}
-}
-);
-
-}catch(err){
-
-console.warn(
-"Logout API failed:",
-err.message
-);
-
-}
-
-}
+}catch(e){
 
 localStorage.removeItem(
 "entsoneSession"
@@ -3143,527 +1701,92 @@ user=null;
 
 renderProfile();
 
-toast("Logged out");
-
-page("home");
-
-}
-
-function renderNotifications(){
-
-const box=
-document.getElementById(
-"notificationList"
-);
-
-if(!box)return;
-
-if(!notifications.length){
-
-box.innerHTML=
-'<div class="empty">No notifications.</div>';
-
-return;
-
-}
-
-box.innerHTML=
-notifications.map(n=>`
-
-<div
-class="notice"
-style="
-margin-bottom:10px;
-opacity:${n.read?.65:1}
-">
-
-<div class="row">
-
-<div>
-
-<b>
-${escapeHtml(n.title)}
-</b>
-
-<div
-class="mut"
-style="margin-top:4px">
-
-${escapeHtml(n.text)}
-
-</div>
-
-</div>
-
-<small class="mut">
-${escapeHtml(n.time)}
-</small>
-
-</div>
-
-</div>
-
-`).join("");
-
-const unread=
-notifications.filter(
-n=>!n.read
-).length;
-
-const dot=
-document.getElementById(
-"notifCount"
-);
-
-if(dot){
-
-dot.textContent=
-unread?unread:"";
-
-}
-
-}
-
-function markNotificationsRead(){
-
-notifications=
-notifications.map(
-n=>({...n,read:true})
-);
-
-saveNotifications();
-
-renderNotifications();
-
-toast("Notifications marked as read");
-
-}
-
-function renderSettings(){
-
-const reminders=
-document.getElementById(
-"settingReminders"
-);
-
-const resultsToggle=
-document.getElementById(
-"settingResults"
-);
-
-if(reminders){
-
-reminders.checked=
-!!settings.reminders;
-
-}
-
-if(resultsToggle){
-
-resultsToggle.checked=
-!!settings.results;
-
-}
-
-}
-
-function updateSetting(key,value){
-
-settings[key]=!!value;
-
-saveSettings();
-
-toast(
-"Settings updated"
-);
-
-}
-
-async function renderHistory(){
-
-const box=
-document.getElementById(
-"historyList"
-);
-
-if(!box)return;
-
-if(!user){
-
-box.innerHTML=
-`
-<div class="empty">
-
-Login to view tournament history.
-
-<br><br>
-
-<button
-class="btn sm"
-onclick="openAuth()">
-Login
-</button>
-
-</div>
-`;
-
-return;
-
-}
-
-try{
-
-if(user.id){
-
-const data=
-await api(
-"/api/users/"+Number(user.id)+"/registrations"
-);
-
-if(
-data &&
-data.success &&
-Array.isArray(data.registrations)
-){
-
-const backendHistory=
-data.registrations.map(r=>({
-
-name:r.tournament_name,
-game:r.game,
-entry:r.entry_fee,
-prize:r.prize_pool,
-status:r.tournament_status,
-mode:r.mode,
-team:r.team_name,
-joinedAt:r.created_at,
-result:null
-
-}));
-
-if(backendHistory.length){
-
-joinedTours=
-backendHistory;
-
-localStorage.setItem(
-"entsoneJoined",
-JSON.stringify(joinedTours)
-);
-
-}
-
-}
-
-}
-
-}catch(err){
-
 console.warn(
-"History API failed:",
-err.message
+"Session restore skipped:",
+e.message
 );
 
 }
-
-if(!joinedTours.length){
-
-box.innerHTML=
-'<div class="empty">No tournaments joined yet.</div>';
-
-return;
-
 }
 
-box.innerHTML=
-joinedTours.map((x,i)=>`
-
-<div
-class="card"
-style="
-margin-bottom:12px;
-padding:16px;
-">
-
-<div class="row">
-
-<div>
-
-<span class="tag">
-${escapeHtml(x.status||"UPCOMING")}
-</span>
-
-<h3 style="margin:9px 0 4px">
-${escapeHtml(x.name)}
-</h3>
-
-<div class="mut">
-${escapeHtml(x.game||"Tournament")}
-</div>
-
-</div>
-
-</div>
-
-<div
-class="meta"
-style="margin-top:12px">
-
-Mode:
-<b>${escapeHtml(x.mode||"Solo")}</b>
-
-&nbsp; · &nbsp;
-
-Team:
-<b>${escapeHtml(x.team||"-")}</b>
-
-<br>
-
-Entry:
-<b>${escapeHtml(x.entry||"₹0")}</b>
-
-&nbsp; · &nbsp;
-
-Prize:
-<b>${escapeHtml(x.prize||"₹0")}</b>
-
-</div>
-
-${
-x.result
-?
-`
-<div
-class="notice"
-style="margin-top:12px">
-
-<b>Result:</b>
-
-Position
-${escapeHtml(x.result.position)}
-
-· Kills
-${escapeHtml(x.result.kills)}
-
-· Points
-${escapeHtml(x.result.points)}
-
-</div>
-`
-:""
-}
-
-</div>
-
-`).join("");
-
-}
-
-async function loadMyResults(){
-
-if(!user?.id)return;
-
-try{
-
-const data=
-await api(
-"/api/users/"+Number(user.id)+"/results"
-);
-
-if(
-data &&
-data.success &&
-Array.isArray(data.results)
-){
-
-data.results.forEach(r=>{
-
-const match=
-joinedTours.find(
-x=>x.name===r.tournament_name
-);
-
-if(match){
-
-match.result={
-
-position:r.position,
-
-kills:r.kills,
-
-points:r.points
-
-};
-
-}
-
-});
-
-localStorage.setItem(
-"entsoneJoined",
-JSON.stringify(joinedTours)
-);
-
-renderHistory();
-
-}
-
-}catch(err){
-
-console.warn(
-"My results failed:",
-err.message
-);
-
-}
-
-}
-
-function openRoomForSelected(){
-
-if(!selectedTour)return;
-
-document.getElementById(
-"roomTitle"
-).textContent=
-selectedTour.n;
-
-document.getElementById(
-"roomId"
-).textContent=
-"ENT-"+String(
-Math.floor(
-1000+Math.random()*9000
-)
-);
-
-document.getElementById(
-"roomPass"
-).textContent=
-"KHL"+String(
-Math.floor(
-100+Math.random()*900
-)
-);
-
-closeModal("tourModal");
-
-document
-.getElementById("roomModal")
-.classList.add("show");
-
-}
+/* =========================
+   ADMIN PANEL
+========================= */
 
 function renderAdmin(){
 
-const list=
-document.getElementById(
-"adminTournamentList"
-);
+let stats=document.getElementById("adminStats");
+let list=document.getElementById("adminTournamentList");
 
-if(!list)return;
+if(!stats||!list)return;
 
-const total=
-tours.length;
-
-const open=
-tours.filter(
-t=>t[6]==="OPEN"
+let open=tours.filter(
+x=>x[6]==="OPEN"
 ).length;
 
-const completed=
-tours.filter(
-t=>t[6]==="COMPLETED"
+let ongoing=tours.filter(
+x=>x[6]==="ONGOING"
 ).length;
 
-document.getElementById(
-"adminTotal"
-).textContent=total;
+let completed=tours.filter(
+x=>x[6]==="COMPLETED"
+).length;
 
-document.getElementById(
-"adminOpen"
-).textContent=open;
+stats.innerHTML=`
+<div class="adminStat">
+<b>${tours.length}</b>
+<small class="mut">Total</small>
+</div>
 
-document.getElementById(
-"adminCompleted"
-).textContent=completed;
+<div class="adminStat">
+<b>${open}</b>
+<small class="mut">Open</small>
+</div>
+
+<div class="adminStat">
+<b>${ongoing}</b>
+<small class="mut">Ongoing</small>
+</div>
+
+<div class="adminStat">
+<b>${completed}</b>
+<small class="mut">Completed</small>
+</div>
+`;
+
+if(!tours.length){
+
+list.innerHTML=
+'<div class="empty">No tournaments available.</div>';
+
+return;
+}
 
 list.innerHTML=
 tours.map((t,i)=>`
 
-<div
-class="adminRow"
-style="
-padding:14px 0;
-border-bottom:1px solid #25304a;
-">
+<div class="adminRow">
 
-<div
-class="row"
-style="gap:12px">
-
-<div style="flex:1">
-
-<b>
-${escapeHtml(t[0])}
-</b>
-
-<div class="mut"
-style="margin-top:4px">
-
+<div class="row">
+<div>
+<b>${escapeHtml(t[0])}</b>
+<div class="mut" style="font-size:11px">
 ${escapeHtml(t[1])}
-
+</div>
 </div>
 
-<div class="meta"
-style="margin-top:5px">
-
-${escapeHtml(t[3])}
-·
-${escapeHtml(t[4])}
-·
-${escapeHtml(t[5])}
-
+<span class="badge">
+${escapeHtml(t[6]||"UPCOMING")}
+</span>
 </div>
 
+<div class="meta">
+Prize ${escapeHtml(t[3])}
+· Entry ${escapeHtml(t[4])}
+· ${escapeHtml(t[5])}
 </div>
 
-<select
-class="statusSelect"
-onchange="
-setAdminStatus(${i},this.value)
-">
-
-<option
-${t[6]==="OPEN"?"selected":""}>
-OPEN
-</option>
-
-<option
-${t[6]==="UPCOMING"?"selected":""}>
-UPCOMING
-</option>
-
-<option
-${t[6]==="ONGOING"?"selected":""}>
-ONGOING
-</option>
-
-<option
-${t[6]==="COMPLETED"?"selected":""}>
-COMPLETED
-</option>
-
-</select>
-
-</div>
-
-<div
-style="
-display:flex;
-gap:8px;
-margin-top:10px;
-">
+<div class="adminActions">
 
 <button
 class="btn secondary sm"
@@ -3677,895 +1800,34 @@ onclick="deleteAdminTournament(${i})">
 Delete
 </button>
 
+<select
+class="statusSelect"
+onchange="setAdminStatus(${i},this.value)">
+<option value="">Change Status</option>
+<option value="OPEN">OPEN</option>
+<option value="UPCOMING">UPCOMING</option>
+<option value="ONGOING">ONGOING</option>
+<option value="COMPLETED">COMPLETED</option>
+</select>
+
 <button
-class="btn sm"
+class="btn secondary sm"
 onclick="selectResultTournament(${i})">
 Results
 </button>
 
 </div>
-
 </div>
 
-`).join("");
+`)
+.join("");
 
 renderResultSelector();
-
-}
-
-function renderResultSelector(){
-
-const select=
-document.getElementById(
-"rTournament"
-);
-
-if(!select)return;
-
-select.innerHTML=
-tours.map((t,i)=>`
-
-<option value="${i}">
-${escapeHtml(t[0])}
-</option>
-
-`).join("");
-
-renderResultTable();
-
-}
-
-async function renderResultTable(){
-
-const select=
-document.getElementById(
-"rTournament"
-);
-
-const box=
-document.getElementById(
-"resultAdminTable"
-);
-
-if(!select||!box)return;
-
-const index=
-Number(select.value||0);
-
-const t=
-tours[index];
-
-if(!t){
-
-box.innerHTML=
-'<div class="empty">No tournament selected.</div>';
-
-return;
-
-}
-
-const tid=
-t[7];
-
-if(!tid){
-
-box.innerHTML=
-'<div class="empty">Save tournament to backend before adding results.</div>';
-
-return;
-
-}
-
-try{
-
-const data=
-await api(
-"/api/results/"+Number(tid)
-);
-
-if(
-data &&
-data.success &&
-Array.isArray(data.results)
-){
-
-results[tid]=
-data.results.map(r=>({
-
-id:r.id,
-
-name:r.player_name,
-
-team:r.team_name,
-
-position:r.position,
-
-kills:r.kills,
-
-points:r.points
-
-}));
-
-saveResults();
-
-}
-
-}catch(err){
-
-console.warn(
-"Results API failed:",
-err.message
-);
-
-}
-
-const arr=
-results[tid]||[];
-
-if(!arr.length){
-
-box.innerHTML=
-'<div class="empty">No results added yet.</div>';
-
-return;
-
-}
-
-box.innerHTML=
-arr
-.slice()
-.sort(
-(a,b)=>a.position-b.position
-)
-.map(r=>`
-
-<div
-class="resultRow"
-style="
-display:grid;
-grid-template-columns:1fr auto auto auto;
-gap:10px;
-align-items:center;
-padding:12px 0;
-border-bottom:1px solid #25304a;
-">
-
-<div>
-
-<b>
-${escapeHtml(r.name)}
-</b>
-
-<div class="mut">
-${escapeHtml(r.team||"")}
-</div>
-
-</div>
-
-<span>
-#${escapeHtml(r.position)}
-</span>
-
-<span>
-${escapeHtml(r.kills)} K
-</span>
-
-<b>
-${escapeHtml(r.points)} P
-</b>
-
-<button
-class="btn danger sm"
-onclick="removeResultDb(${Number(r.id)||0})">
-×
-</button>
-
-</div>
-
-`).join("");
-
-}
-
-function selectResultTournament(i){
-
-const select=
-document.getElementById(
-"rTournament"
-);
-
-if(select){
-
-select.value=i;
-
-renderResultTable();
-
-}
-
-document
-.getElementById("admin")
-?.scrollIntoView({
-behavior:"smooth"
-});
-
-}
-  <script>
-
-async function addResult(){
-
-const select=
-document.getElementById("rTournament");
-
-const index=
-Number(select?.value||0);
-
-const t=
-tours[index];
-
-if(!t){
-
-toast("Select a tournament");
-
-return;
-
-}
-
-const name=
-document.getElementById("rName")
-.value
-.trim();
-
-const position=
-Number(
-document.getElementById("rPlace")
-.value
-);
-
-const kills=
-Number(
-document.getElementById("rKills")
-.value
-);
-
-if(!name){
-
-toast("Enter player or team name");
-
-return;
-
-}
-
-if(!position||position<1){
-
-toast("Enter valid placement");
-
-return;
-
-}
-
-if(kills<0){
-
-toast("Kills cannot be negative");
-
-return;
-
-}
-
-const points=
-totalPoints(position,kills);
-
-const tid=
-Number(t[7]);
-
-if(!tid){
-
-toast(
-"Save tournament to backend first"
-);
-
-return;
-
-}
-
-try{
-
-const data=
-await api(
-"/api/results",
-{
-method:"POST",
-body:JSON.stringify({
-
-tournament_id:tid,
-
-user_id:user?.id||null,
-
-player_name:name,
-
-team_name:name,
-
-position,
-
-kills
-
-})
-}
-);
-
-if(
-data &&
-data.success &&
-data.result
-){
-
-if(!results[tid]){
-results[tid]=[];
-}
-
-results[tid].push({
-
-id:data.result.id,
-
-name:data.result.player_name,
-
-team:data.result.team_name,
-
-position:data.result.position,
-
-kills:data.result.kills,
-
-points:data.result.points
-
-});
-
-saveResults();
-
-}
-
-}catch(err){
-
-toast(
-err.message||
-"Could not save result"
-);
-
-return;
-
-}
-
-document.getElementById("rName")
-.value="";
-
-document.getElementById("rPlace")
-.value="";
-
-document.getElementById("rKills")
-.value="";
-
-renderResultTable();
-
-toast(
-`${name} added — ${points} points`
-);
-
-}
-
-async function removeResultDb(id){
-
-const select=
-document.getElementById("rTournament");
-
-const tid=
-Number(
-tours[
-Number(select?.value||0)
-]?.[7]
-);
-
-if(!id){
-
-toast("Result ID not found");
-
-return;
-
-}
-
-try{
-
-await api(
-"/api/results/"+Number(id),
-{
-method:"DELETE"
-}
-);
-
-}catch(err){
-
-toast(
-err.message||
-"Could not remove result"
-);
-
-return;
-
-}
-
-if(results[tid]){
-
-results[tid]=
-results[tid].filter(
-r=>Number(r.id)!==Number(id)
-);
-
-saveResults();
-
-}
-
-renderResultTable();
-
-toast("Result removed");
-
-}
-
-async function clearResults(){
-
-const select=
-document.getElementById("rTournament");
-
-const tid=
-Number(
-tours[
-Number(select?.value||0)
-]?.[7]
-);
-
-if(!tid){
-
-toast("Select a saved tournament");
-
-return;
-
-}
-
-const arr=
-results[tid]||[];
-
-if(!arr.length){
-
-toast("No results to clear");
-
-return;
-
-}
-
-if(
-!confirm(
-"Clear all results for this tournament?"
-)
-)return;
-
-for(const r of arr){
-
-if(r.id){
-
-try{
-
-await api(
-"/api/results/"+Number(r.id),
-{
-method:"DELETE"
-}
-);
-
-}catch(err){
-
-console.warn(
-"Could not delete result:",
-err.message
-);
-
-}
-
-}
-
-}
-
-delete results[tid];
-
-saveResults();
-
-renderResultTable();
-
-toast("Results cleared");
-
-}
-
-async function publishResults(){
-
-const select=
-document.getElementById("rTournament");
-
-const index=
-Number(select?.value||0);
-
-const t=
-tours[index];
-
-if(!t){
-
-toast("Select a tournament");
-
-return;
-
-}
-
-const tid=
-Number(t[7]);
-
-if(!tid){
-
-toast(
-"Save tournament to backend first"
-);
-
-return;
-
-}
-
-const arr=
-results[tid]||[];
-
-if(!arr.length){
-
-toast(
-"Add at least one result first"
-);
-
-return;
-
-}
-
-try{
-
-const data=
-await api(
-"/api/tournaments/"+tid+"/publish-results",
-{
-method:"POST"
-}
-);
-
-if(
-data &&
-data.success
-){
-
-t[6]="COMPLETED";
-
-saveTours();
-
-const localTour=
-tours[index];
-
-localTour[6]="COMPLETED";
-
-notifications.unshift({
-
-id:Date.now(),
-
-title:"Results published",
-
-text:
-`${t[0]} results are now published.`,
-
-read:false,
-
-time:"Just now"
-
-});
-
-saveNotifications();
-
-renderAdmin();
-
-renderHomeTours();
-
-renderTours("all");
-
-toast(
-"Results published successfully"
-);
-
-}
-
-}catch(err){
-
-toast(
-err.message||
-"Could not publish results"
-);
-
-}
-
-}
-
-async function viewResults(name){
-
-const t=
-tours.find(
-x=>x[0]===name
-);
-
-if(!t){
-
-toast("Tournament not found");
-
-return;
-
-}
-
-const tid=
-Number(t[7]);
-
-let leaderboard=[];
-
-if(tid){
-
-try{
-
-const data=
-await api(
-"/api/leaderboard/"+tid
-);
-
-if(
-data &&
-data.success &&
-Array.isArray(data.leaderboard)
-){
-
-leaderboard=
-data.leaderboard;
-
-}
-
-}catch(err){
-
-console.warn(
-"Leaderboard API failed:",
-err.message
-);
-
-}
-
-}
-
-if(!leaderboard.length){
-
-const local=
-results[tid]||[];
-
-leaderboard=
-local
-.slice()
-.sort(
-(a,b)=>{
-
-if(b.points!==a.points){
-
-return b.points-a.points;
-
-}
-
-return a.position-b.position;
-
-}
-);
-
-}
-
-document.getElementById(
-"resTitle"
-).textContent=name;
-
-document.getElementById(
-"resSub"
-).textContent=
-"Final leaderboard";
-
-const box=
-document.getElementById(
-"publicResults"
-);
-
-if(!box)return;
-
-if(!leaderboard.length){
-
-box.innerHTML=
-'<div class="empty">No published results.</div>';
-
-}else{
-
-box.innerHTML=`
-
-<div class="notice">
-
-<b>Leaderboard</b>
-
-</div>
-
-<div
-style="margin-top:10px">
-
-${leaderboard.map((r,i)=>`
-
-<div
-style="
-display:grid;
-grid-template-columns:45px 1fr auto;
-gap:10px;
-align-items:center;
-padding:13px 0;
-border-bottom:1px solid #25304a;
-">
-
-<div>
-
-<b>
-#${Number(r.position)||i+1}
-</b>
-
-</div>
-
-<div>
-
-<b>
-${escapeHtml(
-r.player_name||
-r.name||
-"Player"
-)}
-</b>
-
-<div class="mut">
-
-${escapeHtml(
-r.team_name||
-r.team||
-""
-)}
-
-</div>
-
-</div>
-
-<div>
-
-<b>
-${Number(r.points)||0} P
-</b>
-
-<div class="mut">
-
-${Number(r.kills)||0} Kills
-
-</div>
-
-</div>
-
-</div>
-
-`).join("")}
-
-</div>
-
-`;
-
-}
-
-document
-.getElementById("resultsModal")
-.classList.add("show");
-
-}
-
-function editAdminTournament(i){
-
-const t=
-tours[i];
-
-if(!t)return;
-
-document.getElementById("aName")
-.value=t[0]||"";
-
-const parts=
-(t[1]||"").split(" · ");
-
-document.getElementById("aGame")
-.value=
-parts[0]||t[2]||"Free Fire";
-
-document.getElementById("aMode")
-.value=
-parts[1]||"Solo";
-
-document.getElementById("aPrize")
-.value=t[3]||"";
-
-document.getElementById("aEntry")
-.value=t[4]||"";
-
-const slotMatch=
-String(t[5]||"").match(/(\d+)\s*Slots?/i);
-
-document.getElementById("aSlots")
-.value=
-slotMatch
-?slotMatch[1]
-:50;
-
-document.getElementById("aStart")
-.value=
-String(t[5]||"")
-.replace(/\d+\s*Slots?\s*·\s*/i,"");
-
-document.getElementById("aStatus")
-.value=
-t[6]||"OPEN";
-
-window.editingTournamentIndex=i;
-
-document.getElementById(
-"adminFormTitle"
-).textContent=
-"Edit Tournament";
-
-document.getElementById(
-"adminSaveBtn"
-).textContent=
-"Update Tournament";
-
-document.getElementById(
-"adminCancelBtn"
-).style.display=
-"block";
-
-document
-.getElementById("admin")
-.scrollIntoView({
-behavior:"smooth"
-});
-
 }
 
 function resetAdminForm(){
 
-window.editingTournamentIndex=null;
-
-document.getElementById("aName")
-.value="";
-
-document.getElementById("aGame")
-.value="Free Fire";
-
-document.getElementById("aMode")
-.value="Solo";
-
-document.getElementById("aPrize")
-.value="";
-
-document.getElementById("aEntry")
-.value="";
-
-document.getElementById("aSlots")
-.value=50;
-
-document.getElementById("aStart")
-.value="";
-
-document.getElementById("aStatus")
-.value="OPEN";
+window.__adminEdit=null;
 
 document.getElementById(
 "adminFormTitle"
@@ -4582,448 +1844,458 @@ document.getElementById(
 ).style.display=
 "none";
 
+[
+"aName",
+"aPrize",
+"aEntry",
+"aSlots",
+"aStart"
+].forEach(
+id=>document.getElementById(id).value=""
+);
+
+document.getElementById(
+"aStatus"
+).value=
+"UPCOMING";
 }
 
 async function saveAdminTournament(){
 
-const name=
-document.getElementById("aName")
-.value
-.trim();
+let name=
+document.getElementById("aName").value.trim();
 
-const game=
-document.getElementById("aGame")
-.value;
+let game=
+document.getElementById("aGame").value;
 
-const mode=
-document.getElementById("aMode")
-.value;
+let mode=
+document.getElementById("aMode").value;
 
-const prize=
-document.getElementById("aPrize")
-.value
-.trim()||"₹0";
-
-const entry=
-document.getElementById("aEntry")
-.value
-.trim()||"₹0";
-
-const slots=
+let prize=
 Number(
-document.getElementById("aSlots")
-.value
-)||50;
+document.getElementById("aPrize").value
+)||0;
 
-const start=
-document.getElementById("aStart")
-.value
-.trim()||"Scheduled";
+let entry=
+Number(
+document.getElementById("aEntry").value
+)||0;
 
-const status=
-document.getElementById("aStatus")
-.value;
+let slots=
+Number(
+document.getElementById("aSlots").value
+)||0;
+
+let start=
+document.getElementById("aStart").value.trim();
+
+let status=
+document.getElementById("aStatus").value;
 
 if(!name){
-
 toast("Enter tournament name");
-
 return;
-
 }
 
-const editing=
-window.editingTournamentIndex;
-
-const payload={
-
+let payload={
 name,
-
 game,
-
 mode,
-
 entry_fee:entry,
-
 prize_pool:prize,
-
 start_label:start,
-
 slots,
-
 status
-
 };
+
+let edit=
+window.__adminEdit;
+
+let id=
+Number.isInteger(edit)
+?tours[edit]?.[7]
+:null;
 
 try{
 
-if(
-editing!==null &&
-editing!==undefined
-){
-
-const old=
-tours[editing];
-
-const id=
-Number(old?.[7]);
-
-if(!id){
-
-toast(
-"Old tournament has no backend ID"
-);
-
-return;
-
-}
-
-await api(
-"/api/tournaments/"+id,
+const response=
+await fetch(
+id
+?`${API_BASE}/api/tournaments/${id}`
+:`${API_BASE}/api/tournaments`,
 {
-method:"PUT",
+method:id?"PUT":"POST",
+headers:{
+"Content-Type":"application/json"
+},
 body:JSON.stringify(payload)
 }
 );
 
-tours[editing]=[
+const data=
+await response.json();
 
-name,
+if(!response.ok||!data.success)
+throw new Error(
+data.message||
+"Server rejected tournament"
+);
 
-`${game} · ${mode}`,
+const row=
+tournamentRowFromApi(
+data.tournament
+);
 
-game,
+if(Number.isInteger(edit)){
 
-prize,
-
-entry,
-
-`${slots} Slots · ${start}`,
-
-status,
-
-id
-
-];
+tours[edit]=row;
 
 toast(
-"Tournament updated"
+"Tournament updated in database"
 );
 
 }else{
 
-const data=
-await api(
-"/api/tournaments",
-{
-method:"POST",
-body:JSON.stringify(payload)
-}
-);
-
-if(
-!data ||
-!data.success ||
-!data.tournament
-){
-
-throw new Error(
-"Could not create tournament"
-);
-
-}
-
-const x=data.tournament;
-
-tours.unshift([
-
-x.name,
-
-`${x.game} · ${x.mode}`,
-
-x.game,
-
-x.prize_pool,
-
-x.entry_fee,
-
-`${x.slots} Slots · ${x.start_label}`,
-
-x.status,
-
-x.id
-
-]);
+tours.push(row);
 
 toast(
-"Tournament created"
+"Tournament created in database"
 );
 
 }
 
-saveTours();
+backendTournamentMode=true;
 
+saveTours();
 resetAdminForm();
-
 renderAdmin();
-
-renderHomeTours();
-
 renderTours("all");
+renderHomeTours();
 
 }catch(err){
 
-toast(
-err.message||
-"Could not save tournament"
-);
-
-}
-
-}
-
-async function setAdminStatus(i,status){
-
-const t=
-tours[i];
-
-if(!t)return;
-
-const id=
-Number(t[7]);
-
-if(!id){
-
-t[6]=status;
-
-saveTours();
-
-renderAdmin();
-
-renderHomeTours();
-
-renderTours("all");
-
-return;
-
-}
-
-try{
-
-await api(
-"/api/tournaments/"+id,
-{
-method:"PUT",
-body:JSON.stringify({
-
-status
-
-})
-}
-);
-
-t[6]=status;
-
-saveTours();
-
-renderAdmin();
-
-renderHomeTours();
-
-renderTours("all");
+console.error(err);
 
 toast(
-"Status updated"
-);
-
-}catch(err){
-
-toast(
-err.message||
-"Could not update status"
+"Database save failed — tournament not saved"
 );
 
 }
+}
 
+function editAdminTournament(i){
+
+let t=tours[i];
+
+document.getElementById("aName").value=t[0];
+
+let parts=t[1].split(" · ");
+
+document.getElementById("aGame").value=
+parts[0]||"Other";
+
+document.getElementById("aMode").value=
+parts[1]||"Solo";
+
+document.getElementById("aPrize").value=t[3];
+
+document.getElementById("aEntry").value=t[4];
+
+document.getElementById("aSlots").value=
+(t[5].match(/\d+/)||["100"])[0];
+
+document.getElementById("aStart").value=
+t[5].replace(/\d+ Slots · /,"");
+
+document.getElementById("aStatus").value=
+t[6]||"UPCOMING";
+
+window.__adminEdit=i;
+
+document.getElementById(
+"adminFormTitle"
+).textContent=
+"Edit Tournament";
+
+document.getElementById(
+"adminSaveBtn"
+).textContent=
+"Save Changes";
+
+document.getElementById(
+"adminCancelBtn"
+).style.display=
+"block";
+
+window.scrollTo({
+top:0,
+behavior:"smooth"
+});
 }
 
 async function deleteAdminTournament(i){
 
-const t=
-tours[i];
+if(!confirm("Delete this tournament?"))
+return;
 
-if(!t)return;
+let id=tours[i]?.[7];
 
-if(
-!confirm(
-`Delete "${t[0]}"?`
-)
-)return;
-
-const id=
-Number(t[7]);
-
-if(id){
+if(!id){
+toast("Tournament ID missing");
+return;
+}
 
 try{
 
-await api(
-"/api/tournaments/"+id,
+const r=await fetch(
+`${API_BASE}/api/tournaments/${id}`,
 {
 method:"DELETE"
 }
 );
 
-}catch(err){
+const d=await r.json();
 
-toast(
-err.message||
-"Could not delete tournament"
+if(!r.ok||!d.success)
+throw new Error(
+d.message||"Delete failed"
 );
-
-return;
-
-}
-
-}
 
 tours.splice(i,1);
 
 saveTours();
-
 renderAdmin();
-
+renderTours("all");
 renderHomeTours();
 
-renderTours("all");
-
 toast(
-"Tournament deleted"
+"Tournament deleted from database"
 );
-
-}
-
-async function loadBackendResults(){
-
-if(!tours.length)return;
-
-for(const t of tours){
-
-const id=
-Number(t[7]);
-
-if(!id)continue;
-
-try{
-
-const data=
-await api(
-"/api/results/"+id
-);
-
-if(
-data &&
-data.success &&
-Array.isArray(data.results)
-){
-
-results[id]=
-data.results.map(r=>({
-
-id:r.id,
-
-name:r.player_name,
-
-team:r.team_name,
-
-position:r.position,
-
-kills:r.kills,
-
-points:r.points
-
-}));
-
-}
 
 }catch(err){
 
-console.warn(
-"Result sync failed:",
-err.message
+console.error(err);
+
+toast(
+"Database delete failed"
 );
 
 }
-
 }
 
-saveResults();
+async function setAdminStatus(i,status){
 
+let id=tours[i]?.[7];
+
+if(!id){
+toast("Tournament ID missing");
+return;
 }
 
-function updateNotificationCount(){
+let t=tours[i];
 
-const dot=
-document.getElementById(
-"notifCount"
+let payload={
+name:t[0],
+game:t[2],
+mode:
+(t[1].split(" · ")[1]||"Solo"),
+entry_fee:
+Number(
+String(t[4]).replace(/[^\d.]/g,"")
+)||0,
+prize_pool:
+Number(
+String(t[3]).replace(/[^\d.]/g,"")
+)||0,
+start_label:
+t[5].replace(
+/^\d+ Slots · /,
+""
+),
+slots:
+Number(
+t[5].match(/\d+/)?.[0]||0
+),
+status
+};
+
+try{
+
+const r=await fetch(
+`${API_BASE}/api/tournaments/${id}`,
+{
+method:"PUT",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify(payload)
+}
 );
 
-if(!dot)return;
+const d=await r.json();
 
-const unread=
-notifications.filter(
-n=>!n.read
-).length;
+if(!r.ok||!d.success)
+throw new Error(
+d.message||"Status update failed"
+);
 
-dot.textContent=
-unread?unread:"";
+tours[i]=
+tournamentRowFromApi(
+d.tournament
+);
 
-}
-
-async function init(){
-
-renderGames();
-
-renderHomeTours();
-
-renderTours("all");
-
-renderProfile();
-
-renderNotifications();
-
-renderSettings();
-
-updateNotificationCount();
-
-replaceDemoAuth();
-
-await loadBackendTournaments();
-
-await restoreSession();
-
-await syncUserFromBackend();
-
-await loadMyResults();
-
-await loadBackendResults();
-
-renderHomeTours();
-
-renderTours("all");
+saveTours();
 
 renderAdmin();
+renderTours("all");
+renderHomeTours();
 
-renderProfile();
-
-}
-
-document.addEventListener(
-"DOMContentLoaded",
-init
+toast(
+"Tournament status updated"
 );
 
-</script>
+}catch(err){
 
+console.error(err);
+
+toast(
+"Database status update failed"
+);
+
+}
+}
+
+function renderResultSelector(){
+
+let sel=
+document.getElementById(
+"rTournament"
+);
+
+if(!sel)return;
+
+let current=sel.value;
+
+sel.innerHTML=
+tours.map(
+(t,i)=>
+`<option value="${i}">
+${t[0]} · ${t[1]}
+</option>`
+).join("");
+
+if(current&&tours[current])
+sel.value=current;
+
+renderResultTable();
+}
+
+function selectResultTournament(i){
+
+let sel=
+document.getElementById(
+"rTournament"
+);
+
+if(sel){
+
+sel.value=String(i);
+
+renderResultTable();
+
+document.querySelector(
+".resultBox"
+)?.scrollIntoView({
+behavior:"smooth",
+block:"start"
+});
+
+}
+}
+  function addResult(){let idx=Number(document.getElementById('rTournament').value),name=document.getElementById('rName').value.trim(),place=Number(document.getElementById('rPlace').value),kills=Number(document.getElementById('rKills').value)||0;if(!name||!place||place<1||kills<0){toast('Enter player, placement and kills');return}let t=tours[idx],tid=t?.[7];if(tid){try{let r=await fetch(`${API_BASE}/api/results`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tournament_id:tid,user_id:user?.id||null,player_name:name,team_name:name,position:place,kills})});let d=await r.json();if(!r.ok||!d.success)throw new Error(d.message||'Result API failed');['rName','rPlace','rKills'].forEach(id=>document.getElementById(id).value='');await renderResultTable();toast('Match result saved to database');return}catch(e){toast(e.message||'Could not save result');return}}let key=String(idx);results[key]=results[key]||[];results[key].push({name,place,kills,points:totalPoints(place,kills)});results[key].sort((a,b)=>b.points-a.points||a.place-b.place);saveResults();['rName','rPlace','rKills'].forEach(id=>document.getElementById(id).value='');renderResultTable();toast('Match result added')}
+
+async function renderResultTable(){let box=document.getElementById('resultAdminTable'),sel=document.getElementById('rTournament');if(!box||!sel||!tours.length)return;let idx=Number(sel.value||0),t=tours[idx],tid=t?.[7],arr=[];if(tid){try{let r=await fetch(`${API_BASE}/api/results/${tid}`),d=await r.json();if(r.ok&&d.success)arr=d.results.map(x=>({id:x.id,name:x.player_name,place:x.position,kills:x.kills,points:x.points,published:x.published}))}catch(e){console.warn(e)}}else arr=results[String(idx)]||[];if(!arr.length){box.innerHTML='<div class="empty" style="margin-top:12px">No results added for this tournament.</div>';return}box.innerHTML=`<table class="resultTable"><thead><tr><th>#</th><th>Player / Team</th><th>Placement</th><th>Kills</th><th>Points</th><th></th></tr></thead><tbody>${arr.map((r,i)=>`<tr><td class="rank">${i+1}</td><td>${i===0?'🏆 ':''}<b>${escapeHtml(r.name)}</b></td><td>${r.place}</td><td>${r.kills}</td><td><b>${r.points}</b></td><td>${r.id?`<button class="btn sm danger" onclick="removeResultDb(${r.id})">×</button>`:`<button class="btn sm danger" onclick="removeResult(${idx},${i})">×</button>`}</td></tr>`).join('')}</tbody></table>`}
+
+async function removeResultDb(id){if(!confirm('Remove this result?'))return;try{let r=await fetch(`${API_BASE}/api/results/${id}`,{method:'DELETE'});let d=await r.json();if(!r.ok||!d.success)throw new Error(d.message||'Delete failed');renderResultTable();toast('Result removed')}catch(e){toast(e.message||'Could not remove result')}}
+
+function removeResult(idx,i){if(!results[String(idx)])return;results[String(idx)].splice(i,1);saveResults();renderResultTable();toast('Result removed')}
+
+async function clearResults(){let idx=Number(document.getElementById('rTournament').value||0),t=tours[idx],tid=t?.[7];if(tid){let r=await fetch(`${API_BASE}/api/results/${tid}`),d=await r.json();if(d.success&&d.results?.length){if(!confirm('Clear all results for this tournament?'))return;for(const x of d.results)await fetch(`${API_BASE}/api/results/${x.id}`,{method:'DELETE'});renderResultTable();toast('Results cleared');return}}if(!results[String(idx)]?.length){toast('No results to clear');return}if(!confirm('Clear all results for this tournament?'))return;delete results[String(idx)];saveResults();renderResultTable();toast('Results cleared')}
+
+async function publishResults(){let idx=Number(document.getElementById('rTournament').value||0),t=tours[idx],tid=t?.[7],tn=t?.[0]||'';if(tid){try{let r=await fetch(`${API_BASE}/api/tournaments/${tid}/publish-results`,{method:'POST'}),d=await r.json();if(!r.ok||!d.success)throw new Error(d.message||'Publish failed');tours[idx][6]='COMPLETED';saveTours();await syncRegistrations();notifications.unshift({id:Date.now(),title:'Results published',text:`Results are live for ${tn}.`,read:false,time:'Just now'});saveNotifications();await syncRegistrations();await syncUserResults();renderAdmin();renderTours('all');renderHomeTours();renderHistory();renderProfile();toast('Results published and tournament marked COMPLETED');return}catch(e){toast(e.message||'Could not publish results');return}}let arr=results[String(idx)]||[];if(!arr.length){toast('Add at least one result first');return}tours[idx][6]='COMPLETED';saveTours();joinedTours=joinedTours.map(x=>x.name!==tn?x:{...x,status:'Completed'});localStorage.setItem('entsoneJoined',JSON.stringify(joinedTours));notifications.unshift({id:Date.now(),title:'Results published',text:`Results are live for ${tn}.`,read:false,time:'Just now'});saveNotifications();renderAdmin();renderTours('all');renderHomeTours();renderHistory();renderProfile();toast('Results published and tournament marked COMPLETED')}
+
+async function viewResults(name){let idx=tours.findIndex(t=>t[0]===name),t=tours[idx],arr=[],tid=t?.[7];if(tid){try{let r=await fetch(`${API_BASE}/api/leaderboard/${tid}`),d=await r.json();if(r.ok&&d.success)arr=d.leaderboard.map(x=>({name:x.player_name,place:x.position,kills:x.kills,points:x.points,rank:x.rank}))}catch(e){console.warn(e)}}else arr=results[String(idx)]||[];document.getElementById('resTitle').textContent=name;document.getElementById('resSub').textContent=arr.length?`Final leaderboard · ${arr.length} result${arr.length===1?'':'s'}`:'No published results yet';document.getElementById('publicResults').innerHTML=arr.length?`<table class="resultTable"><thead><tr><th>Rank</th><th>Player / Team</th><th>Place</th><th>Kills</th><th>Points</th></tr></thead><tbody>${arr.map((r,i)=>`<tr><td class="rank ${i===0?'winner':''}">${r.rank||i+1}</td><td><b>${escapeHtml(r.name)}</b></td><td>${r.place}</td><td>${r.kills}</td><td><b>${r.points}</b></td></tr>`).join('')}</tbody></table>`:'<div class="empty">Results have not been published for this tournament.</div>';document.getElementById('resultsModal').classList.add('show')}
+
+function renderHistory(){let box=document.getElementById('historyCards'),list=document.getElementById('historyList');if(!box||!list)return;let completed=joinedTours.filter(x=>x.status==='Completed').length,upcoming=joinedTours.filter(x=>x.status==='Upcoming').length,ongoing=joinedTours.filter(x=>x.status==='Ongoing').length;box.innerHTML=`<div class="historyCard"><small class="mut">UPCOMING</small><br><b>${upcoming}</b><p class="mut">Registered matches</p></div><div class="historyCard"><small class="mut">ONGOING</small><br><b>${ongoing}</b><p class="mut">Matches in progress</p></div><div class="historyCard"><small class="mut">COMPLETED</small><br><b>${completed}</b><p class="mut">Finished matches</p></div>`;if(!joinedTours.length){list.innerHTML='<div class="empty">No tournament history yet.</div>';return}list.innerHTML=joinedTours.map((x,i)=>{let r=x.result;return `<div class="item"><div><b>${escapeHtml(x.name)}</b><small>${escapeHtml(x.game)} · ${escapeHtml(x.mode||'Solo')} · ${escapeHtml(x.team||'Solo')}</small><small>${escapeHtml(x.joinedAt||'')}</small></div><div style="text-align:right"><span class="badge">${escapeHtml(x.status||'Upcoming')}</span>${r?`<small class="green">Rank #${r.rank} · ${r.points} pts</small>`:''}${x.status!=='Completed'?`<button class="btn secondary sm" style="margin-top:5px" onclick="openRoomForJoined(${i})">Room</button>`:''}</div></div>`}).join('')}
+
+function renderNotifications(){let box=document.getElementById('notificationList');if(!box)return;let unread=notifications.filter(x=>!x.read).length;document.getElementById('notifCount').style.display=unread?'inline-block':'none';box.innerHTML=notifications.length?notifications.map(n=>`<div class="item" style="opacity:${n.read?.65:1}"><div><b>${n.read?'':'● '}${escapeHtml(n.title)}</b><small>${escapeHtml(n.text)}</small><small>${escapeHtml(n.time||'')}</small></div></div>`).join(''):'<div class="empty">No notifications.</div>'}
+
+function markNotificationsRead(){notifications.forEach(n=>n.read=true);saveNotifications();renderNotifications();toast('Notifications marked as read')}
+
+function renderSettings(){let r=document.getElementById('toggleReminders'),q=document.getElementById('toggleResults');if(r)r.classList.toggle('on',settings.reminders!==false);if(q)q.classList.toggle('on',settings.results!==false)}
+
+function toggleSetting(k){settings[k]=settings[k]===false;saveSettings();renderSettings()}
+
+function openRoomForJoined(i){let x=joinedTours[i];if(!x)return;showRoom(x.name,i)}
+
+function openRoomForSelected(){let i=joinedTours.findIndex(x=>x.name===selectedTour?.n);if(i<0){toast('Join the tournament first');return}showRoom(joinedTours[i].name,i)}
+
+function showRoom(name,i){let code='ENT-'+String(1000+(i*137)%8999),pass='KHL'+String(100+i*17);document.getElementById('roomTitle').textContent=name;document.getElementById('roomId').textContent=code;document.getElementById('roomPass').textContent=pass;document.getElementById('roomModal').classList.add('show')}
+
+function resetDemoData(){if(!confirm('Reset ENTSONE demo data on this browser?'))return;['entsoneTours','entsoneJoined','entsoneResults','entsoneUser','entsoneNotifications','entsoneSettings'].forEach(k=>localStorage.removeItem(k));location.reload()}
+
+function renderHomeTours(){document.getElementById('homeTours').innerHTML=tours.slice(0,3).map(cardTour).join('')}
+
+function renderTours(filter){document.getElementById('allTours').innerHTML=tours.filter(t=>filter==='all'||t[2]===filter).map(cardTour).join('')}
+
+function filterTours(f,b){document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderTours(f)}
+
+function renderGames(){document.getElementById('allGames').innerHTML=games.map(g=>`<div class="game"><div class="ico">${g[0]}</div><h3>${g[1]}</h3><small>${g[2]}</small></div>`).join('')}
+
+function openAuth(){document.getElementById('auth').classList.add('show')}
+
+function toggleAuthChannel(){let c=document.getElementById('authChannel').value;document.getElementById('phone').style.display=c==='phone'?'block':'none';document.getElementById('email').style.display=c==='email'?'block':'none'}
+
+async function requestOtp(){let c=document.getElementById('authChannel').value,d=c==='phone'?document.getElementById('phone').value.replace(/\D/g,''):document.getElementById('email').value.trim().toLowerCase();if(c==='phone'&&d.length!==10){toast('Enter a valid 10-digit mobile number');return}if(c==='email'&&!/^\S+@\S+\.\S+$/.test(d)){toast('Enter a valid email address');return}try{let r=await fetch(`${API_BASE}/api/auth/request-otp`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({channel:c,destination:d})});let x=await r.json();if(!r.ok||!x.success)throw new Error(x.message||'OTP request failed');if(x.demo_code){document.getElementById('otp').value=x.demo_code;document.getElementById('otpHint').textContent='Development OTP generated by ENTSONE backend. Verify it to continue.';toast('Demo OTP generated')}else{document.getElementById('otpHint').textContent='OTP request created. Connect an approved SMS/email provider before production use.';toast('OTP request created')}}catch(e){console.error(e);toast('Could not request OTP')}}
+
+async function verifyOtp(){let c=document.getElementById('authChannel').value,d=c==='phone'?document.getElementById('phone').value.replace(/\D/g,''):document.getElementById('email').value.trim().toLowerCase(),otp=document.getElementById('otp').value.trim(),n=document.getElementById('name').value.trim()||'ENTSONE Player';if(!otp){toast('Enter the OTP');return}try{let r=await fetch(`${API_BASE}/api/auth/verify-otp`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({channel:c,destination:d,otp})});let x=await r.json();if(!r.ok||!x.success)throw new Error(x.message||'OTP verification failed');if(n&&x.user&&x.user.name==='ENTSONE Player'){try{await fetch(`${API_BASE}/api/users`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,email:x.user.email||undefined,phone:x.user.phone||undefined})})}catch(_){}}user={id:x.user.id,name:x.user.name&&x.user.name!=='ENTSONE Player'?x.user.name:n,phone:x.user.phone||null,email:x.user.email||null,joined:user?.joined||0,wins:user?.wins||0,earn:user?.earn||0};localStorage.setItem('entsoneUser',JSON.stringify(user));localStorage.setItem('entsoneSession',x.session_token);closeModal('auth');document.getElementById('authBtn').textContent=(user.name||'Player').split(' ')[0]+' ✓';await syncRegistrations();renderProfile();toast('Login successful')}catch(e){console.error(e);toast(e.message||'OTP verification failed')}}
+
+async function sendOtp(){await requestOtp()}
+
+async function syncRegistrations(){if(!user?.id)return;try{let r=await fetch(`${API_BASE}/api/users/${user.id}/registrations`),d=await r.json();if(!r.ok||!d.success)return;joinedTours=d.registrations.map(x=>({name:x.name,game:x.game,entry:`₹${Number(x.entry_fee||0).toLocaleString('en-IN')}`,prize:`₹${Number(x.prize_pool||0).toLocaleString('en-IN')}`,status:x.status==='COMPLETED'?'Completed':x.status==='ONGOING'?'Ongoing':'Upcoming',mode:x.mode,team:x.team_name||user.name,joinedAt:x.created_at,result:null,tournamentId:x.tournament_id}));await syncUserResults();localStorage.setItem('entsoneJoined',JSON.stringify(joinedTours));renderHistory();renderProfile()}catch(e){console.warn('Registration sync skipped',e.message)}}
+
+async function syncUserResults(){if(!user?.id)return;try{let r=await fetch(`${API_BASE}/api/users/${user.id}/results`),d=await r.json();if(!r.ok||!d.success)return;joinedTours=joinedTours.map(x=>{let rr=d.results.find(z=>Number(z.tournament_id)===Number(x.tournamentId));return rr?{...x,status:'Completed',result:{rank:Number(rr.position||0),points:Number(rr.points||0),kills:Number(rr.kills||0),placement:Number(rr.position||0)}}:x});localStorage.setItem('entsoneJoined',JSON.stringify(joinedTours));renderHistory();renderProfile()}catch(e){console.warn('Result sync skipped',e.message)}}
+
+function openTournament(n,g,p,e){let t=tours.find(x=>x[0]===n);selectedTour={n,g,p,e,meta:t?t[5]:'',id:t?t[7]:null};document.getElementById('tmName').textContent=n;document.getElementById('tmGame').textContent=g;document.getElementById('tmPrize').textContent=p;document.getElementById('tmEntry').textContent=e;document.getElementById('tmSlots').textContent=(t&&t[5]?t[5].match(/\d+/)?.[0]:'100')+' Slots';document.getElementById('tmStart').textContent=t&&t[5]?t[5].replace(/\d+ Slots · /,''): 'Scheduled';document.getElementById('tmRules').textContent=(g.includes('Squad')?'Squad match · team registration · placement + performance scoring.':g.includes('Duo')?'Duo match · team registration · placement + performance scoring.':'Match format · performance determines leaderboard position.')+' Final results are published after the match.';let joined=joinedTours.find(x=>x.name===n);document.getElementById('roomBtn').style.display=joined?'block':'none';if(joined){document.getElementById('teamName').value=joined.team||'';if(document.getElementById('joinMode'))document.getElementById('joinMode').value=joined.mode||'Solo'}else{document.getElementById('teamName').value=''}document.getElementById('tourModal').classList.add('show')}
+
+async function joinTournament(){if(!user){closeModal('tourModal');openAuth();toast('Login required before joining');return}if(!selectedTour)return;if(joinedTours.some(x=>x.name===selectedTour.n)){closeModal('tourModal');toast('You already joined this tournament');return}let mode=document.getElementById('joinMode')?.value||'Solo',team=(document.getElementById('teamName')?.value||'').trim();if(selectedTour.id){try{let r=await fetch(`${API_BASE}/api/tournament-registrations`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tournament_id:selectedTour.id,user_id:user.id,mode,team_name:team||user.name})});let d=await r.json();if(!r.ok||!d.success)throw new Error(d.message||'Registration failed')}catch(e){toast(e.message||'Could not join tournament');return}}let entry={name:selectedTour.n,game:selectedTour.g,entry:selectedTour.e,prize:selectedTour.p,status:'Upcoming',mode,team:team||user.name,joinedAt:new Date().toLocaleString(),result:null,tournamentId:selectedTour.id||null};joinedTours.unshift(entry);localStorage.setItem('entsoneJoined',JSON.stringify(joinedTours));user.joined=(user.joined||0)+1;localStorage.setItem('entsoneUser',JSON.stringify(user));notifications.unshift({id:Date.now(),title:'Tournament joined',text:`You joined ${selectedTour.n}.`,read:false,time:'Just now'});saveNotifications();closeModal('tourModal');renderProfile();renderHistory();page('history');toast(selectedTour.id?'Tournament registration saved to database.':'Tournament added to your history.')}
+
+function renderProfile(){let u=user||{};document.getElementById('profileName').textContent=u.name||'Guest Player';document.getElementById('profileMobile').textContent=u.phone?'+91 '+u.phone:'Not signed in';document.getElementById('pJoined').textContent=u.joined||0;document.getElementById('pWins').textContent=u.wins||0;document.getElementById('pEarn').textContent='₹'+(u.earn||0);document.getElementById('authBtn').textContent=u.name?(u.name.split(' ')[0]+' ✓'):'Login / Sign Up';let box=document.getElementById('myTournaments');if(!joinedTours.length){box.innerHTML='<div class="empty">No tournaments joined yet.</div>'}else{box.innerHTML=joinedTours.slice(0,8).map(x=>`<div style="padding:12px 0;border-bottom:1px solid #25304a"><div class="row"><div><b>${x.name}</b><small class="mut">${x.game}</small></div><span class="badge">${x.status}</span></div><div class="meta" style="margin-top:6px">Entry ${x.entry} · Prize ${x.prize}</div></div>`).join('')}}
+
+function openMoney(m){moneyMode=m;document.getElementById('moneyTitle').textContent=m==='add'?'Add Money':'Withdraw';document.getElementById('amount').value='';document.getElementById('money').classList.add('show')}
+
+function setAmount(a){document.getElementById('amount').value=a}
+
+function moneyAction(){let a=Number(document.getElementById('amount').value);if(!a||a<=0){toast('Enter a valid amount');return}if(a<10){toast('Minimum amount is ₹10');return}closeModal('money');toast('Demo payment flow ready. No real money was charged.')}
+
+function renderWallet(){document.getElementById('navBalance').textContent='₹0';document.getElementById('walletBalance').textContent='₹0';document.getElementById('transactions').innerHTML='<div class="empty">No transactions yet.</div>'}
+
+function toast(m){let t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(window.__t);window.__t=setTimeout(()=>t.classList.remove('show'),3000)}
+
+async function restoreSession(){const token=localStorage.getItem('entsoneSession');if(!token)return;try{const r=await fetch(`${API_BASE}/api/auth/session`,{headers:{Authorization:`Bearer ${token}`}});const d=await r.json();if(!r.ok||!d.success)throw new Error('Session expired');user={...d.user,joined:user?.joined||0,wins:user?.wins||0,earn:user?.earn||0};localStorage.setItem('entsoneUser',JSON.stringify(user));await syncRegistrations();renderProfile();}catch(e){localStorage.removeItem('entsoneSession');localStorage.removeItem('entsoneUser');user=null;renderProfile();console.warn('Session restore skipped:',e.message)}}
+
+renderHomeTours();
+renderGames();
+renderProfile();
+renderWallet();
+renderHistory();
+renderNotifications();
+renderSettings();
+toggleAuthChannel();
+if(location.hash==="#admin")page("admin");
+loadBackendTournaments();
+restoreSession();
+
+</script>
 </body>
 </html>
