@@ -2,1796 +2,2339 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080b18">
 <title>ENTSONE — eSports Tournament Platform</title>
-<meta name="theme-color" content="#080617">
+
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#080617;
-  --panel:#111025;
-  --panel2:#17152f;
-  --line:#29254a;
-  --text:#f5f4ff;
-  --muted:#9b98b7;
-  --purple:#8b5cf6;
-  --cyan:#22d3ee;
-  --green:#22c55e;
-  --red:#ef4444;
-  --yellow:#facc15;
+--bg:#070a14;
+--p:#10162a;
+--p2:#151d35;
+--line:#283351;
+--txt:#f7f8ff;
+--mut:#9ca8c4;
+--a:#7c5cff;
+--c:#16d9ff;
+--g:#39e58c;
+--r:#ff5d76
 }
-html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-body{overflow-x:hidden}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+
+body{
+margin:0;
+background:radial-gradient(circle at 15% -5%,#27204d 0,#0a0d1b 38%,#070a14 78%);
+color:var(--txt);
+font:14px system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif
+}
+
 button,input,select,textarea{font:inherit}
 button{cursor:pointer}
-a{text-decoration:none;color:inherit}
-.app{min-height:100vh}
-.header{
-  position:sticky;top:0;z-index:50;
-  height:68px;padding:0 18px;
-  display:flex;align-items:center;justify-content:space-between;
-  background:rgba(8,6,23,.92);
-  backdrop-filter:blur(18px);
-  border-bottom:1px solid var(--line)
+
+.wrap{
+max-width:1200px;
+margin:auto;
+padding:0 18px
 }
-.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:21px;letter-spacing:.5px}
+
+.top{
+position:sticky;
+top:0;
+z-index:30;
+background:#080b18df;
+backdrop-filter:blur(18px);
+border-bottom:1px solid #202943
+}
+
+.nav{
+height:68px;
+display:flex;
+align-items:center;
+gap:22px
+}
+
 .logo{
-  width:38px;height:38px;border-radius:12px;
-  display:grid;place-items:center;
-  background:linear-gradient(135deg,var(--purple),var(--cyan));
-  color:#fff;font-weight:1000;
-  box-shadow:0 0 25px rgba(139,92,246,.35)
+font-weight:950;
+letter-spacing:.1em;
+font-size:25px;
+background:linear-gradient(90deg,#fff,#a88dff,#43e8ff);
+-webkit-background-clip:text;
+color:transparent
 }
-.header-actions{display:flex;align-items:center;gap:9px}
-.icon-btn{
-  width:40px;height:40px;border:1px solid var(--line);
-  border-radius:12px;background:var(--panel);
-  color:var(--text);display:grid;place-items:center
+
+.links{
+display:flex;
+gap:20px;
+flex:1
 }
-.icon-btn:hover{border-color:var(--purple);transform:translateY(-1px)}
-.wallet-pill{
-  border:1px solid var(--line);background:var(--panel);
-  padding:9px 12px;border-radius:12px;font-size:13px;font-weight:800
+
+.links a{
+color:#aeb9d1;
+text-decoration:none;
+font-size:13px
 }
-.drawer{
-  position:fixed;inset:0;z-index:100;
-  pointer-events:none
+
+.links a:hover{color:#fff}
+
+.navRight{
+display:flex;
+gap:8px;
+align-items:center
 }
-.drawer-bg{
-  position:absolute;inset:0;background:rgba(0,0,0,.58);
-  opacity:0;transition:.2s
+
+.walletPill,.profilePill{
+border:1px solid var(--line);
+background:#0e1427;
+border-radius:12px;
+padding:9px 11px
 }
-.drawer-panel{
-  position:absolute;left:0;top:0;bottom:0;width:min(320px,86vw);
-  background:#0e0c20;border-right:1px solid var(--line);
-  transform:translateX(-105%);transition:.25s;
-  padding:22px 16px;overflow:auto
+
+.walletPill{color:#ffd75c}
+
+.btn{
+border:0;
+border-radius:12px;
+padding:11px 15px;
+color:#fff;
+font-weight:850;
+background:linear-gradient(135deg,var(--a),#4c91ff);
+box-shadow:0 8px 25px #604cff25
 }
-.drawer.open{pointer-events:auto}
-.drawer.open .drawer-bg{opacity:1}
-.drawer.open .drawer-panel{transform:translateX(0)}
-.drawer-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
-.drawer-title{font-size:20px;font-weight:900}
-.nav-list{display:grid;gap:8px}
-.nav-item{
-  width:100%;padding:13px 14px;border-radius:12px;
-  border:1px solid transparent;background:transparent;color:var(--text);
-  text-align:left;display:flex;align-items:center;gap:12px
+
+.btn.secondary{
+background:#141d34;
+border:1px solid #2d3958;
+box-shadow:none
 }
-.nav-item:hover,.nav-item.active{background:var(--panel2);border-color:var(--line)}
-.main{max-width:1250px;margin:auto;padding:22px 18px 100px}
+
+.btn.danger{
+background:#441928;
+border:1px solid #713046;
+box-shadow:none
+}
+
+.btn.full{
+width:100%;
+margin-top:10px
+}
+
+.btn.sm{
+padding:8px 11px;
+font-size:12px
+}
+
 .page{display:none}
 .page.active{display:block}
-.hero{
-  border:1px solid var(--line);border-radius:22px;
-  padding:28px;position:relative;overflow:hidden;
-  background:
-    radial-gradient(circle at 85% 15%,rgba(34,211,238,.15),transparent 28%),
-    radial-gradient(circle at 15% 90%,rgba(139,92,246,.2),transparent 35%),
-    linear-gradient(145deg,#15122d,#0e0c20)
+
+.hero{padding:38px 0 18px}
+
+.heroGrid{
+display:grid;
+grid-template-columns:1.15fr .85fr;
+gap:18px
 }
-.hero h1{font-size:clamp(30px,5vw,52px);line-height:1.05;margin-bottom:12px}
-.hero p{max-width:650px;color:var(--muted);line-height:1.6}
-.hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
-.btn{
-  border:1px solid var(--line);background:var(--panel2);
-  color:var(--text);border-radius:12px;padding:11px 16px;
-  font-weight:800;transition:.18s
-}
-.btn:hover{transform:translateY(-1px);border-color:var(--purple)}
-.btn.primary{
-  border-color:transparent;
-  background:linear-gradient(135deg,var(--purple),#6d3fe8)
-}
-.btn.cyan{
-  border-color:transparent;
-  background:linear-gradient(135deg,#0891b2,var(--cyan));color:#041016
-}
-.btn.danger{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.3);color:#fecaca}
-.btn.small{padding:8px 11px;font-size:12px}
-.section{margin-top:26px}
-.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}
-.section-title{font-size:20px;font-weight:900}
-.muted{color:var(--muted)}
-.games{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px
-}
-.game-card{
-  border:1px solid var(--line);background:var(--panel);
-  border-radius:16px;padding:15px;text-align:center;
-  cursor:pointer;transition:.18s
-}
-.game-card:hover{transform:translateY(-2px);border-color:var(--purple)}
-.game-icon{
-  width:48px;height:48px;margin:0 auto 9px;border-radius:14px;
-  display:grid;place-items:center;font-size:22px;
-  background:linear-gradient(135deg,#28234d,#16132f)
-}
-.game-name{font-size:13px;font-weight:800}
-.filters{display:flex;gap:8px;overflow:auto;padding-bottom:4px}
-.filter{
-  flex:0 0 auto;border:1px solid var(--line);background:var(--panel);
-  color:var(--muted);border-radius:999px;padding:9px 13px;font-size:12px;font-weight:800
-}
-.filter.active{color:#fff;border-color:var(--purple);background:rgba(139,92,246,.15)}
-.tournament-grid{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px
-}
-.t-card{
-  border:1px solid var(--line);background:var(--panel);
-  border-radius:18px;padding:17px;transition:.18s
-}
-.t-card:hover{border-color:#40386e;transform:translateY(-2px)}
-.t-top{display:flex;justify-content:space-between;gap:12px}
-.t-game{color:var(--cyan);font-size:12px;font-weight:900}
-.t-name{font-size:18px;font-weight:900;margin-top:5px}
-.status{
-  height:max-content;border-radius:999px;padding:6px 9px;
-  font-size:10px;font-weight:900
-}
-.status.open{background:rgba(34,197,94,.12);color:#86efac}
-.status.upcoming{background:rgba(250,204,21,.12);color:#fde68a}
-.status.ongoing{background:rgba(34,211,238,.12);color:#67e8f9}
-.status.completed{background:rgba(156,163,175,.12);color:#d1d5db}
-.t-meta{
-  display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin:15px 0
-}
-.meta-box{background:#0c0a1b;border:1px solid #211d3b;border-radius:12px;padding:10px}
-.meta-label{font-size:10px;color:var(--muted);text-transform:uppercase}
-.meta-value{font-size:13px;font-weight:900;margin-top:3px}
-.t-actions{display:flex;gap:8px}
-.t-actions .btn{flex:1}
-.empty{
-  border:1px dashed var(--line);border-radius:16px;padding:30px;
-  text-align:center;color:var(--muted)
-}
-.stats{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px
-}
-.stat{
-  border:1px solid var(--line);background:var(--panel);
-  border-radius:16px;padding:16px
-}
-.stat-label{color:var(--muted);font-size:12px}
-.stat-value{font-size:25px;font-weight:950;margin-top:5px}
+
 .card{
-  border:1px solid var(--line);background:var(--panel);
-  border-radius:18px;padding:18px
+border:1px solid var(--line);
+background:linear-gradient(145deg,#151c33,#0e1425);
+border-radius:24px
 }
-.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.field{display:grid;gap:6px}
-.field.full{grid-column:1/-1}
-.field label{font-size:12px;color:var(--muted);font-weight:700}
-.field input,.field select,.field textarea{
-  width:100%;border:1px solid var(--line);background:#0b0919;
-  color:var(--text);border-radius:11px;padding:11px 12px;outline:none
+
+.heroMain{
+padding:34px;
+min-height:450px;
+background:linear-gradient(135deg,#221d4d,#11172d 60%,#0d1323);
+position:relative;
+overflow:hidden
 }
-.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--purple)}
-.table-wrap{overflow:auto}
-table{width:100%;border-collapse:collapse;min-width:650px}
-th,td{padding:11px 10px;border-bottom:1px solid var(--line);text-align:left;font-size:12px}
-th{color:var(--muted);font-weight:800}
-.toast{
-  position:fixed;right:16px;bottom:85px;z-index:200;
-  background:#15122b;border:1px solid var(--line);
-  border-radius:13px;padding:12px 15px;box-shadow:0 15px 45px rgba(0,0,0,.35);
-  transform:translateY(20px);opacity:0;pointer-events:none;transition:.2s
+
+.heroMain:after{
+content:"";
+position:absolute;
+width:360px;
+height:360px;
+right:-130px;
+top:-140px;
+border-radius:50%;
+background:#16d9ff17
 }
-.toast.show{transform:translateY(0);opacity:1}
+
+.eyebrow{
+color:#5de8ff;
+font-weight:900;
+letter-spacing:.15em;
+font-size:12px
+}
+
+.hero h1{
+font-size:clamp(42px,7vw,72px);
+line-height:.95;
+margin:13px 0
+}
+
+.hero h1 span{color:#55e6ff}
+
+.hero p{
+color:#abb7d0;
+line-height:1.7;
+max-width:650px;
+font-size:16px
+}
+
+.actions{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+margin-top:22px
+}
+
+.stats{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:10px;
+margin-top:26px
+}
+
+.stat{
+background:#0b1121;
+border:1px solid #27324d;
+border-radius:15px;
+padding:14px
+}
+
+.stat b{font-size:20px}
+
+.stat small{
+display:block;
+color:var(--mut);
+margin-top:3px
+}
+
+.featured{padding:24px}
+
+.tag{
+display:inline-block;
+border-radius:99px;
+padding:6px 9px;
+background:#30224e;
+color:#d7cbff;
+font-size:11px;
+font-weight:900
+}
+
+.featured h2{
+font-size:27px;
+margin:18px 0 6px
+}
+
+.mut{color:var(--mut)}
+
+.prize{
+font-size:35px;
+font-weight:950;
+margin:22px 0
+}
+
+.bar{
+height:8px;
+background:#26304a;
+border-radius:99px;
+overflow:hidden
+}
+
+.bar i{
+display:block;
+height:100%;
+width:72%;
+background:linear-gradient(90deg,var(--a),var(--c))
+}
+
+section{padding:25px 0}
+
+.head{
+display:flex;
+justify-content:space-between;
+gap:12px;
+align-items:end;
+margin-bottom:15px
+}
+
+.head h2{
+margin:0;
+font-size:24px
+}
+
+.head p{
+margin:4px 0 0;
+color:var(--mut);
+font-size:12px
+}
+
+.grid4{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:12px
+}
+
+.game{
+padding:17px;
+border:1px solid var(--line);
+border-radius:18px;
+background:#10172a;
+min-height:128px
+}
+
+.game .ico{font-size:30px}
+
+.game h3{
+margin:9px 0 4px
+}
+
+.game small{color:var(--mut)}
+
+.filters{
+display:flex;
+gap:7px;
+overflow:auto;
+padding-bottom:3px
+}
+
+.chip{
+border:1px solid #2b3654;
+background:#10172a;
+color:#aeb9d1;
+border-radius:99px;
+padding:8px 12px;
+white-space:nowrap
+}
+
+.chip.active{
+background:#6c53e8;
+color:#fff
+}
+
+.tours{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:12px;
+margin-top:12px
+}
+
+.tour{
+padding:17px;
+border:1px solid var(--line);
+border-radius:19px;
+background:#10172a
+}
+
+.tourTop,.row{
+display:flex;
+justify-content:space-between;
+gap:10px;
+align-items:center
+}
+
+.badge{
+font-size:10px;
+color:#c5d4f5;
+background:#1a2642;
+border-radius:8px;
+padding:6px 8px
+}
+
+.open{
+font-size:10px;
+color:var(--g);
+font-weight:900
+}
+
+.tour h3{
+margin:15px 0 6px
+}
+
+.meta{
+color:var(--mut);
+font-size:12px;
+line-height:1.8
+}
+
+.tourFoot{
+border-top:1px solid #26304a;
+margin-top:13px;
+padding-top:13px
+}
+
+.tourFoot b{font-size:18px}
+
+.tourFoot small{
+display:block;
+color:var(--mut);
+font-size:10px
+}
+
+.steps{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:12px
+}
+
+.step{
+padding:18px;
+border:1px solid var(--line);
+border-radius:18px;
+background:#0e1426
+}
+
+.num{
+width:31px;
+height:31px;
+display:grid;
+place-items:center;
+background:#6c53e8;
+border-radius:10px;
+font-weight:900
+}
+
+.step p{
+color:var(--mut);
+font-size:12px;
+line-height:1.6
+}
+
+.dashboard{padding:26px 0}
+
+.dashHead{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:15px;
+margin-bottom:15px
+}
+
+.dashTitle h2{margin:0}
+
+.dashTitle p{
+margin:5px 0;
+color:var(--mut)
+}
+
+.dashGrid{
+display:grid;
+grid-template-columns:1.1fr .9fr;
+gap:13px
+}
+
+.balance{padding:22px}
+
+.balance strong{font-size:34px}
+
+.balanceActions{
+display:flex;
+gap:8px;
+margin-top:17px
+}
+
+.list{padding:18px}
+
+.list h3{margin-top:0}
+
+.item{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:12px 0;
+border-bottom:1px solid #252f49
+}
+
+.item:last-child{border-bottom:0}
+
+.item small{
+color:var(--mut);
+display:block;
+margin-top:3px
+}
+
+.green{color:var(--g)}
+.red{color:#ff7a8e}
+
+.empty{
+padding:28px;
+text-align:center;
+color:var(--mut);
+border:1px dashed #34415f;
+border-radius:17px
+}
+
+footer{
+border-top:1px solid #202943;
+padding:28px 0 95px;
+color:#77839f;
+font-size:12px;
+margin-top:20px
+}
+
+.bottom{display:none}
+
+.amountGrid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:8px;
+margin:12px 0
+}
+
+.amountGrid button,.payMethods div{
+border:1px solid #2d3958;
+background:#11192e;
+color:#eaf0ff;
+border-radius:12px;
+padding:11px;
+text-align:center;
+font-weight:800
+}
+
+.amountGrid button:hover,.payMethods div:hover{
+border-color:#7c5cff
+}
+
+.payMethods{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:7px;
+margin-top:10px
+}
+
+.payMethods div{
+font-size:11px;
+padding:9px
+}
+
 .modal{
-  position:fixed;inset:0;z-index:150;background:rgba(0,0,0,.65);
-  display:none;align-items:center;justify-content:center;padding:18px
+position:fixed;
+inset:0;
+z-index:80;
+display:none;
+place-items:center;
+background:#000b;
+padding:18px
 }
-.modal.show{display:flex}
-.modal-box{
-  width:min(600px,100%);max-height:90vh;overflow:auto;
-  background:#100d23;border:1px solid var(--line);border-radius:20px;padding:20px
+
+.modal.show{display:grid}
+
+.modalBox{
+width:min(450px,100%);
+padding:23px;
+background:#11182c;
+border:1px solid #34405f;
+border-radius:22px
 }
-.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
-.modal-title{font-size:20px;font-weight:900}
-.bottom-nav{
-  position:fixed;left:0;right:0;bottom:0;z-index:60;
-  background:rgba(9,7,22,.95);backdrop-filter:blur(15px);
-  border-top:1px solid var(--line);
-  display:flex;justify-content:center
+
+.modalBox h2{margin-top:0}
+
+.modalBox input{
+width:100%;
+padding:13px;
+border-radius:12px;
+border:1px solid #34405e;
+background:#0a1020;
+color:#fff;
+margin:7px 0 13px;
+outline:none
 }
-.bottom-inner{width:min(600px,100%);display:grid;grid-template-columns:repeat(5,1fr)}
-.bottom-item{
-  border:0;background:transparent;color:var(--muted);
-  padding:9px 4px 10px;font-size:10px;font-weight:800
+
+.x{
+float:right;
+border:0;
+background:none;
+color:#b5c0d6;
+font-size:23px
 }
-.bottom-item.active{color:#fff}
-.bottom-icon{font-size:18px;display:block;margin-bottom:3px}
-.login-box{max-width:500px;margin:35px auto}
+
+.toast{
+position:fixed;
+right:18px;
+bottom:22px;
+z-index:100;
+background:#17223a;
+border:1px solid #3a4868;
+padding:13px 15px;
+border-radius:12px;
+display:none
+}
+
+.toast.show{display:block}
+
+.adminGrid{
+display:grid;
+grid-template-columns:380px 1fr;
+gap:14px
+}
+
+.adminForm,.adminList{padding:20px}
+
+.adminForm input,
+.adminForm select,
+.adminForm textarea{
+width:100%;
+padding:12px;
+border-radius:11px;
+border:1px solid #34405e;
+background:#0a1020;
+color:#fff;
+margin:6px 0 11px;
+outline:none
+}
+
+.adminForm label{
+display:block;
+color:#aeb9d1;
+font-size:11px;
+font-weight:800;
+margin-top:4px
+}
+
+.adminStats{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:9px;
+margin-bottom:14px
+}
+
+.adminStat{
+padding:14px;
+border:1px solid var(--line);
+border-radius:15px;
+background:#0e1426
+}
+
+.adminStat b{font-size:21px}
+
+.adminRow{
+padding:14px 0;
+border-bottom:1px solid #26304a
+}
+
+.adminRow:last-child{border-bottom:0}
+
+.adminActions{
+display:flex;
+gap:7px;
+flex-wrap:wrap;
+margin-top:9px
+}
+
+.statusSelect{
+padding:7px 9px;
+border-radius:9px;
+border:1px solid #34405e;
+background:#11192e;
+color:#fff;
+font-size:11px
+}
+
+.resultBox{
+margin-top:14px;
+padding:18px
+}
+
+.resultForm{
+display:grid;
+grid-template-columns:1.5fr .8fr .8fr auto;
+gap:8px;
+align-items:end
+}
+
+.resultForm input{
+width:100%;
+padding:11px;
+border-radius:10px;
+border:1px solid #34405e;
+background:#0a1020;
+color:#fff;
+outline:none
+}
+
+.resultTable{
+width:100%;
+border-collapse:collapse;
+margin-top:12px;
+font-size:12px
+}
+
+.resultTable th,
+.resultTable td{
+text-align:left;
+padding:10px 8px;
+border-bottom:1px solid #27314b
+}
+
+.resultTable th{
+color:#8f9bb6;
+font-size:10px;
+text-transform:uppercase
+}
+
+.rank{
+font-weight:950;
+color:#dfe7ff
+}
+
+.winner{color:#ffd75c}
+
+.resultActions{
+display:flex;
+gap:7px;
+flex-wrap:wrap;
+margin-top:12px
+}
+
+.historyGrid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:12px
+}
+
+.historyCard{
+padding:16px;
+border:1px solid var(--line);
+border-radius:18px;
+background:#10172a
+}
+
+.historyCard b{font-size:18px}
+
 .notice{
-  border:1px solid rgba(34,211,238,.25);background:rgba(34,211,238,.07);
-  color:#bae6fd;border-radius:12px;padding:11px;font-size:12px;line-height:1.5
+padding:12px 14px;
+border:1px solid #30405f;
+border-radius:14px;
+background:#0d1427;
+color:#b8c5df;
+font-size:12px;
+line-height:1.5
 }
-@media(max-width:650px){
-  .header{padding:0 12px}
-  .brand{font-size:18px}
-  .wallet-pill{display:none}
-  .main{padding:15px 12px 90px}
-  .hero{padding:21px}
-  .form-grid{grid-template-columns:1fr}
-  .field.full{grid-column:auto}
-  .tournament-grid{grid-template-columns:1fr}
+
+.teamGrid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px
+}
+
+.teamBox{
+padding:14px;
+border:1px solid #2b3654;
+border-radius:15px;
+background:#0d1426
+}
+
+.roomBox{
+padding:16px;
+border:1px solid #334363;
+border-radius:16px;
+background:#0b1224
+}
+
+.roomCode{
+font-size:22px;
+font-weight:950;
+letter-spacing:.08em
+}
+
+.notifDot{
+display:inline-block;
+width:7px;
+height:7px;
+border-radius:50%;
+background:#ff5d76;
+margin-left:4px
+}
+
+.settingsGrid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px
+}
+
+.setting{
+padding:16px;
+border:1px solid var(--line);
+border-radius:17px;
+background:#10172a
+}
+
+.setting label{
+display:flex;
+justify-content:space-between;
+gap:10px;
+align-items:center
+}
+
+.toggle{
+width:42px;
+height:24px;
+border-radius:99px;
+border:1px solid #3a4868;
+background:#18213a;
+position:relative
+}
+
+.toggle i{
+display:block;
+width:18px;
+height:18px;
+border-radius:50%;
+background:#8e9bb8;
+margin:2px;
+transition:.2s
+}
+
+.toggle.on{background:#5b45ca}
+
+.toggle.on i{
+transform:translateX(18px);
+background:#fff
+}
+
+@media(max-width:900px){
+.links{display:none}
+.heroGrid,.dashGrid{grid-template-columns:1fr}
+.grid4{grid-template-columns:repeat(2,1fr)}
+.tours{grid-template-columns:1fr 1fr}
+.steps{grid-template-columns:1fr 1fr}
+.adminGrid{grid-template-columns:1fr}
+}
+
+@media(max-width:700px){
+.resultForm{grid-template-columns:1fr 1fr}
+.resultForm .resultName{grid-column:1/-1}
+.resultForm button{grid-column:1/-1}
+.historyGrid,.settingsGrid,.teamGrid{grid-template-columns:1fr}
+}
+
+@media(max-width:600px){
+html,body{
+max-width:100%;
+overflow-x:hidden
+}
+
+.wrap{padding:0 14px}
+
+.nav{height:62px}
+
+.walletPill,.profilePill{display:none}
+
+.hero{padding-top:24px}
+
+.heroMain{padding:25px}
+
+.hero h1{font-size:52px}
+
+.featured{padding:21px}
+
+.grid4,.tours,.steps{
+grid-template-columns:1fr 1fr
+}
+
+.tour:nth-child(3n){
+grid-column:auto
+}
+
+.game{
+min-height:118px;
+padding:14px
+}
+
+.bottom{
+position:fixed;
+display:grid;
+grid-template-columns:repeat(5,minmax(0,1fr));
+left:0;
+right:0;
+bottom:0;
+z-index:40;
+background:rgba(8,13,27,.96);
+border-top:1px solid #27314a;
+padding:7px 2px calc(7px + env(safe-area-inset-bottom));
+backdrop-filter:blur(15px);
+height:auto;
+min-height:68px;
+overflow:hidden
+}
+
+.bottom button{
+width:100%;
+min-width:0;
+height:54px;
+padding:2px 0;
+border:0;
+background:none;
+color:#8f9bb6;
+font-size:10px!important;
+line-height:1.1;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+gap:2px;
+white-space:nowrap;
+overflow:hidden
+}
+
+.bottom button.active{color:#fff}
+
+.bottom span{
+display:block;
+font-size:17px!important;
+line-height:18px;
+margin:0;
+white-space:nowrap
+}
+
+footer{padding-bottom:88px}
 }
 </style>
 </head>
+
 <body>
-<div class="app">
 
-<header class="header">
-  <div class="brand">
-    <button class="icon-btn" onclick="openDrawer()" aria-label="Menu">☰</button>
-    <div class="logo">E</div>
-    <span>ENTSONE</span>
-  </div>
-  <div class="header-actions">
-    <button class="wallet-pill" onclick="page('wallet')">💰 ₹<span id="walletBalance">0</span></button>
-    <button class="icon-btn" onclick="page('notifications')" aria-label="Notifications">🔔</button>
-    <button class="icon-btn" onclick="page('profile')" aria-label="Profile">👤</button>
-  </div>
-</header>
+<header class="top">
+<div class="wrap nav">
 
-<div class="drawer" id="drawer">
-  <div class="drawer-bg" onclick="closeDrawer()"></div>
-  <aside class="drawer-panel">
-    <div class="drawer-head">
-      <div class="drawer-title">ENTSONE</div>
-      <button class="icon-btn" onclick="closeDrawer()">✕</button>
-    </div>
-    <div class="nav-list">
-      <button class="nav-item" onclick="page('home')">🏠 <span>Home</span></button>
-      <button class="nav-item" onclick="page('tournaments')">🏆 <span>Tournaments</span></button>
-      <button class="nav-item" onclick="page('joined')">🎮 <span>My Tournaments</span></button>
-      <button class="nav-item" onclick="page('results')">📊 <span>Results</span></button>
-      <button class="nav-item" onclick="page('leaderboards')">🥇 <span>Leaderboards</span></button>
-      <button class="nav-item" onclick="page('wallet')">💰 <span>Wallet</span></button>
-      <button class="nav-item" onclick="page('notifications')">🔔 <span>Notifications</span></button>
-      <button class="nav-item" onclick="page('settings')">⚙️ <span>Settings</span></button>
-      <button class="nav-item" onclick="page('admin')">🛠️ <span>Admin</span></button>
-      <button class="nav-item" onclick="page('profile')">👤 <span>Profile</span></button>
-    </div>
-  </aside>
-</div>
+<div class="logo">ENTSONE</div>
 
-<main class="main">
-
-<section id="home" class="page active">
-  <div class="hero">
-    <h1>Play. Compete.<br><span style="color:var(--cyan)">Win Your Rank.</span></h1>
-    <p>ENTSONE is your eSports tournament platform for competitive gaming, live matches, results and leaderboards.</p>
-    <div class="hero-actions">
-      <button class="btn primary" onclick="page('tournaments')">🏆 Explore Tournaments</button>
-      <button class="btn" onclick="page('joined')">🎮 My Tournaments</button>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-head">
-      <div class="section-title">Games</div>
-      <button class="btn small" onclick="page('tournaments')">View All</button>
-    </div>
-    <div class="games" id="homeGames"></div>
-  </div>
-
-  <div class="section">
-    <div class="section-head">
-      <div class="section-title">Live & Upcoming</div>
-      <button class="btn small" onclick="page('tournaments')">All</button>
-    </div>
-    <div class="tournament-grid" id="homeTournaments"></div>
-  </div>
-</section>
-
-<section id="tournaments" class="page">
-  <div class="section-head">
-    <div>
-      <div class="section-title">Tournaments</div>
-      <div class="muted">Choose your game and join a tournament.</div>
-    </div>
-    <button class="btn small" onclick="loadTournaments(true)">↻ Refresh</button>
-  </div>
-  <div class="filters" id="gameFilters"></div>
-  <div style="height:12px"></div>
-  <div class="tournament-grid" id="tournamentList"></div>
-</section>
-
-<section id="joined" class="page">
-  <div class="section-head">
-    <div>
-      <div class="section-title">My Tournaments</div>
-      <div class="muted">Your joined tournament history.</div>
-    </div>
-  </div>
-  <div id="joinedList"></div>
-</section>
-
-<section id="results" class="page">
-  <div class="section-head">
-    <div>
-      <div class="section-title">My Results</div>
-      <div class="muted">Your tournament performance and points.</div>
-    </div>
-    <button class="btn small" onclick="renderResults()">↻ Refresh</button>
-  </div>
-  <div id="myResults"></div>
-</section>
-
-<section id="leaderboards" class="page">
-  <div class="section-head">
-    <div>
-      <div class="section-title">Leaderboards</div>
-      <div class="muted">Published tournament rankings.</div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="field">
-      <label>Select Tournament</label>
-      <select id="leaderboardTournament" onchange="loadLeaderboard(this.value)">
-        <option value="">Select tournament</option>
-      </select>
-    </div>
-    <div id="leaderboardBox" style="margin-top:15px"></div>
-  </div>
-</section>
-
-<section id="wallet" class="page">
-  <div class="section-head">
-    <div>
-      <div class="section-title">Wallet</div>
-      <div class="muted">Demo wallet for ENTSONE testing.</div>
-    </div>
-  </div>
-  <div class="stats">
-    <div class="stat">
-      <div class="stat-label">Available Balance</div>
-      <div class="stat-value">₹<span id="walletBalanceBig">0</span></div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">Joined Tournaments</div>
-      <div class="stat-value" id="walletJoinedCount">0</div>
-    </div>
-  </div>
-  <div class="card" style="margin-top:14px">
-    <div class="notice">This is a demo wallet. No real money is added or charged.</div>
-  </div>
-</section>
-
-<section id="notifications" class="page">
-  <div class="section-head">
-    <div>
-      <div class="section-title">Notifications</div>
-      <div class="muted">Tournament and result updates.</div>
-    </div>
-    <button class="btn small" onclick="clearNotifications()">Clear</button>
-  </div>
-  <div id="notificationList"></div>
-</section>
-
-<section id="settings" class="page">
-  <div class="section-head">
-    <div>
-      <div class="section-title">Settings</div>
-      <div class="muted">Manage your ENTSONE preferences.</div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="field">
-      <label>Notifications</label>
-      <select id="settingNotifications" onchange="saveSettings()">
-        <option value="on">On</option>
-        <option value="off">Off</option>
-      </select>
-    </div>
-    <div style="height:12px"></div>
-    <button class="btn danger" onclick="resetDemoData()">Reset Demo Data</button>
-  </div>
-</section>
-
-<section id="profile" class="page">
-  <div class="login-box">
-    <div class="card">
-      <div class="section-title">Profile</div>
-      <div class="muted" style="margin:5px 0 18px">Your demo ENTSONE profile.</div>
-      <div class="form-grid">
-        <div class="field full">
-          <label>Name</label>
-          <input id="profileName" placeholder="Enter your name">
-        </div>
-        <div class="field full">
-          <label>Email</label>
-          <input id="profileEmail" placeholder="Enter your email">
-        </div>
-        <div class="field full">
-          <label>Mobile</label>
-          <input id="profileMobile" placeholder="Enter mobile number">
-        </div>
-      </div>
-      <button class="btn primary" style="margin-top:14px;width:100%" onclick="saveProfile()">Save Profile</button>
-    </div>
-  </div>
-</section>
-
-<section id="admin" class="page">
-  <div class="section-head">
-    <div>
-      <div class="section-title">Admin Panel</div>
-      <div class="muted">Demo tournament management and results.</div>
-    </div>
-    <button class="btn small" onclick="loadAdmin()">↻ Refresh</button>
-  </div>
-
-  <div class="card">
-    <div class="section-title" style="font-size:17px">Create Tournament</div>
-    <div class="form-grid" style="margin-top:14px">
-      <div class="field">
-        <label>Tournament Name</label>
-        <input id="adminName" placeholder="Tournament name">
-      </div>
-      <div class="field">
-        <label>Game</label>
-        <select id="adminGame"></select>
-      </div>
-      <div class="field">
-        <label>Mode</label>
-        <select id="adminMode">
-          <option>Solo</option>
-          <option>Duo</option>
-          <option>Squad</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Entry Fee</label>
-        <input id="adminEntry" type="number" min="0" value="0">
-      </div>
-      <div class="field">
-        <label>Prize Pool</label>
-        <input id="adminPrize" type="number" min="0" value="0">
-      </div>
-      <div class="field">
-        <label>Slots</label>
-        <input id="adminSlots" type="number" min="1" value="100">
-      </div>
-      <div class="field">
-        <label>Start Label</label>
-        <input id="adminStartLabel" placeholder="Tonight 8:00 PM">
-      </div>
-      <div class="field">
-        <label>Status</label>
-        <select id="adminStatus">
-          <option>OPEN</option>
-          <option>UPCOMING</option>
-          <option>ONGOING</option>
-          <option>COMPLETED</option>
-        </select>
-      </div>
-    </div>
-    <button class="btn primary" style="margin-top:14px" onclick="createTournament()">+ Create Tournament</button>
-  </div>
-
-  <div class="card" style="margin-top:14px">
-    <div class="section-title" style="font-size:17px">Tournament Management</div>
-    <div id="adminTournamentList" style="margin-top:14px"></div>
-  </div>
-
-  <div class="card" style="margin-top:14px">
-    <div class="section-title" style="font-size:17px">Results</div>
-    <div class="form-grid" style="margin-top:14px">
-      <div class="field">
-        <label>Tournament</label>
-        <select id="resultTournament" onchange="loadAdminResults(this.value)"></select>
-      </div>
-      <div class="field">
-        <label>Player / Team Name</label>
-        <input id="resultPlayer" placeholder="Player or team">
-      </div>
-      <div class="field">
-        <label>User ID (optional)</label>
-        <input id="resultUserId" type="number" placeholder="User ID">
-      </div>
-      <div class="field">
-        <label>Placement</label>
-        <input id="resultPlacement" type="number" min="1" placeholder="1">
-      </div>
-      <div class="field">
-        <label>Kills</label>
-        <input id="resultKills" type="number" min="0" value="0">
-      </div>
-    </div>
-    <button class="btn cyan" style="margin-top:14px" onclick="addResult()">+ Add Result</button>
-    <div id="adminResults" style="margin-top:15px"></div>
-  </div>
-</section>
-
-</main>
-
-<nav class="bottom-nav">
-  <div class="bottom-inner">
-    <button class="bottom-item active" data-page="home" onclick="page('home')">
-      <span class="bottom-icon">🏠</span>Home
-    </button>
-    <button class="bottom-item" data-page="tournaments" onclick="page('tournaments')">
-      <span class="bottom-icon">🏆</span>Tournaments
-    </button>
-    <button class="bottom-item" data-page="joined" onclick="page('joined')">
-      <span class="bottom-icon">🎮</span>My Games
-    </button>
-    <button class="bottom-item" data-page="results" onclick="page('results')">
-      <span class="bottom-icon">📊</span>Results
-    </button>
-    <button class="bottom-item" data-page="profile" onclick="page('profile')">
-      <span class="bottom-icon">👤</span>Profile
-    </button>
-  </div>
+<nav class="links">
+<a href="#" onclick="page('home')">Home</a>
+<a href="#" onclick="page('games')">Games</a>
+<a href="#" onclick="page('tournaments')">Tournaments</a>
+<a href="#" onclick="page('wallet')">Wallet</a>
 </nav>
 
-<div class="modal" id="tournamentModal">
-  <div class="modal-box">
-    <div class="modal-head">
-      <div class="modal-title" id="modalTitle">Tournament</div>
-      <button class="icon-btn" onclick="closeTournamentModal()">✕</button>
-    </div>
-    <div id="modalContent"></div>
-  </div>
+<div class="navRight">
+<button class="btn secondary sm" onclick="page('notifications')">
+🔔<span id="notifCount" class="notifDot"></span>
+</button>
+
+<div class="walletPill">
+💰 <span id="navBalance">₹0</span>
 </div>
 
-<div class="modal" id="editTournamentModal">
-  <div class="modal-box">
-    <div class="modal-head">
-      <div class="modal-title">Edit Tournament</div>
-      <button class="icon-btn" onclick="closeEditModal()">✕</button>
-    </div>
-    <div class="form-grid">
-      <div class="field">
-        <label>Tournament Name</label>
-        <input id="editName">
-      </div>
-      <div class="field">
-        <label>Game</label>
-        <select id="editGame"></select>
-      </div>
-      <div class="field">
-        <label>Mode</label>
-        <select id="editMode">
-          <option>Solo</option>
-          <option>Duo</option>
-          <option>Squad</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Entry Fee</label>
-        <input id="editEntry" type="number" min="0">
-      </div>
-      <div class="field">
-        <label>Prize Pool</label>
-        <input id="editPrize" type="number" min="0">
-      </div>
-      <div class="field">
-        <label>Slots</label>
-        <input id="editSlots" type="number" min="1">
-      </div>
-      <div class="field">
-        <label>Start Label</label>
-        <input id="editStartLabel">
-      </div>
-      <div class="field">
-        <label>Status</label>
-        <select id="editStatus">
-          <option>OPEN</option>
-          <option>UPCOMING</option>
-          <option>ONGOING</option>
-          <option>COMPLETED</option>
-        </select>
-      </div>
-    </div>
-    <button class="btn primary" style="margin-top:15px;width:100%" onclick="saveTournamentEdit()">Save Changes</button>
-  </div>
+<button class="btn sm" id="authBtn" onclick="openAuth()">
+Login / Sign Up
+</button>
 </div>
+
+</div>
+</header>
+
+<main>
+
+<div id="home" class="page active">
+
+<section class="hero">
+<div class="wrap heroGrid">
+
+<div class="card heroMain">
+<div class="eyebrow">ENTSONE ESPORTS ARENA</div>
+
+<h1>
+PLAY.<br>
+COMPETE.<br>
+<span>WIN.</span>
+</h1>
+
+<p>
+One platform for competitive gaming tournaments.
+Find your game, join your match, follow results and manage
+your tournament balance.
+</p>
+
+<div class="actions">
+<button class="btn" onclick="page('tournaments')">
+Explore Tournaments
+</button>
+
+<button class="btn secondary" onclick="page('games')">
+Browse Games
+</button>
+</div>
+
+<div class="stats">
+<div class="stat">
+<b>10+</b>
+<small>Games</small>
+</div>
+
+<div class="stat">
+<b>24/7</b>
+<small>Events</small>
+</div>
+
+<div class="stat">
+<b>Live</b>
+<small>Results</small>
+</div>
+</div>
+</div>
+
+<div class="card featured">
+
+<span class="tag">🔥 FEATURED</span>
+
+<h2>ENTSONE Battle Cup</h2>
+
+<p class="mut">
+Free Fire · Squad · Registration Open
+</p>
+
+<div class="prize">₹10,000</div>
+
+<div class="row mut" style="font-size:11px">
+<span>Prize Pool</span>
+<span>72 / 100 Slots</span>
+</div>
+
+<div class="bar">
+<i></i>
+</div>
+
+<div class="row" style="margin-top:20px">
+
+<div>
+<small class="mut">Entry</small><br>
+<b>₹49</b>
+</div>
+
+<div>
+<small class="mut">Starts</small><br>
+<b>9:00 PM</b>
+</div>
+
+</div>
+
+<button class="btn full"
+onclick="openTournament('ENTSONE Battle Cup','Free Fire · Squad','₹10,000','₹49')">
+View Tournament
+</button>
+
+</div>
+
+</div>
+</section>
+
+<section>
+<div class="wrap">
+
+<div class="head">
+
+<div>
+<h2>Popular Games</h2>
+<p>Competitive titles available on ENTSONE.</p>
+</div>
+
+<button class="btn secondary sm" onclick="page('games')">
+View All
+</button>
+
+</div>
+
+<div class="grid4">
+
+<div class="game">
+<div class="ico">🔥</div>
+<h3>Free Fire</h3>
+<small>Solo · Duo · Squad</small>
+</div>
+
+<div class="game">
+<div class="ico">🎯</div>
+<h3>BGMI</h3>
+<small>Solo · Duo · Squad</small>
+</div>
+
+<div class="game">
+<div class="ico">⚔️</div>
+<h3>ScarFall</h3>
+<small>Solo · Squad</small>
+</div>
+
+<div class="game">
+<div class="ico">💥</div>
+<h3>COD Mobile</h3>
+<small>MP · BR · Duo</small>
+</div>
+
+</div>
+</div>
+</section>
+
+<section>
+<div class="wrap">
+
+<div class="head">
+<div>
+<h2>Upcoming Tournaments</h2>
+<p>Choose an event and start your registration.</p>
+</div>
+</div>
+
+<div class="tours" id="homeTours"></div>
+
+</div>
+</section>
+
+</div>
+
+<div id="games" class="page">
+
+<section class="dashboard">
+<div class="wrap">
+
+<div class="dashHead">
+<div class="dashTitle">
+<h2>Games</h2>
+<p>Choose a title to view its tournaments.</p>
+</div>
+</div>
+
+<div class="grid4" id="allGames"></div>
+
+</div>
+</section>
+
+</div>
+
+<div id="tournaments" class="page">
+
+<section class="dashboard">
+<div class="wrap">
+
+<div class="dashHead">
+<div class="dashTitle">
+<h2>Tournaments</h2>
+<p>Live and upcoming competitive events.</p>
+</div>
+</div>
+
+<div class="filters">
+
+<button class="chip active"
+onclick="filterTours('all',this)">
+All
+</button>
+
+<button class="chip"
+onclick="filterTours('Free Fire',this)">
+Free Fire
+</button>
+
+<button class="chip"
+onclick="filterTours('BGMI',this)">
+BGMI
+</button>
+
+<button class="chip"
+onclick="filterTours('COD Mobile',this)">
+COD Mobile
+</button>
+
+<button class="chip"
+onclick="filterTours('Other',this)">
+Other
+</button>
+
+</div>
+
+<div class="tours" id="allTours"></div>
+
+</div>
+</section>
+
+</div>
+
+<div id="wallet" class="page">
+
+<section class="dashboard">
+<div class="wrap">
+
+<div class="dashHead">
+
+<div class="dashTitle">
+<h2>Wallet</h2>
+<p>Manage your tournament balance and transaction history.</p>
+</div>
+
+<button class="btn" onclick="openMoney('add')">
++ Add Money
+</button>
+
+</div>
+
+<div class="dashGrid">
+
+<div class="card balance">
+
+<small class="mut">Available Balance</small><br>
+
+<strong id="walletBalance">₹0</strong>
+
+<div class="balanceActions">
+
+<button class="btn sm"
+onclick="openMoney('add')">
+Add Money
+</button>
+
+<button class="btn secondary sm"
+onclick="openMoney('withdraw')">
+Withdraw
+</button>
+
+</div>
+
+<p class="mut"
+style="font-size:12px;line-height:1.6">
+
+Production payment and withdrawal processing will require
+a verified payment provider, KYC where applicable,
+and server-side transaction validation.
+
+</p>
+
+</div>
+
+<div class="card list">
+
+<h3>Recent Transactions</h3>
+
+<div id="transactions"></div>
+
+</div>
+
+</div>
+
+</div>
+</section>
+
+</div>
+</head>
+<body>
+<header class="top"><div class="wrap nav">
+<div class="logo">ENTSONE</div>
+<nav class="links"><a href="#" onclick="page('home')">Home</a><a href="#" onclick="page('games')">Games</a><a href="#" onclick="page('tournaments')">Tournaments</a><a href="#" onclick="page('wallet')">Wallet</a></nav>
+<div class="navRight"><button class="btn secondary sm" onclick="page('notifications')">🔔<span id="notifCount" class="notifDot"></span></button><div class="walletPill">💰 <span id="navBalance">₹0</span></div><button class="btn sm" id="authBtn" onclick="openAuth()">Login / Sign Up</button></div>
+</div></header>
+
+<main>
+<div id="home" class="page active">
+<section class="hero"><div class="wrap heroGrid">
+<div class="card heroMain"><div class="eyebrow">ENTSONE ESPORTS ARENA</div><h1>PLAY.<br>COMPETE.<br><span>WIN.</span></h1><p>One platform for competitive gaming tournaments. Find your game, join a contest, play your match, follow results and manage your tournament balance.</p><div class="actions"><button class="btn" onclick="page('tournaments')">Explore Tournaments</button><button class="btn secondary" onclick="page('games')">Browse Games</button></div><div class="stats"><div class="stat"><b>10+</b><small>Games</small></div><div class="stat"><b>24/7</b><small>Events</small></div><div class="stat"><b>Live</b><small>Results</small></div></div></div>
+<div class="card featured"><span class="tag">🔥 FEATURED</span><h2>ENTSONE Battle Cup</h2><p class="mut">Free Fire · Squad · Registration Open</p><div class="prize">₹10,000</div><div class="row mut" style="font-size:11px"><span>Prize Pool</span><span>72 / 100 Slots</span></div><div class="bar"><i></i></div><div class="row" style="margin-top:20px"><div><small class="mut">Entry</small><br><b>₹49</b></div><div><small class="mut">Starts</small><br><b>9:00 PM</b></div></div><button class="btn full" onclick="openTournament('ENTSONE Battle Cup','Free Fire · Squad','₹10,000','₹49')">View Tournament</button></div>
+</div></section>
+
+<section><div class="wrap"><div class="head"><div><h2>Popular Games</h2><p>Competitive titles available on ENTSONE.</p></div><button class="btn secondary sm" onclick="page('games')">View All</button></div><div class="grid4">
+<div class="game"><div class="ico">🔥</div><h3>Free Fire</h3><small>Solo · Duo · Squad</small></div><div class="game"><div class="ico">🎯</div><h3>BGMI</h3><small>Solo · Duo · Squad</small></div><div class="game"><div class="ico">⚔️</div><h3>ScarFall</h3><small>Solo · Squad</small></div><div class="game"><div class="ico">💥</div><h3>COD Mobile</h3><small>MP · BR · Duo</small></div>
+</div></div></section>
+
+<section><div class="wrap"><div class="head"><div><h2>Upcoming Tournaments</h2><p>Choose an event and start your registration.</p></div></div><div class="tours" id="homeTours"></div></div></section>
+</div>
+
+<div id="games" class="page"><section class="dashboard"><div class="wrap"><div class="dashHead"><div class="dashTitle"><h2>Games</h2><p>Choose a title to view its tournaments.</p></div></div><div class="grid4" id="allGames"></div></div></section></div>
+
+<div id="tournaments" class="page"><section class="dashboard"><div class="wrap"><div class="dashHead"><div class="dashTitle"><h2>Tournaments</h2><p>Live and upcoming competitive events.</p></div></div><div class="filters"><button class="chip active" onclick="filterTours('all',this)">All</button><button class="chip" onclick="filterTours('Free Fire',this)">Free Fire</button><button class="chip" onclick="filterTours('BGMI',this)">BGMI</button><button class="chip" onclick="filterTours('COD Mobile',this)">COD Mobile</button><button class="chip" onclick="filterTours('Other',this)">Other</button></div><div class="tours" id="allTours"></div></div></section></div>
+
+<div id="wallet" class="page"><section class="dashboard"><div class="wrap"><div class="dashHead"><div class="dashTitle"><h2>Wallet</h2><p>Manage your tournament balance and transaction history.</p></div><button class="btn" onclick="openMoney('add')">+ Add Money</button></div><div class="dashGrid"><div class="card balance"><small class="mut">Available Balance</small><br><strong id="walletBalance">₹0</strong><div class="balanceActions"><button class="btn sm" onclick="openMoney('add')">Add Money</button><button class="btn secondary sm" onclick="openMoney('withdraw')">Withdraw</button></div><p class="mut" style="font-size:12px;line-height:1.6">Production payment and withdrawal processing will require a verified payment provider, KYC where applicable, and server-side transaction validation.</p></div><div class="card list"><h3>Recent Transactions</h3><div id="transactions"></div></div></div></div></section></div>
+
+<div id="profile" class="page"><section class="dashboard"><div class="wrap"><div class="dashHead"><div class="dashTitle"><h2>Profile</h2><p id="profileSub">Sign in to access your player profile.</p></div><button class="btn secondary sm" onclick="openAuth()">Login / Sign Up</button></div><div class="dashGrid"><div class="card balance"><h3 id="profileName">Guest Player</h3><p class="mut" id="profileMobile">Not signed in</p><div class="stats"><div class="stat"><b id="pJoined">0</b><small>Tournaments</small></div><div class="stat"><b id="pWins">0</b><small>Wins</small></div><div class="stat"><b id="pEarn">₹0</b><small>Winnings</small></div></div><div class="actions"><button class="btn secondary sm" onclick="page('history')">📊 History</button><button class="btn secondary sm" onclick="page('notifications')">🔔 Notifications</button><button class="btn secondary sm" onclick="page('settings')">⚙️ Settings</button></div></div><div class="card list"><h3>My Tournaments</h3><div id="myTournaments" class="empty">No tournaments joined yet.</div></div></div></div></section></div>
+
+<div id="history" class="page"><section class="dashboard"><div class="wrap"><div class="dashHead"><div class="dashTitle"><h2>Tournament History</h2><p>Your joined, ongoing and completed demo matches.</p></div></div><div class="historyGrid" id="historyCards"></div><div class="card list" style="margin-top:13px"><h3>Match History</h3><div id="historyList"></div></div></div></section></div>
+
+<div id="notifications" class="page"><section class="dashboard"><div class="wrap"><div class="dashHead"><div class="dashTitle"><h2>Notifications</h2><p>Tournament updates and platform announcements.</p></div><button class="btn secondary sm" onclick="markNotificationsRead()">Mark all read</button></div><div class="card list"><div id="notificationList"></div></div></div></section></div>
+
+<div id="settings" class="page"><section class="dashboard"><div class="wrap"><div class="dashHead"><div class="dashTitle"><h2>Settings</h2><p>Manage your demo profile preferences.</p></div></div><div class="settingsGrid"><div class="setting"><label><span>Match reminders</span><button id="toggleReminders" class="toggle on" onclick="toggleSetting('reminders')"><i></i></button></label><p class="mut">Show reminders for upcoming tournaments.</p></div><div class="setting"><label><span>Result alerts</span><button id="toggleResults" class="toggle on" onclick="toggleSetting('results')"><i></i></button></label><p class="mut">Show published leaderboard notifications.</p></div><div class="setting"><h3>Profile</h3><button class="btn secondary sm" onclick="openAuth()">Edit account details</button></div><div class="setting"><h3>Demo data</h3><button class="btn danger sm" onclick="resetDemoData()">Reset demo data</button></div></div></div></section></div>
+
+<div id="admin" class="page">
+<section class="dashboard"><div class="wrap">
+<div class="dashHead"><div class="dashTitle"><h2>ENTSONE Admin Panel</h2><p>Tournament management dashboard · demo frontend</p></div><button class="btn secondary" onclick="page('home')">← Back to Site</button></div>
+
+<div class="adminStats"><div class="adminStat"><b id="adminTotal">0</b><small class="mut">Total Tournaments</small></div><div class="adminStat"><b id="adminOpen">0</b><small class="mut">Open</small></div><div class="adminStat"><b id="adminCompleted">0</b><small class="mut">Completed</small></div></div>
+
+<div class="adminGrid">
+<div class="card adminForm">
+<h3 id="adminFormTitle">Create Tournament</h3>
+<label>Tournament Name</label><input id="aName" placeholder="e.g. ENTSONE Night Cup">
+
+<label>Game</label><select id="aGame"><option>Free Fire</option><option>BGMI</option><option>COD Mobile</option><option>ScarFall</option><option>8 Ball Pool</option><option>Ludo</option><option>Other</option></select>
+
+<label>Mode</label><select id="aMode"><option>Solo</option><option>Duo</option><option>Squad</option><option>1v1</option><option>4 Players</option><option>MP</option><option>BR</option></select>
+
+<label>Prize Pool</label><input id="aPrize" placeholder="₹5,000">
+<label>Entry (demo)</label><input id="aEntry" placeholder="₹0">
+<label>Slots</label><input id="aSlots" type="number" min="2" placeholder="100">
+<label>Start Time</label><input id="aStart" placeholder="Tomorrow 8:00 PM">
+
+<label>Status</label><select id="aStatus"><option>OPEN</option><option>UPCOMING</option><option>ONGOING</option><option>COMPLETED</option></select>
+
+<button class="btn full" onclick="saveAdminTournament()" id="adminSaveBtn">Create Tournament</button>
+<button class="btn secondary full" onclick="resetAdminForm()" id="adminCancelBtn" style="display:none">Cancel Edit</button>
+
+<p class="mut" style="font-size:11px;margin-bottom:0">Demo admin data is stored in this browser only. Secure server-side admin authentication/database will be required for production.</p>
+</div>
+
+<div class="card adminList"><div class="row"><h3 style="margin:0">Manage Tournaments</h3><span class="badge">ADMIN</span></div><div id="adminTournamentList" style="margin-top:8px"></div></div>
+</div>
+
+<div class="card resultBox"><div class="row"><div><h3 style="margin:0">Match Results</h3><p class="mut" style="margin:4px 0 0;font-size:11px">Add player/team scores and publish the leaderboard.</p></div><span class="badge">DEMO RESULTS</span></div>
+
+<div class="resultForm" style="margin-top:14px"><div class="resultName"><label>Player / Team</label><input id="rName" placeholder="e.g. Raunak Squad"></div><div><label>Placement</label><input id="rPlace" type="number" min="1" placeholder="1"></div><div><label>Kills</label><input id="rKills" type="number" min="0" placeholder="0"></div><button class="btn" onclick="addResult()">Add Result</button></div>
+
+<label style="display:block;margin-top:14px">Tournament</label><select id="rTournament" class="statusSelect" style="width:100%;padding:11px" onchange="renderResultTable()"></select>
+
+<div id="resultAdminTable"></div>
+
+<div class="resultActions"><button class="btn secondary sm" onclick="clearResults()">Clear Results</button><button class="btn sm" onclick="publishResults()">Publish Results</button></div>
+
+<p class="mut" style="font-size:10px;margin-bottom:0">Demo only: results are stored in this browser. No real-money payout is processed.</p>
+</div></div></section></div>
+</main>
+
+<footer><div class="wrap"><b style="color:#dfe7ff">ENTSONE</b> — eSports Tournament Platform. Real OTP, payment gateway, wallet ledger, database and admin services must be connected server-side before accepting real money.</div></footer>
+
+<nav class="bottom">
+<button onclick="page('home')">🏠<span>Home</span></button>
+<button onclick="page('games')">🎮<span>Games</span></button>
+<button onclick="page('tournaments')">🏆<span>Tournaments</span></button>
+<button onclick="page('wallet')">💰<span>Wallet</span></button>
+<button onclick="page('profile')">👤<span>Profile</span></button>
+<button onclick="page('admin')">🛠️<span>Admin</span></button>
+</nav>
+
+<div class="modal" id="auth"><div class="modalBox"><button class="x" onclick="closeModal('auth')">×</button><h2>ENTSONE Login / Sign Up</h2><p class="mut">Enter your mobile number to continue.</p><input id="phone" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number"><input id="name" placeholder="Name (for new account)"><button class="btn full" onclick="sendOtp()">Send OTP</button><p class="mut" style="font-size:11px">This screen is ready for secure OTP-provider integration. It does not fake a successful OTP verification.</p></div></div>
+
+<div class="modal" id="money"><div class="modalBox"><button class="x" onclick="closeModal('money')">×</button><div class="tag">WALLET</div><h2 id="moneyTitle">Add Money</h2><p class="mut">Choose an amount to continue.</p><div class="amountGrid"><button onclick="setAmount(100)">₹100</button><button onclick="setAmount(250)">₹250</button><button onclick="setAmount(500)">₹500</button><button onclick="setAmount(1000)">₹1,000</button></div><input id="amount" inputmode="decimal" placeholder="₹ Enter amount"><div class="payMethods"><div>UPI</div><div>Cards</div><div>Net Banking</div></div><button class="btn full" onclick="moneyAction()">Continue to Payment</button><p class="mut" style="font-size:11px">Demo mode: no real money is charged. A verified payment gateway will be connected later.</p></div></div>
+
+<div class="modal" id="tourModal"><div class="modalBox"><button class="x" onclick="closeModal('tourModal')">×</button><span class="tag">TOURNAMENT DETAILS</span><h2 id="tmName">Tournament</h2><p class="mut" id="tmGame"></p><div class="row"><div><small class="mut">Prize</small><br><b id="tmPrize"></b></div><div><small class="mut">Entry</small><br><b id="tmEntry"></b></div></div><div class="row" style="margin-top:14px"><div><small class="mut">Slots</small><br><b id="tmSlots">100</b></div><div><small class="mut">Start</small><br><b id="tmStart">—</b></div></div><div class="card" style="margin-top:14px;padding:13px;background:#0b1224"><b>Rules & Scoring</b><p class="mut" id="tmRules" style="font-size:12px;line-height:1.5;margin-bottom:0">Follow the selected game rules. Results and leaderboard will be recorded after the match.</p></div><div id="teamJoinBox" class="card" style="margin-top:14px;padding:14px;background:#0b1224"><b>Registration</b><div class="teamGrid" style="margin-top:8px"><div><label class="mut" style="font-size:11px">Mode</label><select id="joinMode" class="statusSelect" style="width:100%;padding:10px"><option>Solo</option><option>Duo</option><option>Squad</option></select></div><div><label class="mut" style="font-size:11px">Team name</label><input id="teamName" placeholder="Optional team name" style="margin:0;padding:10px"></div></div></div><button class="btn full" onclick="joinTournament()">Join Tournament</button><button id="roomBtn" class="btn secondary full" onclick="openRoomForSelected()" style="display:none">🔐 View Match Room</button><p class="mut" style="font-size:11px">Demo tournament flow: real entry-fee payment will not be processed in this demo.</p></div></div>
+
+<div class="modal" id="resultsModal"><div class="modalBox"><button class="x" onclick="closeModal('resultsModal')">×</button><span class="tag">MATCH RESULTS</span><h2 id="resTitle">Tournament Results</h2><p class="mut" id="resSub">Final leaderboard</p><div id="publicResults"></div><button class="btn secondary full" onclick="closeModal('resultsModal')">Close</button></div></div>
+
+<div class="modal" id="roomModal"><div class="modalBox"><button class="x" onclick="closeModal('roomModal')">×</button><span class="tag">MATCH ROOM</span><h2 id="roomTitle">Match Room</h2><p class="mut">Demo room details. In production these should be revealed by the secure backend at the configured time.</p><div class="roomBox"><small class="mut">ROOM ID</small><div class="roomCode" id="roomId">—</div><small class="mut" style="display:block;margin-top:12px">PASSWORD</small><div class="roomCode" id="roomPass">—</div></div><button class="btn secondary full" onclick="closeModal('roomModal')">Close</button></div></div>
 
 <div class="toast" id="toast"></div>
-
 <script>
- <script>
 const API_BASE="https://entsoneapi.onrender.com";
 const games=[
 ['🔥','Free Fire','Solo · Duo · Squad'],['🎯','BGMI','Solo · Duo · Squad'],['⚔️','ScarFall','Solo · Squad'],['💥','COD Mobile','MP · BR · Duo'],
 ['♟️','Ludo','1v1 · 4 Players'],['🎱','8 Ball Pool','1v1'],['🏰','Clash of Clans','Clan Battles'],['👑','Clash Royale','1v1 · 2v2'],['🏎️','Asphalt','Race Events'],['🎮','More Games','Coming Soon']
 ];
+
 const defaultTours=[
-['ENTSONE Battle Cup','Free Fire · Squad','Free Fire','₹10,000','₹49','100 Slots','Tonight 8:00 PM','OPEN'],
-['BGMI Pro Clash','BGMI · Squad','BGMI','₹25,000','₹99','100 Slots','Tomorrow 7:00 PM','UPCOMING'],
-['COD Mobile Rush','COD Mobile · MP','COD Mobile','₹15,000','₹49','64 Slots','Tomorrow 9:00 PM','UPCOMING'],
-['Pool Masters','8 Ball Pool · 1v1','8 Ball Pool','₹5,000','₹29','32 Slots','Tonight 10:00 PM','OPEN'],
-['Ludo Knockout','Ludo · 1v1','Ludo','₹3,000','₹19','64 Slots','Sunday 6:00 PM','UPCOMING'],
-['Night Duo Wars','Free Fire · Duo','Free Fire','₹8,000','₹39','100 Slots','Saturday 9:30 PM','OPEN']
+['ENTSONE Battle Cup','Free Fire · Squad','Free Fire','₹10,000','₹49','100 Slots · Tonight 9:00 PM','OPEN'],
+['BGMI Pro Clash','BGMI · Squad','BGMI','₹25,000','₹99','100 Slots · Tomorrow 8:00 PM','OPEN'],
+['COD Mobile Rush','COD Mobile · Duo','COD Mobile','₹5,000','₹29','64 Slots · Tomorrow 7:30 PM','OPEN'],
+['Pool Masters','8 Ball Pool · 1v1','Other','₹2,500','₹19','32 Slots · Saturday 6:00 PM','OPEN'],
+['Ludo Knockout','Ludo · 1v1','Other','₹3,000','₹29','64 Slots · Sunday 5:00 PM','UPCOMING'],
+['Night Duo Wars','Free Fire · Duo','Free Fire','₹7,500','₹39','50 Teams · Sunday 9:30 PM','UPCOMING']
 ];
 
-let tours=[];
-let selectedGame="All";
-let editingTournamentId=null;
+let tours=JSON.parse(localStorage.getItem('entsoneTours')||'null')||defaultTours;
+let backendTournamentMode=false;
 
-function getLS(key,fallback){
-  try{
-    const v=localStorage.getItem(key);
-    return v===null?fallback:JSON.parse(v);
-  }catch(e){return fallback}
-}
-
-function setLS(key,value){
-  localStorage.setItem(key,JSON.stringify(value));
-}
-
-function saveTours(){
-  setLS("entsoneTours",tours);
-}
+function saveTours(){localStorage.setItem('entsoneTours',JSON.stringify(tours))}
 
 function tournamentRowFromApi(t){
-  return {
-    id:t.id,
-    name:t.name,
-    game:t.game,
-    mode:t.mode||"Solo",
-    entry_fee:Number(t.entry_fee||0),
-    prize_pool:Number(t.prize_pool||0),
-    slots:Number(t.slots||100),
-    start_label:t.start_label||"Coming Soon",
-    status:String(t.status||"OPEN").toUpperCase()
-  };
+return [
+t.name,
+`${t.game} · ${t.mode||''}`,
+t.game,
+`₹${Number(t.prize_pool||0).toLocaleString('en-IN')}`,
+`₹${Number(t.entry_fee||0).toLocaleString('en-IN')}`,
+`${t.slots||0} Slots · ${t.start_label||'Scheduled'}`,
+t.status||'UPCOMING',
+t.id
+]}
+
+async function loadBackendTournaments(){
+try{
+const r=await fetch(`${API_BASE}/api/tournaments`);
+const d=await r.json();
+if(!r.ok||!d.success||!Array.isArray(d.tournaments))throw new Error('Tournament API failed');
+
+if(d.tournaments.length){
+tours=d.tournaments.map(tournamentRowFromApi);
+backendTournamentMode=true;
+saveTours();
+renderHomeTours();
+renderTours('all');
+renderAdmin();
+}
+}catch(e){
+console.warn('Backend tournament load skipped:',e.message);
+}
 }
 
-async function loadBackendTournaments(showToast=false){
-  try{
-    const res=await fetch(API_BASE+"/api/tournaments");
-    if(!res.ok) throw new Error("API error");
-    const data=await res.json();
-    if(Array.isArray(data.tournaments)){
-      tours=data.tournaments.map(tournamentRowFromApi);
-      saveTours();
-      renderHomeTours();
-      renderTours();
-      renderAdmin();
-      renderResultSelector();
-      updateWallet();
-      if(showToast) toast("Tournaments refreshed");
-      return true;
-    }
-  }catch(e){}
-  return false;
-}
+let selectedTour=null;
+let moneyMode='add';
+let user=JSON.parse(localStorage.getItem('entsoneUser')||'null');
+let joinedTours=JSON.parse(localStorage.getItem('entsoneJoined')||'[]');
+let results=JSON.parse(localStorage.getItem('entsoneResults')||'{}');
 
-function saveNotifications(list){
-  setLS("entsoneNotifications",list);
+let notifications=JSON.parse(localStorage.getItem('entsoneNotifications')||'null')||[
+{id:1,title:'Welcome to ENTSONE',text:'Your tournament dashboard is ready.',read:false,time:'Just now'},
+{id:2,title:'Demo results system',text:'Published match results will appear in your history.',read:false,time:'Today'}
+];
+
+let settings=JSON.parse(localStorage.getItem('entsoneSettings')||'{"reminders":true,"results":true}');
+
+function saveNotifications(){
+localStorage.setItem('entsoneNotifications',JSON.stringify(notifications))
 }
 
 function saveSettings(){
-  const settings=getLS("entsoneSettings",{notifications:"on"});
-  const el=document.getElementById("settingNotifications");
-  if(el) settings.notifications=el.value;
-  setLS("entsoneSettings",settings);
-  toast("Settings saved");
+localStorage.setItem('entsoneSettings',JSON.stringify(settings))
 }
 
-function escapeHtml(str){
-  return String(str??"")
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
+function escapeHtml(v){
+return String(v??'').replace(/[&<>"']/g,m=>({
+'&':'&amp;',
+'<':'&lt;',
+'>':'&gt;',
+'"':'&quot;',
+"'":'&#39;'
+}[m]))
 }
 
-function saveResults(list){
-  setLS("entsoneResults",list);
+function saveResults(){
+localStorage.setItem('entsoneResults',JSON.stringify(results))
 }
 
-function placementPoints(place){
-  const map={1:12,2:9,3:7,4:5,5:4,6:3,7:2,8:1};
-  return map[Number(place)]||0;
+function placementPoints(pos){
+return ({1:12,2:9,3:7,4:5,5:4,6:3,7:2,8:1}[Number(pos)]||0)
 }
 
-function totalPoints(place,kills){
-  return placementPoints(place)+Number(kills||0);
+function totalPoints(pos,kills){
+return placementPoints(pos)+(Number(kills)||0)
 }
 
 function page(id){
-  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-  const target=document.getElementById(id);
-  if(target) target.classList.add("active");
+document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+window.scrollTo(0,0);
+renderProfile();
 
-  document.querySelectorAll(".bottom-item").forEach(b=>{
-    b.classList.toggle("active",b.dataset.page===id);
-  });
+if(id==='games')renderGames();
+if(id==='tournaments')renderTours('all');
+if(id==='home')renderHomeTours();
+if(id==='wallet')renderWallet();
+if(id==='admin')renderAdmin();
+if(id==='history')renderHistory();
+if(id==='notifications')renderNotifications();
+if(id==='settings')renderSettings();
 
-  closeDrawer();
-
-  if(id==="home") renderHomeTours();
-  if(id==="tournaments") renderTours();
-  if(id==="joined") renderJoined();
-  if(id==="results") renderResults();
-  if(id==="leaderboards") fillLeaderboardSelector();
-  if(id==="notifications") renderNotifications();
-  if(id==="settings") renderSettings();
-  if(id==="profile") renderProfile();
-  if(id==="admin") loadAdmin();
-
-  window.scrollTo({top:0,behavior:"smooth"});
-}
-
-function openDrawer(){
-  document.getElementById("drawer").classList.add("open");
-}
-
-function closeDrawer(){
-  document.getElementById("drawer").classList.remove("open");
+history.replaceState(null,'','#'+id);
 }
 
 function cardTour(t){
-  const status=String(t.status||"OPEN").toLowerCase();
-  const entry=Number(t.entry_fee||0);
-  const prize=Number(t.prize_pool||0);
-  const slots=Number(t.slots||100);
+let st=t[6]||'OPEN';
+let done=st==='COMPLETED';
+let safe=t[0].replace(/'/g,"\\'");
+let onclick=done
+?`viewResults('${safe}')`
+:`openTournament('${safe}','${t[1]}','${t[3]}','${t[4]}')`;
 
-  return `
-  <div class="t-card">
-    <div class="t-top">
-      <div>
-        <div class="t-game">${escapeHtml(t.game||"Game")} · ${escapeHtml(t.mode||"Solo")}</div>
-        <div class="t-name">${escapeHtml(t.name||"Tournament")}</div>
-      </div>
-      <div class="status ${status}">${escapeHtml(t.status||"OPEN")}</div>
-    </div>
+let label=done?'View Results':'View & Join';
 
-    <div class="t-meta">
-      <div class="meta-box">
-        <div class="meta-label">Prize Pool</div>
-        <div class="meta-value">₹${prize.toLocaleString("en-IN")}</div>
-      </div>
-      <div class="meta-box">
-        <div class="meta-label">Entry</div>
-        <div class="meta-value">${entry===0?"FREE":"₹"+entry}</div>
-      </div>
-      <div class="meta-box">
-        <div class="meta-label">Slots</div>
-        <div class="meta-value">${slots}</div>
-      </div>
-      <div class="meta-box">
-        <div class="meta-label">Start</div>
-        <div class="meta-value">${escapeHtml(t.start_label||"Coming Soon")}</div>
-      </div>
-    </div>
-
-    <div class="t-actions">
-      <button class="btn small" onclick="openTournament(${Number(t.id)||0})">View</button>
-      ${
-        String(t.status).toUpperCase()==="COMPLETED"
-        ? `<button class="btn small" onclick="viewResults(${Number(t.id)||0})">Results</button>`
-        : `<button class="btn small primary" onclick="joinTournament(${Number(t.id)||0})">Join</button>`
-      }
-    </div>
-  </div>`;
+return `<article class="tour">
+<div class="tourTop">
+<span class="badge">${t[1]}</span>
+<span class="open">● ${st}</span>
+</div>
+<h3>${t[0]}</h3>
+<div class="meta">
+${t[5]}<br>
+${done?'Final results published.':st==='ONGOING'?'Match in progress.':'Registration open'}
+</div>
+<div class="tourFoot row">
+<div><b>${t[3]}</b><small>Prize Pool</small></div>
+<div><b>${t[4]}</b><small>Entry Fee</small></div>
+</div>
+<button class="btn full" onclick="${onclick}">${label}</button>
+</article>`
 }
 
 function renderAdmin(){
-  const box=document.getElementById("adminTournamentList");
-  if(!box) return;
+let total=tours.length;
+let open=tours.filter(t=>(t[6]||'OPEN')==='OPEN').length;
+let done=tours.filter(t=>(t[6]||'')==='COMPLETED').length;
 
-  if(!tours.length){
-    box.innerHTML=`<div class="empty">No tournaments found.</div>`;
-    return;
-  }
+document.getElementById('adminTotal').textContent=total;
+document.getElementById('adminOpen').textContent=open;
+document.getElementById('adminCompleted').textContent=done;
 
-  box.innerHTML=tours.map(t=>`
-    <div class="card" style="margin-bottom:10px;background:#0d0b1d">
-      <div style="display:flex;justify-content:space-between;gap:10px;align-items:center">
-        <div>
-          <b>${escapeHtml(t.name)}</b>
-          <div class="muted" style="font-size:11px;margin-top:3px">
-            ${escapeHtml(t.game)} · ${escapeHtml(t.mode)} · ${escapeHtml(t.status)}
-          </div>
-        </div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
-          <button class="btn small" onclick="editAdminTournament(${Number(t.id)||0})">Edit</button>
-          <button class="btn small danger" onclick="deleteAdminTournament(${Number(t.id)||0})">Delete</button>
-        </div>
-      </div>
-    </div>
-  `).join("");
+let box=document.getElementById('adminTournamentList');
+
+if(!total){
+box.innerHTML='<div class="empty">No tournaments created yet.</div>';
+}else{
+box.innerHTML=tours.map((t,i)=>`
+<div class="adminRow">
+<div class="row">
+<div>
+<b>${escapeHtml(t[0])}</b>
+<small class="mut">${escapeHtml(t[1])} · ${escapeHtml(t[5])}</small>
+</div>
+
+<select class="statusSelect" onchange="setAdminStatus(${i},this.value)">
+<option ${t[6]==='OPEN'?'selected':''}>OPEN</option>
+<option ${t[6]==='UPCOMING'?'selected':''}>UPCOMING</option>
+<option ${t[6]==='ONGOING'?'selected':''}>ONGOING</option>
+<option ${t[6]==='COMPLETED'?'selected':''}>COMPLETED</option>
+</select>
+</div>
+
+<div class="meta">
+Prize ${escapeHtml(t[3])} · Entry ${escapeHtml(t[4])} · ${t[5].match(/\d+/)?.[0]||'—'} Slots
+</div>
+
+<div class="adminActions">
+<button class="btn sm secondary" onclick="editAdminTournament(${i})">Edit</button>
+<button class="btn sm secondary" onclick="selectResultTournament(${i})">Results</button>
+<button class="btn sm danger" onclick="deleteAdminTournament(${i})">Delete</button>
+</div>
+</div>`).join('')
+}
+
+renderResultSelector()
 }
 
 async function saveAdminTournament(){
-  const name=document.getElementById("adminName").value.trim();
-  const game=document.getElementById("adminGame").value;
-  const mode=document.getElementById("adminMode").value;
-  const entry=Number(document.getElementById("adminEntry").value||0);
-  const prize=Number(document.getElementById("adminPrize").value||0);
-  const slots=Number(document.getElementById("adminSlots").value||100);
-  const start_label=document.getElementById("adminStartLabel").value.trim();
-  const status=document.getElementById("adminStatus").value;
+const n=document.getElementById('aName').value.trim();
+const g=document.getElementById('aGame').value;
+const m=document.getElementById('aMode').value;
+const p=document.getElementById('aPrize').value.trim()||'₹0';
+const e=document.getElementById('aEntry').value.trim()||'₹0';
+const sl=Math.max(2,Number(document.getElementById('aSlots').value)||2);
+const st=document.getElementById('aStart').value.trim()||'Scheduled';
+const status=document.getElementById('aStatus').value||'UPCOMING';
 
-  if(!name){
-    toast("Tournament name required");
-    return;
-  }
-
-  const payload={
-    name,game,mode,
-    entry_fee:entry,
-    prize_pool:prize,
-    slots,
-    start_label,
-    status
-  };
-
-  try{
-    const res=await fetch(API_BASE+"/api/tournaments",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify(payload)
-    });
-
-    if(!res.ok) throw new Error("create failed");
-
-    const data=await res.json();
-
-    if(data.tournament){
-      tours.push(tournamentRowFromApi(data.tournament));
-      saveTours();
-    }
-
-    resetAdminForm();
-    renderAdmin();
-    renderTours();
-    renderHomeTours();
-    renderResultSelector();
-    toast("Tournament created");
-  }catch(e){
-    const temp={
-      id:Date.now(),
-      name,game,mode,
-      entry_fee:entry,
-      prize_pool:prize,
-      slots,
-      start_label,
-      status
-    };
-    tours.push(temp);
-    saveTours();
-    resetAdminForm();
-    renderAdmin();
-    renderTours();
-    renderHomeTours();
-    renderResultSelector();
-    toast("Tournament saved locally");
-  }
+if(!n){
+toast('Enter tournament name');
+return
 }
 
-function editAdminTournament(id){
-  const t=tours.find(x=>Number(x.id)===Number(id));
-  if(!t) return;
+const payload={
+name:n,
+game:g,
+mode:m,
+entry_fee:Number(String(e).replace(/[^\d.]/g,''))||0,
+prize_pool:Number(String(p).replace(/[^\d.]/g,''))||0,
+start_label:st,
+slots:sl,
+status
+};
 
-  editingTournamentId=id;
+const edit=window.__adminEdit;
 
-  document.getElementById("editName").value=t.name||"";
-  document.getElementById("editGame").value=t.game||"Free Fire";
-  document.getElementById("editMode").value=t.mode||"Solo";
-  document.getElementById("editEntry").value=t.entry_fee||0;
-  document.getElementById("editPrize").value=t.prize_pool||0;
-  document.getElementById("editSlots").value=t.slots||100;
-  document.getElementById("editStartLabel").value=t.start_label||"";
-  document.getElementById("editStatus").value=t.status||"OPEN";
+try{
+const id=Number.isInteger(edit)?tours[edit]?.[7]:null;
 
-  document.getElementById("editTournamentModal").classList.add("show");
+const response=await fetch(
+id?`${API_BASE}/api/tournaments/${id}`:`${API_BASE}/api/tournaments`,
+{
+method:id?'PUT':'POST',
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify(payload)
+}
+);
+
+const data=await response.json();
+
+if(!response.ok||!data.success){
+throw new Error(data.message||'Server rejected tournament')
 }
 
-function closeEditModal(){
-  document.getElementById("editTournamentModal").classList.remove("show");
-  editingTournamentId=null;
+const row=tournamentRowFromApi(data.tournament);
+
+if(Number.isInteger(edit)){
+tours[edit]=row;
+toast('Tournament updated in database')
+}else{
+tours.push(row);
+toast('Tournament created in database')
+}
+
+backendTournamentMode=true;
+saveTours();
+resetAdminForm();
+renderAdmin();
+renderTours('all');
+renderHomeTours();
+
+}catch(err){
+console.error(err);
+toast('Database save failed — tournament not saved');
+}
+}
+
+function editAdminTournament(i){
+let t=tours[i];
+
+document.getElementById('aName').value=t[0];
+
+let parts=t[1].split(' · ');
+
+document.getElementById('aGame').value=parts[0]||'Other';
+document.getElementById('aMode').value=parts[1]||'Solo';
+document.getElementById('aPrize').value=t[3];
+document.getElementById('aEntry').value=t[4];
+document.getElementById('aSlots').value=(t[5].match(/\d+/)||['100'])[0];
+document.getElementById('aStart').value=t[5].replace(/\d+ Slots · /,'');
+document.getElementById('aStatus').value=t[6]||'UPCOMING';
+
+window.__adminEdit=i;
+
+document.getElementById('adminFormTitle').textContent='Edit Tournament';
+document.getElementById('adminSaveBtn').textContent='Save Changes';
+document.getElementById('adminCancelBtn').style.display='block';
+
+window.scrollTo({top:0,behavior:'smooth'});
 }
 
 function resetAdminForm(){
-  document.getElementById("adminName").value="";
-  document.getElementById("adminEntry").value=0;
-  document.getElementById("adminPrize").value=0;
-  document.getElementById("adminSlots").value=100;
-  document.getElementById("adminStartLabel").value="";
-  document.getElementById("adminStatus").value="OPEN";
+window.__adminEdit=null;
+
+document.getElementById('adminFormTitle').textContent='Create Tournament';
+document.getElementById('adminSaveBtn').textContent='Create Tournament';
+document.getElementById('adminCancelBtn').style.display='none';
+
+['aName','aPrize','aEntry','aSlots','aStart'].forEach(id=>{
+document.getElementById(id).value=''
+});
+
+document.getElementById('aStatus').value='UPCOMING';
 }
 
-async function deleteAdminTournament(id){
-  const t=tours.find(x=>Number(x.id)===Number(id));
-  if(!t) return;
+async function deleteAdminTournament(i){
+if(!confirm('Delete this tournament?'))return;
 
-  if(!confirm(`Delete "${t.name}"?`)) return;
+let id=tours[i]?.[7];
 
-  try{
-    const res=await fetch(API_BASE+"/api/tournaments/"+id,{method:"DELETE"});
-    if(!res.ok) throw new Error("delete failed");
-  }catch(e){}
-
-  tours=tours.filter(x=>Number(x.id)!==Number(id));
-  saveTours();
-  renderAdmin();
-  renderTours();
-  renderHomeTours();
-  renderResultSelector();
-  toast("Tournament deleted");
+if(!id){
+toast('Tournament ID missing');
+return
 }
 
-async function setAdminStatus(id,status){
-  const t=tours.find(x=>Number(x.id)===Number(id));
-  if(!t) return;
+try{
+const r=await fetch(`${API_BASE}/api/tournaments/${id}`,{method:'DELETE'});
+const d=await r.json();
 
-  try{
-    const res=await fetch(API_BASE+"/api/tournaments/"+id,{
-      method:"PUT",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({status})
-    });
-    if(!res.ok) throw new Error("update failed");
-  }catch(e){}
+if(!r.ok||!d.success){
+throw new Error(d.message||'Delete failed')
+}
 
-  t.status=status;
-  saveTours();
-  renderAdmin();
-  renderTours();
-  renderHomeTours();
-  toast("Status updated");
+tours.splice(i,1);
+saveTours();
+renderAdmin();
+renderTours('all');
+renderHomeTours();
+
+toast('Tournament deleted from database');
+
+}catch(err){
+console.error(err);
+toast('Database delete failed')
+}
+}
+
+async function setAdminStatus(i,status){
+let id=tours[i]?.[7];
+
+if(!id){
+toast('Tournament ID missing');
+return
+}
+
+let t=tours[i];
+
+let payload={
+name:t[0],
+game:t[2],
+mode:(t[1].split(' · ')[1]||'Solo'),
+entry_fee:Number(String(t[4]).replace(/[^\d.]/g,''))||0,
+prize_pool:Number(String(t[3]).replace(/[^\d.]/g,''))||0,
+start_label:t[5].replace(/^\d+ Slots · /,''),
+slots:Number(t[5].match(/\d+/)?.[0]||0),
+status
+};
+
+try{
+const r=await fetch(`${API_BASE}/api/tournaments/${id}`,{
+method:'PUT',
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify(payload)
+});
+
+const d=await r.json();
+
+if(!r.ok||!d.success){
+throw new Error(d.message||'Status update failed')
+}
+
+tours[i]=tournamentRowFromApi(d.tournament);
+
+saveTours();
+renderAdmin();
+renderTours('all');
+renderHomeTours();
+
+toast('Tournament status updated');
+
+}catch(err){
+console.error(err);
+toast('Database status update failed')
+}
 }
 
 function renderResultSelector(){
-  const sel=document.getElementById("resultTournament");
-  if(!sel) return;
+let s=document.getElementById('rTournament');
 
-  const current=sel.value;
+if(!s)return;
 
-  sel.innerHTML=`<option value="">Select tournament</option>`+
-    tours.map(t=>`<option value="${Number(t.id)}">${escapeHtml(t.name)}</option>`).join("");
+s.innerHTML=tours.map((t,i)=>
+`<option value="${i}">${escapeHtml(t[0])}</option>`
+).join('');
 
-  if(current) sel.value=current;
+renderResultTable();
 }
 
-function selectResultTournament(id){
-  const sel=document.getElementById("resultTournament");
-  if(sel) sel.value=id;
-  loadAdminResults(id);
+function selectResultTournament(i){
+let s=document.getElementById('rTournament');
+
+if(s){
+s.value=i;
+renderResultTable();
 }
 
-async function addResult(){
-  const tournamentId=Number(document.getElementById("resultTournament").value);
-  const player=document.getElementById("resultPlayer").value.trim();
-  const userIdRaw=document.getElementById("resultUserId").value.trim();
-  const placement=Number(document.getElementById("resultPlacement").value);
-  const kills=Number(document.getElementById("resultKills").value||0);
-
-  if(!tournamentId||!player||!placement){
-    toast("Tournament, player and placement required");
-    return;
-  }
-
-  const points=totalPoints(placement,kills);
-
-  const payload={
-    tournament_id:tournamentId,
-    user_id:userIdRaw?Number(userIdRaw):null,
-    player_name:player,
-    placement,
-    kills,
-    points
-  };
-
-  try{
-    const res=await fetch(API_BASE+"/api/results",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify(payload)
-    });
-    if(!res.ok) throw new Error("result failed");
-  }catch(e){
-    const list=getLS("entsoneResults",[]);
-    list.push({
-      id:Date.now(),
-      ...payload
-    });
-    saveResults(list);
-  }
-
-  document.getElementById("resultPlayer").value="";
-  document.getElementById("resultUserId").value="";
-  document.getElementById("resultPlacement").value="";
-  document.getElementById("resultKills").value=0;
-
-  loadAdminResults(tournamentId);
-  toast("Result added");
+document.getElementById('rName').focus();
 }
 
-async function loadAdminResults(tournamentId){
-  const box=document.getElementById("adminResults");
-  if(!box) return;
+function renderResultTable(){
+let s=document.getElementById('rTournament');
+let box=document.getElementById('resultAdminTable');
 
-  if(!tournamentId){
-    box.innerHTML=`<div class="empty">Select a tournament.</div>`;
-    return;
-  }
+if(!s||!box)return;
 
-  try{
-    const res=await fetch(API_BASE+"/api/results/"+tournamentId);
-    const data=await res.json();
+let idx=Number(s.value);
+let arr=results[String(idx)]||[];
 
-    if(Array.isArray(data.results)){
-      renderResultTable(data.results,tournamentId);
-      return;
-    }
-  }catch(e){}
-
-  const local=getLS("entsoneResults",[])
-    .filter(r=>Number(r.tournament_id)===Number(tournamentId));
-
-  renderResultTable(local,tournamentId);
+if(!arr.length){
+box.innerHTML='<div class="empty" style="margin-top:12px">No results added yet.</div>';
+return
 }
 
-function renderResultTable(results,tournamentId){
-  const box=document.getElementById("adminResults");
-  if(!box) return;
-
-  if(!results.length){
-    box.innerHTML=`<div class="empty">No results added yet.</div>`;
-    return;
-  }
-
-  box.innerHTML=`
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Player / Team</th>
-            <th>Placement</th>
-            <th>Kills</th>
-            <th>Points</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${results.map((r,i)=>`
-            <tr>
-              <td>${i+1}</td>
-              <td>${escapeHtml(r.player_name||r.player||"Player")}</td>
-              <td>${Number(r.placement||0)}</td>
-              <td>${Number(r.kills||0)}</td>
-              <td><b>${Number(r.points||totalPoints(r.placement,r.kills))}</b></td>
-              <td>
-                <button class="btn small danger" onclick="removeResult(${Number(r.id)||0},${Number(tournamentId)})">Remove</button>
-              </td>
-            </tr>
-          `).join("")}
-        </tbody>
-      </table>
-    </div>
-    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
-      <button class="btn small danger" onclick="clearResults(${Number(tournamentId)})">Clear Results</button>
-      <button class="btn small primary" onclick="publishResults(${Number(tournamentId)})">Publish Results</button>
-    </div>
-  `;
+box.innerHTML=`
+<table class="resultTable">
+<thead>
+<tr>
+<th>#</th>
+<th>Player / Team</th>
+<th>Place</th>
+<th>Kills</th>
+<th>Points</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+${arr.map((r,i)=>`
+<tr>
+<td>${i+1}</td>
+<td><b>${escapeHtml(r.name)}</b></td>
+<td>${r.place}</td>
+<td>${r.kills}</td>
+<td><b>${r.points}</b></td>
+<td><button class="btn sm danger" onclick="removeResult(${idx},${i})">×</button></td>
+</tr>`).join('')}
+</tbody>
+</table>`
 }
 
-async function removeResult(id,tournamentId){
-  if(!id) return;
+function addResult(){
+let s=document.getElementById('rTournament');
+let name=document.getElementById('rName').value.trim();
+let place=Number(document.getElementById('rPlace').value);
+let kills=Number(document.getElementById('rKills').value)||0;
 
-  try{
-    const res=await fetch(API_BASE+"/api/results/"+id,{method:"DELETE"});
-    if(!res.ok) throw new Error("delete failed");
-  }catch(e){}
-
-  const list=getLS("entsoneResults",[])
-    .filter(r=>Number(r.id)!==Number(id));
-
-  saveResults(list);
-  loadAdminResults(tournamentId);
-  toast("Result removed");
+if(!name){
+toast('Enter player or team name');
+return
 }
 
-async function clearResults(tournamentId){
-  if(!confirm("Clear all results for this tournament?")) return;
-
-  const local=getLS("entsoneResults",[])
-    .filter(r=>Number(r.tournament_id)!==Number(tournamentId));
-
-  saveResults(local);
-  loadAdminResults(tournamentId);
-  toast("Results cleared");
-                      }
- async function publishResults(tournamentId){
-  try{
-    const res=await fetch(API_BASE+"/api/tournaments/"+tournamentId+"/publish-results",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"}
-    });
-    if(!res.ok) throw new Error("publish failed");
-  }catch(e){}
-
-  const t=tours.find(x=>Number(x.id)===Number(tournamentId));
-  if(t) t.status="COMPLETED";
-
-  saveTours();
-  renderAdmin();
-  renderTours();
-  renderHomeTours();
-
-  const notifications=getLS("entsoneNotifications",[]);
-  notifications.unshift({
-    id:Date.now(),
-    text:`Results published for ${t?t.name:"tournament"}.`,
-    time:new Date().toLocaleString("en-IN")
-  });
-  saveNotifications(notifications);
-
-  toast("Results published • Tournament completed");
+if(!place||place<1){
+toast('Enter valid placement');
+return
 }
 
-async function viewResults(tournamentId){
-  const t=tours.find(x=>Number(x.id)===Number(tournamentId));
-  if(!t) return;
+let idx=Number(s.value);
 
-  document.getElementById("modalTitle").textContent=t.name+" — Results";
-  const box=document.getElementById("modalContent");
+if(!results[String(idx)])results[String(idx)]=[];
 
-  box.innerHTML=`<div class="empty">Loading results...</div>`;
-  document.getElementById("tournamentModal").classList.add("show");
+results[String(idx)].push({
+name,
+place,
+kills,
+points:totalPoints(place,kills)
+});
 
-  try{
-    const res=await fetch(API_BASE+"/api/leaderboard/"+tournamentId);
-    const data=await res.json();
+results[String(idx)].sort((a,b)=>b.points-a.points||a.place-b.place);
 
-    if(Array.isArray(data.leaderboard)){
-      renderLeaderboard(data.leaderboard,box);
-      return;
-    }
-  }catch(e){}
+saveResults();
 
-  const local=getLS("entsoneResults",[])
-    .filter(r=>Number(r.tournament_id)===Number(tournamentId))
-    .sort((a,b)=>Number(b.points||0)-Number(a.points||0));
+document.getElementById('rName').value='';
+document.getElementById('rPlace').value='';
+document.getElementById('rKills').value='';
 
-  renderLeaderboard(local,box);
+renderResultTable();
+
+toast('Result added');
 }
 
-function renderLeaderboard(rows,box){
-  if(!rows.length){
-    box.innerHTML=`<div class="empty">No published results yet.</div>`;
-    return;
-  }
+function removeResult(ti,ri){
+let arr=results[String(ti)]||[];
 
-  box.innerHTML=`
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Rank</th>
-            <th>Player / Team</th>
-            <th>Placement</th>
-            <th>Kills</th>
-            <th>Points</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rows.map((r,i)=>`
-            <tr>
-              <td><b>#${i+1}</b></td>
-              <td>${escapeHtml(r.player_name||r.player||"Player")}</td>
-              <td>${Number(r.placement||0)}</td>
-              <td>${Number(r.kills||0)}</td>
-              <td><b>${Number(r.points||0)}</b></td>
-            </tr>
-          `).join("")}
-        </tbody>
-      </table>
-    </div>
-  `;
+arr.splice(ri,1);
+
+results[String(ti)]=arr;
+saveResults();
+renderResultTable();
+
+toast('Result removed');
 }
 
-function closeTournamentModal(){
-  document.getElementById("tournamentModal").classList.remove("show");
+function clearResults(){
+let s=document.getElementById('rTournament');
+
+if(!s)return;
+
+let idx=Number(s.value);
+
+if(!confirm('Clear all results for this tournament?'))return;
+
+delete results[String(idx)];
+
+saveResults();
+renderResultTable();
+
+toast('Results cleared');
 }
 
-function openTournament(id){
-  const t=tours.find(x=>Number(x.id)===Number(id));
-  if(!t) return;
+function publishResults(){
+let s=document.getElementById('rTournament');
 
-  document.getElementById("modalTitle").textContent=t.name;
+if(!s)return;
 
-  const status=String(t.status||"OPEN").toUpperCase();
-  const canJoin=status!=="COMPLETED";
+let idx=Number(s.value);
+let arr=results[String(idx)]||[];
 
-  document.getElementById("modalContent").innerHTML=`
-    <div class="t-game">${escapeHtml(t.game)} · ${escapeHtml(t.mode)}</div>
-    <h2 style="margin-top:6px">${escapeHtml(t.name)}</h2>
-
-    <div class="t-meta" style="margin-top:16px">
-      <div class="meta-box">
-        <div class="meta-label">Prize Pool</div>
-        <div class="meta-value">₹${Number(t.prize_pool||0).toLocaleString("en-IN")}</div>
-      </div>
-      <div class="meta-box">
-        <div class="meta-label">Entry</div>
-        <div class="meta-value">${Number(t.entry_fee||0)===0?"FREE":"₹"+Number(t.entry_fee||0)}</div>
-      </div>
-      <div class="meta-box">
-        <div class="meta-label">Slots</div>
-        <div class="meta-value">${Number(t.slots||100)}</div>
-      </div>
-      <div class="meta-box">
-        <div class="meta-label">Start</div>
-        <div class="meta-value">${escapeHtml(t.start_label||"Coming Soon")}</div>
-      </div>
-    </div>
-
-    <div class="notice">
-      Tournament status: <b>${escapeHtml(t.status||"OPEN")}</b>
-    </div>
-
-    <div style="display:flex;gap:8px;margin-top:15px">
-      ${
-        canJoin
-        ? `<button class="btn primary" style="flex:1" onclick="joinTournament(${Number(t.id)||0});closeTournamentModal()">Join Tournament</button>`
-        : `<button class="btn" style="flex:1" onclick="viewResults(${Number(t.id)||0})">View Results</button>`
-      }
-    </div>
-  `;
-
-  document.getElementById("tournamentModal").classList.add("show");
+if(!arr.length){
+toast('Add at least one result first');
+return
 }
 
-function getJoined(){
-  return getLS("entsoneJoined",[]);
+let t=tours[idx];
+
+if(!t){
+toast('Tournament not found');
+return
 }
 
-function saveJoined(list){
-  setLS("entsoneJoined",list);
+t[6]='COMPLETED';
+
+joinedTours.forEach(x=>{
+if(x.name===t[0]){
+x.status='Completed';
+}
+});
+
+saveTours();
+localStorage.setItem('entsoneJoined',JSON.stringify(joinedTours));
+
+notifications.unshift({
+id:Date.now(),
+title:'Results published',
+text:`Results are live for ${t[0]}.`,
+read:false,
+time:'Just now'
+});
+
+saveNotifications();
+
+renderAdmin();
+renderTours('all');
+renderHomeTours();
+renderHistory();
+renderProfile();
+
+toast('Results published and tournament marked COMPLETED');
 }
 
-async function joinTournament(id){
-  const t=tours.find(x=>Number(x.id)===Number(id));
-  if(!t) return;
+function viewResults(name){
+let idx=tours.findIndex(t=>t[0]===name);
+let arr=results[String(idx)]||[];
 
-  const joined=getJoined();
+document.getElementById('resTitle').textContent=name;
 
-  if(joined.some(x=>Number(x.tournament_id||x.id)===Number(id))){
-    toast("Already joined");
-    page("joined");
-    return;
-  }
+document.getElementById('resSub').textContent=arr.length
+?`Final leaderboard · ${arr.length} result${arr.length===1?'':'s'}`
+:'No published results yet';
 
-  const user=getLS("entsoneUser",null);
-  const userId=user&&user.id?Number(user.id):null;
+document.getElementById('publicResults').innerHTML=arr.length
+?`
+<table class="resultTable">
+<thead>
+<tr>
+<th>Rank</th>
+<th>Player / Team</th>
+<th>Place</th>
+<th>Kills</th>
+<th>Points</th>
+</tr>
+</thead>
+<tbody>
+${arr.map((r,i)=>`
+<tr>
+<td class="rank ${i===0?'winner':''}">${i+1}</td>
+<td><b>${escapeHtml(r.name)}</b></td>
+<td>${r.place}</td>
+<td>${r.kills}</td>
+<td><b>${r.points}</b></td>
+</tr>`).join('')}
+</tbody>
+</table>`
+:'<div class="empty">Results have not been published for this tournament.</div>';
 
-  const entry=Number(t.entry_fee||0);
-
-  if(entry>0){
-    toast("Demo mode: paid entry is not charged");
-  }
-
-  const item={
-    id:Date.now(),
-    tournament_id:Number(id),
-    name:t.name,
-    game:t.game,
-    mode:t.mode,
-    entry_fee:entry,
-    joined_at:new Date().toISOString()
-  };
-
-  joined.unshift(item);
-  saveJoined(joined);
-
-  try{
-    await fetch(API_BASE+"/api/tournament-registrations",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        tournament_id:Number(id),
-        user_id:userId,
-        team_name:"",
-        mode:t.mode
-      })
-    });
-  }catch(e){}
-
-  const notifications=getLS("entsoneNotifications",[]);
-  notifications.unshift({
-    id:Date.now(),
-    text:`You joined ${t.name}.`,
-    time:new Date().toLocaleString("en-IN")
-  });
-  saveNotifications(notifications);
-
-  updateWallet();
-  toast("Tournament joined");
-  page("joined");
+document.getElementById('resultsModal').classList.add('show');
 }
 
-function renderJoined(){
-  const box=document.getElementById("joinedList");
-  if(!box) return;
+function renderHistory(){
+let box=document.getElementById('historyCards');
+let list=document.getElementById('historyList');
 
-  const joined=getJoined();
+if(!box||!list)return;
 
-  if(!joined.length){
-    box.innerHTML=`
-      <div class="empty">
-        <div style="font-size:30px;margin-bottom:8px">🎮</div>
-        You haven't joined any tournaments yet.
-        <div style="margin-top:12px">
-          <button class="btn primary" onclick="page('tournaments')">Explore Tournaments</button>
-        </div>
-      </div>`;
-    return;
-  }
+let completed=joinedTours.filter(x=>x.status==='Completed').length;
+let upcoming=joinedTours.filter(x=>x.status==='Upcoming').length;
+let ongoing=joinedTours.filter(x=>x.status==='Ongoing').length;
 
-  box.innerHTML=`
-    <div class="tournament-grid">
-      ${joined.map(j=>`
-        <div class="t-card">
-          <div class="t-game">${escapeHtml(j.game)} · ${escapeHtml(j.mode)}</div>
-          <div class="t-name">${escapeHtml(j.name)}</div>
-          <div class="muted" style="font-size:11px;margin-top:7px">
-            Joined ${new Date(j.joined_at||Date.now()).toLocaleString("en-IN")}
-          </div>
-          <div style="margin-top:13px">
-            <button class="btn small" onclick="openTournament(${Number(j.tournament_id||j.id)})">View Tournament</button>
-          </div>
-        </div>
-      `).join("")}
-    </div>
-  `;
+box.innerHTML=`
+<div class="historyCard">
+<small class="mut">UPCOMING</small><br>
+<b>${upcoming}</b>
+<p class="mut">Registered matches</p>
+</div>
+
+<div class="historyCard">
+<small class="mut">ONGOING</small><br>
+<b>${ongoing}</b>
+<p class="mut">Matches in progress</p>
+</div>
+
+<div class="historyCard">
+<small class="mut">COMPLETED</small><br>
+<b>${completed}</b>
+<p class="mut">Finished matches</p>
+</div>`;
+
+if(!joinedTours.length){
+list.innerHTML='<div class="empty">No tournament history yet.</div>';
+return
 }
 
-function renderTours(){
-  const box=document.getElementById("tournamentList");
-  if(!box) return;
+list.innerHTML=joinedTours.map((x,i)=>{
+let r=x.result;
 
-  let list=tours;
+return `
+<div class="item">
+<div>
+<b>${escapeHtml(x.name)}</b>
+<small>${escapeHtml(x.game)} · ${escapeHtml(x.mode||'Solo')} · ${escapeHtml(x.team||'Solo')}</small>
+<small>${escapeHtml(x.joinedAt||'')}</small>
+</div>
 
-  if(selectedGame!=="All"){
-    list=list.filter(t=>String(t.game).toLowerCase()===String(selectedGame).toLowerCase());
-  }
+<div style="text-align:right">
+<span class="badge">${escapeHtml(x.status||'Upcoming')}</span>
 
-  if(!list.length){
-    box.innerHTML=`<div class="empty">No tournaments found for this game.</div>`;
-    return;
-  }
+${r?`<small class="green">Rank #${r.rank} · ${r.points} pts</small>`:''}
 
-  box.innerHTML=list.map(cardTour).join("");
-}
-
-function renderHomeTours(){
-  const box=document.getElementById("homeTournaments");
-  if(!box) return;
-
-  const list=tours.slice(0,6);
-
-  box.innerHTML=list.length
-    ? list.map(cardTour).join("")
-    : `<div class="empty">No tournaments available.</div>`;
-}
-
-function renderGames(){
-  const home=document.getElementById("homeGames");
-  const filters=document.getElementById("gameFilters");
-  const adminGame=document.getElementById("adminGame");
-  const editGame=document.getElementById("editGame");
-
-  if(home){
-    home.innerHTML=games.map(g=>`
-      <div class="game-card" onclick="filterGame('${escapeHtml(g[1])}')">
-        <div class="game-icon">${g[0]}</div>
-        <div class="game-name">${escapeHtml(g[1])}</div>
-      </div>
-    `).join("");
-  }
-
-  if(filters){
-    filters.innerHTML=
-      `<button class="filter ${selectedGame==="All"?"active":""}" onclick="filterGame('All')">All</button>`+
-      games.map(g=>`
-        <button class="filter ${selectedGame===g[1]?"active":""}" onclick="filterGame('${escapeHtml(g[1])}')">
-          ${escapeHtml(g[1])}
-        </button>
-      `).join("");
-  }
-
-  if(adminGame){
-    adminGame.innerHTML=games
-      .filter(g=>g[1]!=="More Games")
-      .map(g=>`<option value="${escapeHtml(g[1])}">${escapeHtml(g[1])}</option>`)
-      .join("");
-  }
-
-  if(editGame){
-    editGame.innerHTML=games
-      .filter(g=>g[1]!=="More Games")
-      .map(g=>`<option value="${escapeHtml(g[1])}">${escapeHtml(g[1])}</option>`)
-      .join("");
-  }
-}
-
-function filterGame(game){
-  selectedGame=game;
-  page("tournaments");
-  renderGames();
-  renderTours();
+${x.status!=='Completed'
+?`<button class="btn secondary sm" style="margin-top:5px" onclick="openRoomForJoined(${i})">Room</button>`
+:''}
+</div>
+</div>`
+}).join('')
 }
 
 function renderNotifications(){
-  const box=document.getElementById("notificationList");
-  if(!box) return;
+let box=document.getElementById('notificationList');
 
-  const list=getLS("entsoneNotifications",[]);
+if(!box)return;
 
-  if(!list.length){
-    box.innerHTML=`<div class="empty">No notifications yet.</div>`;
-    return;
-  }
+let unread=notifications.filter(x=>!x.read).length;
 
-  box.innerHTML=list.map(n=>`
-    <div class="card" style="margin-bottom:9px">
-      <b>🔔 ${escapeHtml(n.text||"Notification")}</b>
-      <div class="muted" style="font-size:11px;margin-top:5px">${escapeHtml(n.time||"")}</div>
-    </div>
-  `).join("");
+document.getElementById('notifCount').style.display=unread?'inline-block':'none';
+
+box.innerHTML=notifications.length
+?notifications.map(n=>`
+<div class="item" style="opacity:${n.read?.65:1}">
+<div>
+<b>${n.read?'':'● '}${escapeHtml(n.title)}</b>
+<small>${escapeHtml(n.text)}</small>
+<small>${escapeHtml(n.time||'')}</small>
+</div>
+</div>`).join('')
+:'<div class="empty">No notifications.</div>';
 }
 
-function clearNotifications(){
-  saveNotifications([]);
-  renderNotifications();
-  toast("Notifications cleared");
+function markNotificationsRead(){
+notifications.forEach(n=>n.read=true);
+saveNotifications();
+renderNotifications();
+toast('Notifications marked as read');
 }
 
 function renderSettings(){
-  const settings=getLS("entsoneSettings",{notifications:"on"});
-  const el=document.getElementById("settingNotifications");
-  if(el) el.value=settings.notifications||"on";
+let r=document.getElementById('toggleReminders');
+let q=document.getElementById('toggleResults');
+
+if(r)r.classList.toggle('on',settings.reminders!==false);
+if(q)q.classList.toggle('on',settings.results!==false);
 }
 
-function renderProfile(){
-  const user=getLS("entsoneUser",{
-    name:"",
-    email:"",
-    mobile:""
-  });
-
-  document.getElementById("profileName").value=user.name||"";
-  document.getElementById("profileEmail").value=user.email||"";
-  document.getElementById("profileMobile").value=user.mobile||"";
+function toggleSetting(k){
+settings[k]=settings[k]===false;
+saveSettings();
+renderSettings();
 }
 
-function saveProfile(){
-  const user={
-    ...getLS("entsoneUser",{}),
-    name:document.getElementById("profileName").value.trim(),
-    email:document.getElementById("profileEmail").value.trim(),
-    mobile:document.getElementById("profileMobile").value.trim()
-  };
+function openRoomForJoined(i){
+let x=joinedTours[i];
 
-  setLS("entsoneUser",user);
-  toast("Profile saved");
+if(!x)return;
+
+showRoom(x.name,i);
 }
 
-function renderResults(){
-  const box=document.getElementById("myResults");
-  if(!box) return;
+function openRoomForSelected(){
+let i=joinedTours.findIndex(x=>x.name===selectedTour?.n);
 
-  const user=getLS("entsoneUser",null);
-
-  if(!user||!user.id){
-    const local=getLS("entsoneResults",[]);
-    if(!local.length){
-      box.innerHTML=`<div class="empty">No results available yet.</div>`;
-      return;
-    }
-
-    renderUserResultRows(local,box);
-    return;
-  }
-
-  fetch(API_BASE+"/api/users/"+user.id+"/results")
-    .then(r=>r.json())
-    .then(data=>{
-      if(Array.isArray(data.results)){
-        renderUserResultRows(data.results,box);
-      }else{
-        renderUserResultRows([],box);
-      }
-    })
-    .catch(()=>{
-      renderUserResultRows([],box);
-    });
+if(i<0){
+toast('Join the tournament first');
+return
 }
 
-function renderUserResultRows(rows,box){
-  if(!rows.length){
-    box.innerHTML=`<div class="empty">No results available yet.</div>`;
-    return;
-  }
-
-  box.innerHTML=`
-    <div class="card">
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Tournament</th>
-              <th>Placement</th>
-              <th>Kills</th>
-              <th>Points</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rows.map(r=>`
-              <tr>
-                <td>${escapeHtml(r.tournament_name||r.name||"Tournament")}</td>
-                <td>${Number(r.placement||0)}</td>
-                <td>${Number(r.kills||0)}</td>
-                <td><b>${Number(r.points||0)}</b></td>
-              </tr>
-            `).join("")}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  `;
+showRoom(joinedTours[i].name,i);
 }
 
-function fillLeaderboardSelector(){
-  const sel=document.getElementById("leaderboardTournament");
-  if(!sel) return;
+function showRoom(name,i){
+let code='ENT-'+String(1000+(i*137)%8999);
+let pass='KHL'+String(100+i*17);
 
-  sel.innerHTML=
-    `<option value="">Select tournament</option>`+
-    tours.map(t=>`
-      <option value="${Number(t.id)}">${escapeHtml(t.name)}</option>
-    `).join("");
-}
+document.getElementById('roomTitle').textContent=name;
+document.getElementById('roomId').textContent=code;
+document.getElementById('roomPass').textContent=pass;
 
-async function loadLeaderboard(id){
-  const box=document.getElementById("leaderboardBox");
-  if(!box) return;
-
-  if(!id){
-    box.innerHTML=`<div class="empty">Select a tournament.</div>`;
-    return;
-  }
-
-  box.innerHTML=`<div class="empty">Loading leaderboard...</div>`;
-
-  try{
-    const res=await fetch(API_BASE+"/api/leaderboard/"+id);
-    const data=await res.json();
-
-    if(Array.isArray(data.leaderboard)){
-      renderLeaderboard(data.leaderboard,box);
-      return;
-    }
-  }catch(e){}
-
-  const local=getLS("entsoneResults",[])
-    .filter(r=>Number(r.tournament_id)===Number(id))
-    .sort((a,b)=>Number(b.points||0)-Number(a.points||0));
-
-  renderLeaderboard(local,box);
-}
-
-function updateWallet(){
-  const joined=getJoined();
-  const balance=getLS("entsoneWallet",0);
-
-  const a=document.getElementById("walletBalance");
-  const b=document.getElementById("walletBalanceBig");
-  const c=document.getElementById("walletJoinedCount");
-
-  if(a) a.textContent=Number(balance).toLocaleString("en-IN");
-  if(b) b.textContent=Number(balance).toLocaleString("en-IN");
-  if(c) c.textContent=joined.length;
-}
-
-function toast(message){
-  const el=document.getElementById("toast");
-  if(!el) return;
-
-  el.textContent=message;
-  el.classList.add("show");
-
-  clearTimeout(window.__toastTimer);
-  window.__toastTimer=setTimeout(()=>{
-    el.classList.remove("show");
-  },2200);
+document.getElementById('roomModal').classList.add('show');
 }
 
 function resetDemoData(){
-  if(!confirm("Reset all local demo data?")) return;
+if(!confirm('Reset ENTSONE demo data on this browser?'))return;
 
-  localStorage.removeItem("entsoneJoined");
-  localStorage.removeItem("entsoneUser");
-  localStorage.removeItem("entsoneResults");
-  localStorage.removeItem("entsoneNotifications");
-  localStorage.removeItem("entsoneWallet");
-  localStorage.removeItem("entsoneSettings");
+[
+'entsoneTours',
+'entsoneJoined',
+'entsoneResults',
+'entsoneUser',
+'entsoneNotifications',
+'entsoneSettings'
+].forEach(k=>localStorage.removeItem(k));
 
-  tours=defaultTours.map((x,i)=>({
-    id:9000+i,
-    name:x[0],
-    mode:x[1].split(" · ")[1]||"Solo",
-    game:x[2],
-    prize_pool:Number(String(x[3]).replace(/[^\d]/g,"")),
-    entry_fee:Number(String(x[4]).replace(/[^\d]/g,"")),
-    slots:Number(String(x[5]).replace(/[^\d]/g,""))||100,
-    start_label:x[6],
-    status:x[7]
-  }));
-
-  saveTours();
-  renderAll();
-  toast("Demo data reset");
+location.reload();
 }
 
-async function loadTournaments(showToast=false){
-  const loaded=await loadBackendTournaments(showToast);
-
-  if(!loaded){
-    const local=getLS("entsoneTours",null);
-
-    if(Array.isArray(local)&&local.length){
-      tours=local;
-    }else{
-      tours=defaultTours.map((x,i)=>({
-        id:9000+i,
-        name:x[0],
-        mode:x[1].split(" · ")[1]||"Solo",
-        game:x[2],
-        prize_pool:Number(String(x[3]).replace(/[^\d]/g,"")),
-        entry_fee:Number(String(x[4]).replace(/[^\d]/g,"")),
-        slots:Number(String(x[5]).replace(/[^\d]/g,""))||100,
-        start_label:x[6],
-        status:x[7]
-      }));
-      saveTours();
-    }
-
-    renderHomeTours();
-    renderTours();
-    renderAdmin();
-    renderResultSelector();
-  }
+function renderHomeTours(){
+document.getElementById('homeTours').innerHTML=
+tours.slice(0,3).map(cardTour).join('');
 }
 
-function loadAdmin(){
-  renderGames();
-  renderAdmin();
-  renderResultSelector();
+function renderTours(filter){
+document.getElementById('allTours').innerHTML=
+tours
+.filter(t=>filter==='all'||t[2]===filter)
+.map(cardTour)
+.join('');
 }
 
-async function saveTournamentEdit(){
-  if(!editingTournamentId) return;
-
-  const payload={
-    name:document.getElementById("editName").value.trim(),
-    game:document.getElementById("editGame").value,
-    mode:document.getElementById("editMode").value,
-    entry_fee:Number(document.getElementById("editEntry").value||0),
-    prize_pool:Number(document.getElementById("editPrize").value||0),
-    slots:Number(document.getElementById("editSlots").value||100),
-    start_label:document.getElementById("editStartLabel").value.trim(),
-    status:document.getElementById("editStatus").value
-  };
-
-  if(!payload.name){
-    toast("Tournament name required");
-    return;
-  }
-
-  try{
-    const res=await fetch(API_BASE+"/api/tournaments/"+editingTournamentId,{
-      method:"PUT",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify(payload)
-    });
-
-    if(!res.ok) throw new Error("update failed");
-  }catch(e){}
-
-  const index=tours.findIndex(x=>Number(x.id)===Number(editingTournamentId));
-
-  if(index>=0){
-    tours[index]={
-      ...tours[index],
-      ...payload
-    };
-  }
-
-  saveTours();
-  closeEditModal();
-  renderAdmin();
-  renderTours();
-  renderHomeTours();
-  toast("Tournament updated");
+function filterTours(f,b){
+document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
+b.classList.add('active');
+renderTours(f);
 }
 
-async function createTournament(){
-  await saveAdminTournament();
+function renderGames(){
+document.getElementById('allGames').innerHTML=
+games.map(g=>`
+<div class="game">
+<div class="ico">${g[0]}</div>
+<h3>${g[1]}</h3>
+<small>${g[2]}</small>
+</div>`).join('');
 }
 
-function renderAll(){
-  renderGames();
-  renderHomeTours();
-  renderTours();
-  renderJoined();
-  renderResults();
-  renderNotifications();
-  renderSettings();
-  renderProfile();
-  renderAdmin();
-  renderResultSelector();
-  fillLeaderboardSelector();
-  updateWallet();
+function openAuth(){
+document.getElementById('auth').classList.add('show');
 }
 
-document.addEventListener("keydown",e=>{
-  if(e.key==="Escape"){
-    closeDrawer();
-    closeTournamentModal();
-    closeEditModal();
-  }
+function closeModal(id){
+document.getElementById(id).classList.remove('show');
+}
+
+function sendOtp(){
+let p=document.getElementById('phone').value.replace(/\D/g,'');
+let n=document.getElementById('name').value.trim()||'ENTSONE Player';
+
+if(p.length!==10){
+toast('Enter a valid 10-digit mobile number');
+return
+}
+
+user={
+name:n,
+phone:p,
+joined:user?.joined||0,
+wins:user?.wins||0,
+earn:user?.earn||0
+};
+
+localStorage.setItem('entsoneUser',JSON.stringify(user));
+
+closeModal('auth');
+renderProfile();
+
+document.getElementById('authBtn').textContent=n.split(' ')[0];
+
+toast('Account details saved. Real OTP verification is the next backend connection.');
+}
+
+function openTournament(n,g,p,e){
+let t=tours.find(x=>x[0]===n);
+
+selectedTour={
+n,
+g,
+p,
+e,
+meta:t?t[5]:''
+};
+
+document.getElementById('tmName').textContent=n;
+document.getElementById('tmGame').textContent=g;
+document.getElementById('tmPrize').textContent=p;
+document.getElementById('tmEntry').textContent=e;
+
+document.getElementById('tmSlots').textContent=
+(t&&t[5]?t[5].match(/\d+/)?.[0]:'100')+' Slots';
+
+document.getElementById('tmStart').textContent=
+t&&t[5]?t[5].replace(/\d+ Slots · /,''):'Scheduled';
+
+document.getElementById('tmRules').textContent=
+(g.includes('Squad')
+?'Squad match · team registration · placement + performance scoring.'
+:g.includes('Duo')
+?'Duo match · team registration · placement + performance scoring.'
+:'Match format · performance determines leaderboard position.')
++' Final results are published after the match.';
+
+let joined=joinedTours.find(x=>x.name===n);
+
+document.getElementById('roomBtn').style.display=
+joined?'block':'none';
+
+if(joined){
+document.getElementById('teamName').value=joined.team||'';
+
+if(document.getElementById('joinMode'))
+document.getElementById('joinMode').value=joined.mode||'Solo';
+}else{
+document.getElementById('teamName').value='';
+}
+
+document.getElementById('tourModal').classList.add('show');
+}
+
+function joinTournament(){
+if(!user){
+closeModal('tourModal');
+openAuth();
+toast('Login required before joining');
+return
+}
+
+if(!selectedTour)return;
+
+if(joinedTours.some(x=>x.name===selectedTour.n)){
+closeModal('tourModal');
+toast('You already joined this tournament');
+return
+}
+
+let mode=document.getElementById('joinMode')?.value||'Solo';
+let team=(document.getElementById('teamName')?.value||'').trim();
+
+let entry={
+name:selectedTour.n,
+game:selectedTour.g,
+entry:selectedTour.e,
+prize:selectedTour.p,
+status:'Upcoming',
+mode,
+team:team||user.name,
+joinedAt:new Date().toLocaleString(),
+result:null
+};
+
+joinedTours.unshift(entry);
+
+localStorage.setItem(
+'entsoneJoined',
+JSON.stringify(joinedTours)
+);
+
+user.joined=(user.joined||0)+1;
+
+localStorage.setItem(
+'entsoneUser',
+JSON.stringify(user)
+);
+
+notifications.unshift({
+id:Date.now(),
+title:'Tournament joined',
+text:`You joined ${selectedTour.n}.`,
+read:false,
+time:'Just now'
 });
 
-document.addEventListener("DOMContentLoaded",async()=>{
-  try{
-    tours=getLS("entsoneTours",[]);
-    if(!Array.isArray(tours)||!tours.length){
-      tours=defaultTours.map((x,i)=>({
-        id:9000+i,
-        name:x[0],
-        mode:x[1].split(" · ")[1]||"Solo",
-        game:x[2],
-        prize_pool:Number(String(x[3]).replace(/[^\d]/g,"")),
-        entry_fee:Number(String(x[4]).replace(/[^\d]/g,"")),
-        slots:Number(String(x[5]).replace(/[^\d]/g,""))||100,
-        start_label:x[6],
-        status:x[7]
-      }));
-      saveTours();
-    }
+saveNotifications();
 
-    renderAll();
-    await loadTournaments(false);
-    renderAll();
-  }catch(e){
-    console.error("ENTSONE init error:",e);
-  }
-});
-</script>
+closeModal('tourModal');
+renderProfile();
+renderHistory();
+page('history');
 
+toast('Tournament added to your history.');
+}
+
+function renderProfile(){
+let u=user||{};
+
+document.getElementById('profileName').textContent=
+u.name||'Guest Player';
+
+document.getElementById('profileMobile').textContent=
+u.phone?'+91 '+u.phone:'Not signed in';
+
+document.getElementById('pJoined').textContent=u.joined||0;
+document.getElementById('pWins').textContent=u.wins||0;
+document.getElementById('pEarn').textContent='₹'+(u.earn||0);
+
+document.getElementById('authBtn').textContent=
+u.name?(u.name.split(' ')[0]+' ✓'):'Login / Sign Up';
+
+let box=document.getElementById('myTournaments');
+
+if(!joinedTours.length){
+box.innerHTML='<div class="empty">No tournaments joined yet.</div>';
+}else{
+box.innerHTML=joinedTours.slice(0,8).map(x=>`
+<div style="padding:12px 0;border-bottom:1px solid #25304a">
+<div class="row">
+<div>
+<b>${escapeHtml(x.name)}</b>
+<small class="mut">${escapeHtml(x.game)}</small>
 </div>
+<span class="badge">${escapeHtml(x.status)}</span>
+</div>
+<div class="meta" style="margin-top:6px">
+Entry ${escapeHtml(x.entry)} · Prize ${escapeHtml(x.prize)}
+</div>
+</div>`).join('')
+}
+}
+
+function openMoney(m){
+moneyMode=m;
+
+document.getElementById('moneyTitle').textContent=
+m==='add'?'Add Money':'Withdraw';
+
+document.getElementById('amount').value='';
+
+document.getElementById('money').classList.add('show');
+}
+
+function setAmount(a){
+document.getElementById('amount').value=a;
+}
+
+function moneyAction(){
+let a=Number(document.getElementById('amount').value);
+
+if(!a||a<=0){
+toast('Enter a valid amount');
+return
+}
+
+if(a<10){
+toast('Minimum amount is ₹10');
+return
+}
+
+closeModal('money');
+
+toast('Demo payment flow ready. No real money was charged.');
+}
+
+function renderWallet(){
+document.getElementById('navBalance').textContent='₹0';
+document.getElementById('walletBalance').textContent='₹0';
+
+document.getElementById('transactions').innerHTML=
+'<div class="empty">No transactions yet.</div>';
+}
+
+function toast(m){
+let t=document.getElementById('toast');
+
+t.textContent=m;
+t.classList.add('show');
+
+clearTimeout(window.__t);
+
+window.__t=setTimeout(
+()=>t.classList.remove('show'),
+3000
+);
+}
+
+renderHomeTours();
+renderGames();
+renderProfile();
+renderWallet();
+renderHistory();
+renderNotifications();
+renderSettings();
+
+if(location.hash==="#admin")page("admin");
+
+loadBackendTournaments();
+</script>
 </body>
 </html>
