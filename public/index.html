@@ -2175,7 +2175,10 @@ async function joinTournament(){
     return;
   }
 
-  if(!selectedTour)return;
+  if(!selectedTour){
+    toast('Tournament not selected');
+    return;
+  }
 
   if(joinedTours.some(x=>x.name===selectedTour.n)){
     closeModal('tourModal');
@@ -2183,89 +2186,135 @@ async function joinTournament(){
     return;
   }
 
-  let mode=document.getElementById('joinMode')?.value||'Solo';
-  let team=(document.getElementById('teamName')?.value||'').trim();
+  const mode=document.getElementById('joinMode')?.value||'Solo';
+  const team=(document.getElementById('teamName')?.value||'').trim();
 
   try{
-    /* Demo login user ko PostgreSQL user ID milegi.
-       OTP/authentication ko abhi touch nahi kar rahe. */
-    if(!user.id){
-      let userRes=await fetch(`${API_BASE}/api/users`,{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({
-          name:user.name||'ENTSONE Player',
-          phone:user.phone||null
-        })
-      });
 
-      let userData=await userRes.json();
-
-      if(!userRes.ok||!userData.success||!userData.user?.id){
-        throw new Error(userData.message||'Could not create player');
-      }
-
-      user.id=userData.user.id;
-      localStorage.setItem('entsoneUser',JSON.stringify(user));
-    }
-
-    /* PostgreSQL registration */
-    if(!selectedTour.id){
-  const tourRes=await fetch(`${API_BASE}/api/tournaments`);
-  const tourData=await tourRes.json();
-
-  if(!tourRes.ok||!tourData.success||!Array.isArray(tourData.tournaments)){
-    throw new Error('Could not load tournament');
-  }
-
-  const dbTour=tourData.tournaments.find(
-    t=>String(t.name).trim()===String(selectedTour.n).trim()
-  );
-
-  if(!dbTour?.id){
-    throw new Error('Tournament ID not found');
-  }
-
-  selectedTour.id=dbTour.id;
-  }
-
-    let r=await fetch(`${API_BASE}/api/tournament-registrations`,{
+    /* 1. Always sync player with PostgreSQL */
+    const userRes=await fetch(`${API_BASE}/api/users`,{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{
+        'Content-Type':'application/json'
+      },
       body:JSON.stringify({
-        tournament_id:Number(selectedTour.id),
-        user_id:Number(user.id),
-        mode,
-        team_name:team||user.name
+        name:user.name||'ENTSONE Player',
+        phone:user.phone||null,
+        email:user.email||null
       })
     });
 
-    let d=await r.json();
+    const userData=await userRes.json();
 
-    if(!r.ok||!d.success){
-      throw new Error(d.message||'Registration failed');
+    if(!userRes.ok || !userData.success || !userData.user?.id){
+      throw new Error(
+        userData.message||'Could not create/find player'
+      );
     }
 
-    let entry={
+    user.id=Number(userData.user.id);
+    localStorage.setItem(
+      'entsoneUser',
+      JSON.stringify(user)
+    );
+
+    /* 2. Make sure tournament has PostgreSQL ID */
+    if(!selectedTour.id){
+
+      const tourRes=await fetch(
+        `${API_BASE}/api/tournaments`
+      );
+
+      const tourData=await tourRes.json();
+
+      if(
+        !tourRes.ok ||
+        !tourData.success ||
+        !Array.isArray(tourData.tournaments)
+      ){
+        throw new Error(
+          tourData.message||
+          'Could not load tournaments'
+        );
+      }
+
+      const dbTour=tourData.tournaments.find(
+        t =>
+          String(t.name).trim() ===
+          String(selectedTour.n).trim()
+      );
+
+      if(!dbTour?.id){
+        throw new Error(
+          'Tournament ID not found in database'
+        );
+      }
+
+      selectedTour.id=Number(dbTour.id);
+    }
+
+    /* 3. Save tournament registration in PostgreSQL */
+    const registrationRes=await fetch(
+      `${API_BASE}/api/tournament-registrations`,
+      {
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json'
+        },
+        body:JSON.stringify({
+          tournament_id:Number(selectedTour.id),
+          user_id:Number(user.id),
+          mode:mode,
+          team_name:team || user.name || 'ENTSONE Player'
+        })
+      }
+    );
+
+    const registrationData=
+      await registrationRes.json();
+
+    if(
+      !registrationRes.ok ||
+      !registrationData.success
+    ){
+      throw new Error(
+        registrationData.message||
+        'Registration failed'
+      );
+    }
+
+    /* 4. Keep local history in sync */
+    const entry={
       name:selectedTour.n,
       game:selectedTour.g,
       entry:selectedTour.e,
       prize:selectedTour.p,
       status:'Upcoming',
-      mode,
-      team:team||user.name,
+      mode:mode,
+      team:team || user.name || 'ENTSONE Player',
       joinedAt:new Date().toLocaleString(),
       result:null,
-      tournamentId:selectedTour.id,
-      registrationId:d.registration?.id||null
+      tournamentId:Number(selectedTour.id),
+      registrationId:
+        registrationData.registration?.id || null
     };
 
     joinedTours.unshift(entry);
-    localStorage.setItem('entsoneJoined',JSON.stringify(joinedTours));
 
+    localStorage.setItem(
+      'entsoneJoined',
+      JSON.stringify(joinedTours)
+    );
+
+    /* 5. Update local profile */
     user.joined=(user.joined||0)+1;
-    localStorage.setItem('entsoneUser',JSON.stringify(user));
 
+    localStorage.setItem(
+      'entsoneUser',
+      JSON.stringify(user)
+    );
+
+    /* 6. Notification */
     notifications.unshift({
       id:Date.now(),
       title:'Tournament joined',
@@ -2275,18 +2324,30 @@ async function joinTournament(){
     });
 
     saveNotifications();
+
+    /* 7. Close and refresh UI */
     closeModal('tourModal');
     renderProfile();
     renderHistory();
     page('history');
 
-    toast('Tournament registration saved to database.');
+    toast(
+      'Tournament registration saved to database.'
+    );
 
-  }catch(e){
-    toast(e.message||'Could not join tournament');
+  }catch(error){
+
+    console.error(
+      'Tournament registration error:',
+      error
+    );
+
+    toast(
+      error.message||
+      'Could not join tournament'
+    );
   }
-}
-
+  }
 function renderProfile(){
 let u=user||{};
 
