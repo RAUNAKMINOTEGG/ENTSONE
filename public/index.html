@@ -2211,8 +2211,23 @@ async function joinTournament(){
 
     /* PostgreSQL registration */
     if(!selectedTour.id){
-      throw new Error('Tournament ID not found');
-    }
+  const tourRes=await fetch(`${API_BASE}/api/tournaments`);
+  const tourData=await tourRes.json();
+
+  if(!tourRes.ok||!tourData.success||!Array.isArray(tourData.tournaments)){
+    throw new Error('Could not load tournament');
+  }
+
+  const dbTour=tourData.tournaments.find(
+    t=>String(t.name).trim()===String(selectedTour.n).trim()
+  );
+
+  if(!dbTour?.id){
+    throw new Error('Tournament ID not found');
+  }
+
+  selectedTour.id=dbTour.id;
+  }
 
     let r=await fetch(`${API_BASE}/api/tournament-registrations`,{
       method:'POST',
