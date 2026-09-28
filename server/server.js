@@ -1400,54 +1400,79 @@ app.post("/api/results", async (req, res) => {
 });
 
 /* =========================
-   GET RESULTS
+   GET RESULTS BY TOURNAMENT
 ========================= */
 
-app.get(
-  "/api/results/:tournamentId",
-  async (req, res) => {
-    try {
-      const result = await pool.query(
-        `
-        SELECT
-          id,
-          tournament_id,
-          user_id,
-          player_name,
-          team_name,
-          position,
-          kills,
-          points,
-          created_at
-        FROM results
-        WHERE tournament_id = $1
-        ORDER BY
-          points DESC,
-          position ASC,
-          kills DESC,
-          id ASC
-        `,
-        [req.params.tournamentId]
-      );
+app.get("/api/results/:tournamentId", async (req, res) => {
+  try {
+    const tournamentId = Number(req.params.tournamentId);
 
-      res.json({
-        success: true,
-        results: result.rows
-      });
-
-    } catch (error) {
-      console.error(
-        "Get results error:",
-        error
-      );
-
-      res.status(500).json({
+    if (!Number.isInteger(tournamentId)) {
+      return res.status(400).json({
         success: false,
-        results: []
+        message: "Invalid tournament ID"
       });
     }
+
+    // Existing database columns ko directly assume nahi karenge.
+    // Pehle complete row lenge.
+    const result = await pool.query(
+      `
+      SELECT *
+      FROM results
+      WHERE tournament_id = $1
+      ORDER BY id DESC
+      `,
+      [tournamentId]
+    );
+
+    // Frontend ke liye result fields normalize kar rahe hain.
+    const results = result.rows.map((row) => ({
+      ...row,
+
+      player_name:
+        row.player_name ??
+        row.player ??
+        row.name ??
+        row.username ??
+        "Player",
+
+      team_name:
+        row.team_name ??
+        row.team ??
+        null,
+
+      placement:
+        row.placement != null
+          ? Number(row.placement)
+          : 0,
+
+      kills:
+        row.kills != null
+          ? Number(row.kills)
+          : 0,
+
+      points:
+        row.points != null
+          ? Number(row.points)
+          : 0
+    }));
+
+    return res.json({
+      success: true,
+      results
+    });
+
+  } catch (error) {
+    console.error("Get results error:", error);
+
+    return res.status(500).json({
+      success: false,
+      results: [],
+      message: "Could not get tournament results"
+    });
   }
-);
+});
 
 /* =========================
    LEADERBOARD
