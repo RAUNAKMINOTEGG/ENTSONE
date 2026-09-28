@@ -1263,35 +1263,29 @@ function placementPoints(position) {
 
 app.post("/api/results", async (req, res) => {
   try {
-    const tournamentId =
-      Number(req.body.tournament_id);
+    const tournamentId = Number(req.body.tournament_id);
 
-    const userId =
-      req.body.user_id
-        ? Number(req.body.user_id)
-        : null;
+    const userId = req.body.user_id
+      ? Number(req.body.user_id)
+      : null;
 
-    const playerName =
-      String(
-        req.body.player_name ||
-        req.body.team_name ||
-        ""
-      ).trim();
+    const playerName = String(
+      req.body.player_name ||
+      req.body.team_name ||
+      ""
+    ).trim();
 
-    const teamName =
-      String(
-        req.body.team_name ||
-        playerName
-      ).trim();
+    const teamName = String(
+      req.body.team_name ||
+      playerName
+    ).trim();
 
-    const position =
-      Number(req.body.position);
+    const position = Number(req.body.position);
 
-    const kills =
-      Math.max(
-        0,
-        Number(req.body.kills) || 0
-      );
+    const kills = Math.max(
+      0,
+      Number(req.body.kills) || 0
+    );
 
     if (
       !Number.isInteger(tournamentId) ||
@@ -1305,6 +1299,23 @@ app.post("/api/results", async (req, res) => {
           "Tournament, player, and valid placement are required"
       });
     }
+
+    /* =========================
+       ENSURE RESULTS COLUMNS
+    ========================= */
+
+    await pool.query(`
+      ALTER TABLE results
+      ADD COLUMN IF NOT EXISTS player_name VARCHAR(255),
+      ADD COLUMN IF NOT EXISTS team_name VARCHAR(255),
+      ADD COLUMN IF NOT EXISTS position INTEGER,
+      ADD COLUMN IF NOT EXISTS kills INTEGER DEFAULT 0,
+      ADD COLUMN IF NOT EXISTS points INTEGER DEFAULT 0
+    `);
+
+    /* =========================
+       CHECK TOURNAMENT
+    ========================= */
 
     const tournament = await pool.query(
       `
@@ -1323,15 +1334,18 @@ app.post("/api/results", async (req, res) => {
     }
 
     if (
-      String(tournament.rows[0].status)
-        .toUpperCase() === "COMPLETED"
+      String(tournament.rows[0].status).toUpperCase() ===
+      "COMPLETED"
     ) {
       return res.status(400).json({
         success: false,
-        message:
-          "Results are already published"
+        message: "Results are already published"
       });
     }
+
+    /* =========================
+       CHECK USER
+    ========================= */
 
     if (userId) {
       const user = await pool.query(
@@ -1351,8 +1365,16 @@ app.post("/api/results", async (req, res) => {
       }
     }
 
+    /* =========================
+       CALCULATE POINTS
+    ========================= */
+
     const points =
       placementPoints(position) + kills;
+
+    /* =========================
+       SAVE RESULT
+    ========================= */
 
     const result = await pool.query(
       `
@@ -1381,7 +1403,7 @@ app.post("/api/results", async (req, res) => {
       ]
     );
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       result: result.rows[0]
     });
@@ -1392,9 +1414,10 @@ app.post("/api/results", async (req, res) => {
       error
     );
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
-      message: "Could not save result"
+      message: "Could not save result",
+      error: error.message
     });
   }
 });
