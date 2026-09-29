@@ -1780,6 +1780,49 @@ setInterval(async () => {
    NOTIFICATIONS API
    ========================================================= */
 
+/* BROWSER TEST - DELETE NOTIFICATION */
+app.get("/api/notifications/test/delete/:id", async (req, res) => {
+  try {
+    const notificationId = Number(req.params.id);
+
+    if (!Number.isInteger(notificationId) || notificationId < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid notification ID"
+      });
+    }
+
+    const result = await pool.query(
+      `
+      DELETE FROM notifications
+      WHERE id = $1
+      RETURNING *
+      `,
+      [notificationId]
+    );
+
+    if (!result.rows.length) {
+      return res.status(404).json({
+        success: false,
+        message: "Notification not found"
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Notification deleted",
+      notification: result.rows[0]
+    });
+
+  } catch (error) {
+    console.error("Test delete notification error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Could not delete notification"
+    });
+  }
+});
 /* BROWSER TEST - MARK ALL NOTIFICATIONS AS READ */
 app.get("/api/notifications/test/read-all/:userId", async (req, res) => {
   try {
