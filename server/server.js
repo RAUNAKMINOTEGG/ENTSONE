@@ -1776,6 +1776,260 @@ setInterval(async () => {
     console.error("Notifications table setup error:", error);
   }
 })();
+/* =========================================================
+   NOTIFICATIONS API
+   ========================================================= */
+
+/* GET USER NOTIFICATIONS */
+app.get("/api/notifications/:userId", async (req, res) => {
+  try {
+    const userId = Number(req.params.userId);
+
+    if (!Number.isInteger(userId) || userId < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user ID"
+      });
+    }
+
+    const result = await pool.query(
+      `
+      SELECT
+        id,
+        user_id,
+        type,
+        title,
+        message,
+        is_read,
+        created_at
+      FROM notifications
+      WHERE user_id = $1
+      ORDER BY created_at DESC
+      `,
+      [userId]
+    );
+
+    res.json({
+      success: true,
+      notifications: result.rows
+    });
+
+  } catch (error) {
+    console.error("Get notifications error:", error);
+
+    res.status(500).json({
+      success: false,
+      notifications: [],
+      message: "Could not get notifications"
+    });
+  }
+});
+
+
+/* CREATE NOTIFICATION */
+app.post("/api/notifications", async (req, res) => {
+  try {
+    const userId = Number(req.body.user_id);
+    const type = String(req.body.type || "general").trim();
+    const title = String(req.body.title || "").trim();
+    const message = String(req.body.message || "").trim();
+
+    if (
+      !Number.isInteger(userId) ||
+      userId < 1 ||
+      !title ||
+      !message
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "user_id, title and message are required"
+      });
+    }
+
+    /* CHECK USER */
+    const user = await pool.query(
+      `
+      SELECT id
+      FROM users
+      WHERE id = $1
+      `,
+      [userId]
+    );
+
+    if (!user.rows.length) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    /* SAVE NOTIFICATION */
+    const result = await pool.query(
+      `
+      INSERT INTO notifications
+      (
+        user_id,
+        type,
+        title,
+        message
+      )
+      VALUES ($1, $2, $3, $4)
+      RETURNING *
+      `,
+      [
+        userId,
+        type,
+        title,
+        message
+      ]
+    );
+
+    res.status(201).json({
+      success: true,
+      message: "Notification created",
+      notification: result.rows[0]
+    });
+
+  } catch (error) {
+    console.error("Create notification error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Could not create notification"
+    });
+  }
+});
+
+
+/* MARK ONE NOTIFICATION AS READ */
+app.patch("/api/notifications/:id/read", async (req, res) => {
+  try {
+    const notificationId = Number(req.params.id);
+
+    if (!Number.isInteger(notificationId) || notificationId < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid notification ID"
+      });
+    }
+
+    const result = await pool.query(
+      `
+      UPDATE notifications
+      SET is_read = TRUE
+      WHERE id = $1
+      RETURNING *
+      `,
+      [notificationId]
+    );
+
+    if (!result.rows.length) {
+      return res.status(404).json({
+        success: false,
+        message: "Notification not found"
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Notification marked as read",
+      notification: result.rows[0]
+    });
+
+  } catch (error) {
+    console.error("Mark notification read error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Could not update notification"
+    });
+  }
+});
+
+
+/* MARK ALL USER NOTIFICATIONS AS READ */
+app.patch("/api/notifications/user/:userId/read-all", async (req, res) => {
+  try {
+    const userId = Number(req.params.userId);
+
+    if (!Number.isInteger(userId) || userId < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user ID"
+      });
+    }
+
+    const result = await pool.query(
+      `
+      UPDATE notifications
+      SET is_read = TRUE
+      WHERE user_id = $1
+      AND is_read = FALSE
+      RETURNING id
+      `,
+      [userId]
+    );
+
+    res.json({
+      success: true,
+      message: "All notifications marked as read",
+      updated_count: result.rows.length
+    });
+
+  } catch (error) {
+    console.error("Mark all notifications read error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Could not update notifications"
+    });
+  }
+});
+
+
+/* DELETE NOTIFICATION */
+app.delete("/api/notifications/:id", async (req, res) => {
+  try {
+    const notificationId = Number(req.params.id);
+
+    if (!Number.isInteger(notificationId) || notificationId < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid notification ID"
+      });
+    }
+
+    const result = await pool.query(
+      `
+      DELETE FROM notifications
+      WHERE id = $1
+      RETURNING *
+      `,
+      [notificationId]
+    );
+
+    if (!result.rows.length) {
+      return res.status(404).json({
+        success: false,
+        message: "Notification not found"
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Notification deleted",
+      notification: result.rows[0]
+    });
+
+  } catch (error) {
+    console.error("Delete notification error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Could not delete notification"
+    });
+  }
+});
 /* =========================
    START SERVER
 ========================= */
