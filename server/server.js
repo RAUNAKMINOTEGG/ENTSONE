@@ -1780,6 +1780,44 @@ setInterval(async () => {
    NOTIFICATIONS API
    ========================================================= */
 
+/* BROWSER TEST - MARK ALL NOTIFICATIONS AS READ */
+app.get("/api/notifications/test/read-all/:userId", async (req, res) => {
+  try {
+    const userId = Number(req.params.userId);
+
+    if (!Number.isInteger(userId) || userId < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user ID"
+      });
+    }
+
+    const result = await pool.query(
+      `
+      UPDATE notifications
+      SET is_read = TRUE
+      WHERE user_id = $1
+      AND is_read = FALSE
+      RETURNING id
+      `,
+      [userId]
+    );
+
+    res.json({
+      success: true,
+      message: "All notifications marked as read",
+      updated_count: result.rows.length
+    });
+
+  } catch (error) {
+    console.error("Test mark all read error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Could not update notifications"
+    });
+  }
+});
 /* BROWSER TEST - MARK NOTIFICATION AS READ */
 app.get("/api/notifications/test/read/:id", async (req, res) => {
   try {
