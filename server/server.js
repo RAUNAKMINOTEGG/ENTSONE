@@ -1780,6 +1780,50 @@ setInterval(async () => {
    NOTIFICATIONS API
    ========================================================= */
 
+/* BROWSER TEST - MARK NOTIFICATION AS READ */
+app.get("/api/notifications/test/read/:id", async (req, res) => {
+  try {
+    const notificationId = Number(req.params.id);
+
+    if (!Number.isInteger(notificationId) || notificationId < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid notification ID"
+      });
+    }
+
+    const result = await pool.query(
+      `
+      UPDATE notifications
+      SET is_read = TRUE
+      WHERE id = $1
+      RETURNING *
+      `,
+      [notificationId]
+    );
+
+    if (!result.rows.length) {
+      return res.status(404).json({
+        success: false,
+        message: "Notification not found"
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Notification marked as read",
+      notification: result.rows[0]
+    });
+
+  } catch (error) {
+    console.error("Test mark read error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Could not mark notification as read"
+    });
+  }
+});
 /* BROWSER TEST - CREATE NOTIFICATION */
 app.get("/api/notifications/test/:userId", async (req, res) => {
   try {
