@@ -1780,6 +1780,53 @@ setInterval(async () => {
    NOTIFICATIONS API
    ========================================================= */
 
+/* BROWSER TEST - CREATE NOTIFICATION */
+app.get("/api/notifications/test/:userId", async (req, res) => {
+  try {
+    const userId = Number(req.params.userId);
+
+    if (!Number.isInteger(userId) || userId < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user ID"
+      });
+    }
+
+    const result = await pool.query(
+      `
+      INSERT INTO notifications
+      (
+        user_id,
+        type,
+        title,
+        message
+      )
+      VALUES ($1, $2, $3, $4)
+      RETURNING *
+      `,
+      [
+        userId,
+        "test",
+        "ENTSONE Test Notification",
+        "Notification API successfully working!"
+      ]
+    );
+
+    res.json({
+      success: true,
+      message: "Test notification created",
+      notification: result.rows[0]
+    });
+
+  } catch (error) {
+    console.error("Test notification error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Could not create test notification"
+    });
+  }
+});
 /* GET USER NOTIFICATIONS */
 app.get("/api/notifications/:userId", async (req, res) => {
   try {
