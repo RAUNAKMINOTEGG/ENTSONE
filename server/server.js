@@ -1743,6 +1743,40 @@ setInterval(async () => {
 }, 60 * 60 * 1000);
 
 /* =========================
+   NOTIFICATIONS DATABASE
+========================= */
+
+(async () => {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS notifications (
+        id SERIAL PRIMARY KEY,
+
+        user_id INTEGER NOT NULL,
+
+        type VARCHAR(50) NOT NULL,
+
+        title VARCHAR(255) NOT NULL,
+
+        message TEXT NOT NULL,
+
+        is_read BOOLEAN NOT NULL DEFAULT FALSE,
+
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+        CONSTRAINT fk_notification_user
+          FOREIGN KEY (user_id)
+          REFERENCES users(id)
+          ON DELETE CASCADE
+      )
+    `);
+
+    console.log("Notifications table ready");
+  } catch (error) {
+    console.error("Notifications table setup error:", error);
+  }
+})();
+/* =========================
    START SERVER
 ========================= */
 
