@@ -40,6 +40,7 @@ function randomToken() {
   return crypto.randomBytes(32).toString("hex");
 }
 
+
 /* =========================
    DATABASE SETUP
 ========================= */
@@ -64,7 +65,41 @@ async function createTables() {
         name VARCHAR(255),
         email VARCHAR(255) UNIQUE,
         phone VARCHAR(30) UNIQUE,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        created_at async function requestVonageVerification(phone) {
+  const apiKey = process.env.VONAGE_API_KEY;
+  const apiSecret = process.env.VONAGE_API_SECRET;
+
+  if (!apiKey || !apiSecret) {
+    throw new Error("Vonage API credentials are missing");
+  }
+
+  const auth = Buffer
+    .from(`${apiKey}:${apiSecret}`)
+    .toString("base64");
+
+  const response = await fetch("https://api.nexmo.com/verify/json", {
+    method: "POST",
+    headers: {
+      "Authorization": `Basic ${auth}`,
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: new URLSearchParams({
+      api_key: apiKey,
+      number: `91${phone}`,
+      brand: "ENTSONE",
+      code_length: "6"
+    })
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || String(data.status) !== "0") {
+    console.error("Vonage Verify request error:", data);
+    throw new Error(data.error_text || "Vonage OTP request failed");
+  }
+
+  return data.request_id;
+} DEFAULT CURRENT_TIMESTAMP
       );
 
       CREATE TABLE IF NOT EXISTS tournament_registrations (
