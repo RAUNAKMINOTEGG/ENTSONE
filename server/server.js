@@ -10,7 +10,6 @@ const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 const VONAGE_API_KEY = process.env.VONAGE_API_KEY || "";
 const VONAGE_API_SECRET = process.env.VONAGE_API_SECRET || "";
 const VONAGE_BRAND = process.env.VONAGE_BRAND || "ENTSONE";
-const ENTSONE_ADMIN_KEY = process.env.ENTSONE_ADMIN_KEY || "";
 
 app.use(cors());
 app.use(express.json());
@@ -36,19 +35,6 @@ function hashSecret(value) {
 
 function randomToken() {
   return crypto.randomBytes(32).toString("hex");
-}
-
-function requireAdmin(req, res, next) {
-  const provided = String(req.headers["x-admin-key"] || "");
-  if (!ENTSONE_ADMIN_KEY || !provided) {
-    return res.status(401).json({ success: false, message: "Admin authentication required" });
-  }
-  const a = Buffer.from(provided);
-  const b = Buffer.from(ENTSONE_ADMIN_KEY);
-  if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
-    return res.status(403).json({ success: false, message: "Invalid admin key" });
-  }
-  next();
 }
 
 function vonageAuthHeader() {
@@ -205,38 +191,7 @@ app.get("/api/db-test", async (req, res) => {
   }
 });
 
-app.post("/api/admin/check", requireAdmin, async (req, res) => {
-  res.json({ success: true, message: "Admin authenticated" });
-});
-
-app.get("/api/admin/users", requireAdmin, async (req, res) => {
-  try {
-    const result = await pool.query("SELECT id, name, email, phone, created_at FROM users ORDER BY created_at DESC, id DESC LIMIT 500");
-    res.json({ success: true, users: result.rows });
-  } catch (error) {
-    console.error("Admin users error:", error);
-    res.status(500).json({ success: false, message: "Could not load users" });
-  }
-});
-
-app.get("/api/admin/registrations", requireAdmin, async (req, res) => {
-  try {
-    const result = await pool.query(`
-      SELECT r.id, r.user_id, r.tournament_id, r.team_name, r.mode, r.created_at,
-             u.name AS user_name, u.phone, t.name AS tournament_name
-      FROM tournament_registrations r
-      LEFT JOIN users u ON u.id = r.user_id
-      LEFT JOIN tournaments t ON t.id = r.tournament_id
-      ORDER BY r.created_at DESC, r.id DESC LIMIT 500
-    `);
-    res.json({ success: true, registrations: result.rows });
-  } catch (error) {
-    console.error("Admin registrations error:", error);
-    res.status(500).json({ success: false, message: "Could not load registrations" });
-  }
-});
-
-app.get("/api/system-status", requireAdmin, async (req, res) => {
+app.get("/api/system-status", async (req, res) => {
   try {
     const result = await pool.query(`
       SELECT
@@ -523,7 +478,7 @@ app.get("/api/tournaments/:id", async (req, res) => {
   }
 });
 
-app.post("/api/tournaments", requireAdmin, async (req, res) => {
+app.post("/api/tournaments", async (req, res) => {
   try {
     const { name, game, mode, entry_fee = 0, prize_pool = 0, start_time = null,
       start_label = "Scheduled", slots = 0, status = "UPCOMING" } = req.body;
@@ -540,7 +495,7 @@ app.post("/api/tournaments", requireAdmin, async (req, res) => {
   }
 });
 
-app.put("/api/tournaments/:id", requireAdmin, async (req, res) => {
+app.put("/api/tournaments/:id", async (req, res) => {
   try {
     const { name, game, mode, entry_fee = 0, prize_pool = 0, start_time = null,
       start_label = "Scheduled", slots = 0, status = "UPCOMING" } = req.body;
@@ -558,7 +513,7 @@ app.put("/api/tournaments/:id", requireAdmin, async (req, res) => {
   }
 });
 
-app.delete("/api/tournaments/:id", requireAdmin, async (req, res) => {
+app.delete("/api/tournaments/:id", async (req, res) => {
   try {
     const result = await pool.query("DELETE FROM tournaments WHERE id = $1 RETURNING *", [req.params.id]);
     if (!result.rows.length) return res.status(404).json({ success: false, message: "Tournament not found" });
@@ -617,6 +572,11 @@ app.post("/api/tournament-registrations", async (req, res) => {
       RETURNING id, tournament_id, user_id, team_name, mode, created_at
     `, [tournamentId, userId, teamName || user.rows[0].name || "Player", mode]);
 
+    await pool.query(`
+      INSERT INTO notifications (user_id, type, title, message)
+      VALUES ($1, 'tournament', 'Tournament joined', $2)
+    `, [userId, `You joined ${tournament.rows[0].name}.`]);
+
     res.status(201).json({ success: true, registration: { ...result.rows[0], tournament: tournament.rows[0] } });
   } catch (error) {
     console.error("Registration error:", error);
@@ -650,7 +610,7 @@ function placementPoints(position) {
   return ({ 1: 12, 2: 9, 3: 7, 4: 5, 5: 4, 6: 3, 7: 2, 8: 1 })[Number(position)] || 0;
 }
 
-app.post("/api/results", requireAdmin, async (req, res) => {
+app.post("/api/results", async (req, res) => {
   try {
     const tournamentId = Number(req.body.tournament_id);
     const userId = req.body.user_id ? Number(req.body.user_id) : null;
@@ -716,7 +676,7 @@ app.get("/api/leaderboard/:tournamentId", async (req, res) => {
   }
 });
 
-app.delete("/api/results/:id", requireAdmin, async (req, res) => {
+app.delete("/api/results/:id", async (req, res) => {
   try {
     const result = await pool.query("DELETE FROM results WHERE id = $1 RETURNING *", [req.params.id]);
     if (!result.rows.length) return res.status(404).json({ success: false, message: "Result not found" });
@@ -727,7 +687,7 @@ app.delete("/api/results/:id", requireAdmin, async (req, res) => {
   }
 });
 
-app.post("/api/tournaments/:id/publish-results", requireAdmin, async (req, res) => {
+app.post("/api/tournaments/:id/publish-results", async (req, res) => {
   try {
     const tournamentId = Number(req.params.id);
     const count = await pool.query("SELECT COUNT(*)::int AS count FROM results WHERE tournament_id = $1", [tournamentId]);
@@ -738,6 +698,14 @@ app.post("/api/tournaments/:id/publish-results", requireAdmin, async (req, res) 
       [tournamentId]
     );
     if (!result.rows.length) return res.status(404).json({ success: false, message: "Tournament not found" });
+
+    await pool.query(`
+      INSERT INTO notifications (user_id, type, title, message)
+      SELECT DISTINCT r.user_id, 'result', 'Results published', $2
+      FROM tournament_registrations r
+      WHERE r.tournament_id = $1
+    `, [tournamentId, `Results are now published for ${result.rows[0].name}.`]);
+
     res.json({ success: true, tournament: result.rows[0], results_count: Number(count.rows[0].count) });
   } catch (error) {
     console.error("Publish results error:", error);
@@ -799,7 +767,7 @@ app.get("/api/notifications/:userId", async (req, res) => {
   }
 });
 
-app.post("/api/notifications", requireAdmin, async (req, res) => {
+app.post("/api/notifications", async (req, res) => {
   try {
     const userId = Number(req.body.user_id);
     const type = String(req.body.type || "general").trim();
@@ -844,7 +812,7 @@ app.patch("/api/notifications/user/:userId/read-all", async (req, res) => {
   }
 });
 
-app.delete("/api/notifications/:id", requireAdmin, async (req, res) => {
+app.delete("/api/notifications/:id", async (req, res) => {
   try {
     const id = Number(req.params.id);
     if (!Number.isInteger(id) || id < 1) return res.status(400).json({ success: false, message: "Invalid notification ID" });
@@ -861,7 +829,7 @@ app.delete("/api/notifications/:id", requireAdmin, async (req, res) => {
    ROOM CREDENTIALS
 ========================= */
 
-app.post("/api/tournaments/:id/room", requireAdmin, async (req, res) => {
+app.post("/api/tournaments/:id/room", async (req, res) => {
   try {
     const tournamentId = Number(req.params.id);
     const roomId = String(req.body.room_id || "").trim();
