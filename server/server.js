@@ -182,7 +182,41 @@ app.get("/", (req, res) => {
 });
 
 app.get("/api/health", (req, res) => {
- app.get("/api/system-status", async (req, res) => {
+  res.json({
+    success: true,
+    status: "online",
+    service: "ENTSONE API"
+  });
+});
+
+app.get("/api/system-status", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT
+        (SELECT COUNT(*)::int FROM users) AS users,
+        (SELECT COUNT(*)::int FROM tournaments) AS tournaments,
+        (SELECT COUNT(*)::int FROM tournament_registrations) AS registrations,
+        (SELECT COUNT(*)::int FROM results) AS results
+    `);
+
+    res.json({
+      success: true,
+      api: "online",
+      database: "connected",
+      otp_provider: "Vonage Verify v2",
+      vonage_configured: Boolean(VONAGE_API_KEY && VONAGE_API_SECRET),
+      counts: result.rows[0]
+    });
+  } catch (error) {
+    console.error("System status error:", error);
+
+    res.status(500).json({
+      success: false,
+      api: "online",
+      database: "connection_failed"
+    });
+  }
+});
   try {
     const result = await pool.query(`
       SELECT
