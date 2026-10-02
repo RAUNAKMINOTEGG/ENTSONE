@@ -11,6 +11,37 @@ const VONAGE_API_KEY = process.env.VONAGE_API_KEY || "";
 const VONAGE_API_SECRET = process.env.VONAGE_API_SECRET || "";
 const VONAGE_BRAND = process.env.VONAGE_BRAND || "ENTSONE";
 
+const ENTSONE_ADMIN_KEY = process.env.ENTSONE_ADMIN_KEY || "";
+
+function requireAdmin(req, res, next) {
+  const provided = String(req.headers["x-admin-key"] || "");
+
+  if (!ENTSONE_ADMIN_KEY) {
+    return res.status(500).json({
+      success: false,
+      message: "ENTSONE_ADMIN_KEY is not configured"
+    });
+  }
+
+  if (!provided) {
+    return res.status(401).json({
+      success: false,
+      message: "Admin authentication required"
+    });
+  }
+
+  const a = Buffer.from(provided);
+  const b = Buffer.from(ENTSONE_ADMIN_KEY);
+
+  if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
+    return res.status(403).json({
+      success: false,
+      message: "Invalid admin key"
+    });
+  }
+
+  next();
+}
 app.use(cors());
 app.use(express.json());
 
@@ -445,6 +476,16 @@ app.post("/api/auth/logout", async (req, res) => {
   }
 });
 
+/* =========================
+   ADMIN AUTH
+========================= */
+
+app.post("/api/admin/check", requireAdmin, (req, res) => {
+  res.json({
+    success: true,
+    message: "Admin access granted"
+  });
+});
 /* =========================
    TOURNAMENTS — STEPS 5/6
 ========================= */
