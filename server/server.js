@@ -93,7 +93,7 @@ async function requestVonageVerification(phone) {
     body: JSON.stringify({
       brand: VONAGE_BRAND,
       code_length: 6,
-      workflow: [{ channel: "sms", to: `+91${phone}` }]
+      workflow: [{ channel: "sms", to: `91${phone}` }]
     })
   });
 
