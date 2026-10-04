@@ -10,6 +10,7 @@ const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 const VONAGE_API_KEY = process.env.VONAGE_API_KEY || "";
 const VONAGE_API_SECRET = process.env.VONAGE_API_SECRET || "";
 const VONAGE_BRAND = process.env.VONAGE_BRAND || "ENTSONE";
+const OTP_MODE = "demo"; // OTP intentionally demo-only for this release; enable a real provider in a later release.
 const ENTSONE_ADMIN_KEY = process.env.ENTSONE_ADMIN_KEY || "";
 
 app.use(cors());
@@ -58,6 +59,14 @@ function vonageAuthHeader() {
   return "Basic " + Buffer.from(`${VONAGE_API_KEY}:${VONAGE_API_SECRET}`).toString("base64");
 }
 
+function makeDemoOtp() {
+  return String(Math.floor(100000 + Math.random() * 900000));
+}
+
+function verifyDemoOtpHash(code, hash) {
+  return hashSecret(code) === String(hash || "");
+}
+
 async function requestVonageVerification(phone) {
   const response = await fetch("https://api.nexmo.com/v2/verify", {
     method: "POST",
@@ -68,7 +77,7 @@ async function requestVonageVerification(phone) {
     body: JSON.stringify({
       brand: VONAGE_BRAND,
       code_length: 6,
-      workflow: [{ channel: "sms", to: `91${phone}` }]
+      workflow: [{ channel: "sms", to: `+91${phone}` }]
     })
   });
 
@@ -177,6 +186,10 @@ async function createTables() {
       ALTER TABLE otp_requests ALTER COLUMN otp_hash DROP NOT NULL;
       ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS room_id VARCHAR(255);
       ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS room_password VARCHAR(255);
+      ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS map VARCHAR(100);
+      ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS rules TEXT;
+      ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS countdown_enabled BOOLEAN DEFAULT TRUE;
+      ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS countdown_hours INTEGER DEFAULT 24;
     `);
 
     console.log("ENTSONE database tables ready");
@@ -249,7 +262,8 @@ app.get("/api/system-status", requireAdmin, async (req, res) => {
       success: true,
       api: "online",
       database: "connected",
-      otp_provider: "Vonage Verify v2",
+      otp_provider: OTP_MODE === "vonage" ? "Vonage Verify v2" : "Demo OTP",
+      otp_mode: OTP_MODE,
       vonage_configured: Boolean(VONAGE_API_KEY && VONAGE_API_SECRET),
       counts: result.rows[0]
     });
@@ -350,48 +364,18 @@ app.post("/api/auth/request-otp", async (req, res) => {
   try {
     const channel = "phone";
     const destination = normalizePhone(req.body.destination);
-    const mode = req.body.mode === "signup" ? "signup" : "login";
-    const name = String(req.body.name || "").trim();
+    const mode = String(req.body.mode || "login").toLowerCase() === "signup" ? "signup" : "login";
 
     if (!destination || destination.length !== 10 || !/^[6-9]\d{9}$/.test(destination)) {
       return res.status(400).json({ success: false, message: "Enter a valid 10-digit Indian mobile number" });
     }
 
-    if (mode === "signup" && (name.length < 3 || name.length > 30)) {
-      return res.status(400).json({ success: false, message: "Enter a username between 3 and 30 characters" });
+    const existing = await pool.query("SELECT id, name, phone FROM users WHERE phone = $1 LIMIT 1", [destination]);
+    if (mode === "login" && !existing.rows.length) {
+      return res.status(404).json({ success: false, message: "Account not found. Create an account first." });
     }
-
-    const existingUser = await pool.query(
-      "SELECT id FROM users WHERE phone = $1 LIMIT 1",
-      [destination]
-    );
-
-    if (mode === "signup" && existingUser.rows.length) {
-      return res.status(409).json({ success: false, message: "This mobile number is already registered. Please use Sign In." });
-    }
-
-    if (mode === "login" && !existingUser.rows.length) {
-      return res.status(404).json({ success: false, message: "Account not found. Please create an account first." });
-    }
-
-    if (!VONAGE_API_KEY || !VONAGE_API_SECRET) {
-      return res.status(503).json({ success: false, message: "Vonage API key pending. Add VONAGE_API_KEY and VONAGE_API_SECRET in Render." });
-    }
-
-    let requestId;
-    try {
-      requestId = await requestVonageVerification(destination);
-    } catch (providerError) {
-      const providerStatus = Number(providerError.status) || 502;
-      if ([402, 409, 429].includes(providerStatus)) {
-        res.setHeader("Retry-After", "60");
-        return res.status(providerStatus).json({
-          success: false,
-          message: providerError.message || "Vonage OTP request is temporarily unavailable",
-          retry_after_seconds: 60
-        });
-      }
-      throw providerError;
+    if (mode === "signup" && existing.rows.length) {
+      return res.status(409).json({ success: false, message: "Account already exists. Use Sign In." });
     }
 
     await pool.query(
@@ -400,19 +384,35 @@ app.post("/api/auth/request-otp", async (req, res) => {
     );
 
     const expires = new Date(Date.now() + OTP_TTL_MS);
+    if (OTP_MODE !== "vonage") {
+      const demoCode = makeDemoOtp();
+      await pool.query(
+        `INSERT INTO otp_requests (channel, destination, otp_hash, provider, expires_at)
+         VALUES ($1, $2, $3, 'demo', $4)`,
+        [channel, destination, hashSecret(demoCode), expires]
+      );
+      return res.status(202).json({
+        success: true,
+        demo: true,
+        demo_code: demoCode,
+        mode,
+        message: "Demo OTP generated. No SMS was sent.",
+        expires_in_seconds: Math.floor(OTP_TTL_MS / 1000)
+      });
+    }
 
+    if (!VONAGE_API_KEY || !VONAGE_API_SECRET) {
+      return res.status(503).json({ success: false, message: "Vonage is not configured. Set OTP_MODE=vonage and add Vonage credentials in Render." });
+    }
+
+    const requestId = await requestVonageVerification(destination);
     await pool.query(
       `INSERT INTO otp_requests (channel, destination, provider, provider_request_id, expires_at)
        VALUES ($1, $2, 'vonage', $3, $4)`,
       [channel, destination, requestId, expires]
     );
 
-    res.status(202).json({
-      success: true,
-      message: "OTP sent to your mobile number",
-      expires_in_seconds: Math.floor(OTP_TTL_MS / 1000),
-      resend_after_seconds: 60
-    });
+    res.status(202).json({ success: true, demo: false, mode, message: "OTP sent to your mobile number", expires_in_seconds: Math.floor(OTP_TTL_MS / 1000) });
   } catch (error) {
     console.error("Request OTP error:", error);
     const code = error.status === 409 ? 409 : (error.status >= 400 && error.status < 500 ? 400 : 500);
@@ -425,81 +425,48 @@ app.post("/api/auth/verify-otp", async (req, res) => {
     const channel = "phone";
     const destination = normalizePhone(req.body.destination);
     const otp = String(req.body.otp || "").trim();
-    const mode = req.body.mode === "signup" ? "signup" : "login";
-    const name = String(req.body.name || "").trim();
+    const mode = String(req.body.mode || "login").toLowerCase() === "signup" ? "signup" : "login";
 
     if (!destination || destination.length !== 10 || !/^[6-9]\d{9}$/.test(destination) || !/^\d{6}$/.test(otp)) {
-      return res.status(400).json({ success: false, message: "Enter the valid 10-digit mobile number and 6-digit OTP" });
-    }
-    if (mode === "signup" && (name.length < 3 || name.length > 30)) {
-      return res.status(400).json({ success: false, message: "Enter a username between 3 and 30 characters" });
+      return res.status(400).json({ success: false, message: "Enter the 6-digit OTP sent to your mobile" });
     }
 
     const requestResult = await pool.query(
-      `SELECT id, provider_request_id, expires_at, attempts
-       FROM otp_requests
-       WHERE channel = $1 AND destination = $2 AND verified = FALSE
-       ORDER BY id DESC LIMIT 1`,
-      [channel, destination]
+      `SELECT id, otp_hash, provider, provider_request_id, expires_at, attempts
+       FROM otp_requests WHERE channel = $1 AND destination = $2 AND verified = FALSE
+       ORDER BY id DESC LIMIT 1`, [channel, destination]
     );
-
-    if (!requestResult.rows.length) {
-      return res.status(400).json({ success: false, message: "OTP request not found or already used" });
-    }
+    if (!requestResult.rows.length) return res.status(400).json({ success: false, message: "OTP request not found or already used" });
 
     const request = requestResult.rows[0];
-    if (!request.provider_request_id) {
-      return res.status(500).json({ success: false, message: "OTP provider request is missing" });
-    }
-    if (new Date(request.expires_at).getTime() < Date.now()) {
-      return res.status(400).json({ success: false, message: "OTP expired" });
-    }
-    if (Number(request.attempts) >= 3) {
-      return res.status(429).json({ success: false, message: "Too many OTP attempts. Request a new OTP." });
-    }
-
+    if (new Date(request.expires_at).getTime() < Date.now()) return res.status(400).json({ success: false, message: "OTP expired. Request a new OTP." });
+    if (Number(request.attempts) >= 3) return res.status(429).json({ success: false, message: "Too many OTP attempts. Request a new OTP." });
     await pool.query("UPDATE otp_requests SET attempts = attempts + 1 WHERE id = $1", [request.id]);
 
-    try {
-      await verifyVonageCode(request.provider_request_id, otp);
-    } catch (error) {
-      const status = error.status === 410 ? 429 : (error.status === 404 ? 400 : 400);
-      return res.status(status).json({ success: false, message: error.message || "Invalid or expired OTP" });
+    if (request.provider === "demo") {
+      if (!verifyDemoOtpHash(otp, request.otp_hash)) return res.status(400).json({ success: false, message: "Invalid demo OTP" });
+    } else {
+      if (!request.provider_request_id) return res.status(500).json({ success: false, message: "OTP provider request is missing" });
+      try { await verifyVonageCode(request.provider_request_id, otp); }
+      catch (error) { return res.status(error.status === 410 ? 429 : 400).json({ success: false, message: error.message || "Invalid or expired OTP" }); }
     }
 
     await pool.query("UPDATE otp_requests SET verified = TRUE WHERE id = $1", [request.id]);
+    const userResult = await pool.query("SELECT id, name, email, phone, created_at FROM users WHERE phone = $1 LIMIT 1", [destination]);
 
-    const userResult = await pool.query(
-      "SELECT id, name, email, phone, created_at FROM users WHERE phone = $1 LIMIT 1",
-      [destination]
-    );
+    if (mode === "login" && !userResult.rows.length) return res.status(404).json({ success: false, message: "Account not found. Create an account first." });
+    if (mode === "signup" && userResult.rows.length) return res.status(409).json({ success: false, message: "Account already exists. Use Sign In." });
 
     let user;
-    if (mode === "login") {
-      if (!userResult.rows.length) {
-        return res.status(404).json({ success: false, message: "Account not found. Please create an account first." });
-      }
-      user = userResult.rows[0];
-    } else {
-      if (userResult.rows.length) {
-        return res.status(409).json({ success: false, message: "This mobile number is already registered. Please use Sign In." });
-      }
-      const created = await pool.query(
-        `INSERT INTO users (name, phone) VALUES ($1, $2)
-         RETURNING id, name, email, phone, created_at`,
-        [name, destination]
-      );
+    if (userResult.rows.length) user = userResult.rows[0];
+    else {
+      const created = await pool.query(`INSERT INTO users (name, phone) VALUES ('ENTSONE Player', $1) RETURNING id, name, email, phone, created_at`, [destination]);
       user = created.rows[0];
     }
 
     const rawToken = randomToken();
-    await pool.query(
-      `INSERT INTO sessions (user_id, token_hash, expires_at)
-       VALUES ($1, $2, $3)`,
-      [user.id, hashSecret(rawToken), new Date(Date.now() + SESSION_TTL_MS)]
-    );
-
-    res.json({ success: true, user, session_token: rawToken, expires_in_seconds: SESSION_TTL_MS / 1000 });
+    await pool.query(`INSERT INTO sessions (user_id, token_hash, expires_at) VALUES ($1, $2, $3)`, [user.id, hashSecret(rawToken), new Date(Date.now() + SESSION_TTL_MS)]);
+    res.json({ success: true, user, session_token: rawToken, expires_in_seconds: SESSION_TTL_MS / 1000, demo: request.provider === "demo" });
   } catch (error) {
     console.error("Verify OTP error:", error);
     res.status(500).json({ success: false, message: "Could not verify OTP" });
@@ -544,7 +511,7 @@ app.get("/api/tournaments", async (req, res) => {
   try {
     const result = await pool.query(`
       SELECT id, name, game, mode, entry_fee, prize_pool, start_time, start_label,
-             slots, status, created_at
+             slots, status, map, rules, countdown_enabled, countdown_hours, created_at
       FROM tournaments ORDER BY id DESC
     `);
     res.json({ success: true, tournaments: result.rows });
@@ -558,7 +525,7 @@ app.get("/api/tournaments/:id", async (req, res) => {
   try {
     const result = await pool.query(`
       SELECT id, name, game, mode, entry_fee, prize_pool, start_time, start_label,
-             slots, status, created_at
+             slots, status, map, rules, countdown_enabled, countdown_hours, created_at
       FROM tournaments WHERE id = $1
     `, [req.params.id]);
     if (!result.rows.length) return res.status(404).json({ success: false, message: "Tournament not found" });
@@ -572,13 +539,15 @@ app.get("/api/tournaments/:id", async (req, res) => {
 app.post("/api/tournaments", requireAdmin, async (req, res) => {
   try {
     const { name, game, mode, entry_fee = 0, prize_pool = 0, start_time = null,
-      start_label = "Scheduled", slots = 0, status = "UPCOMING" } = req.body;
+      start_label = "Scheduled", slots = 0, status = "UPCOMING", map = null, rules = null,
+      countdown_enabled = true, countdown_hours = 24 } = req.body;
     if (!name || !game) return res.status(400).json({ success: false, message: "Tournament name and game are required" });
     const result = await pool.query(`
-      INSERT INTO tournaments (name, game, mode, entry_fee, prize_pool, start_time, start_label, slots, status)
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *
+      INSERT INTO tournaments (name, game, mode, entry_fee, prize_pool, start_time, start_label, slots, status, map, rules, countdown_enabled, countdown_hours)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *
     `, [name, game, mode || null, Number(entry_fee) || 0, Number(prize_pool) || 0,
-        start_time || null, start_label || "Scheduled", Math.max(0, Number(slots) || 0), status || "UPCOMING"]);
+        start_time || null, start_label || "Scheduled", Math.max(0, Number(slots) || 0), status || "UPCOMING",
+        map || null, rules || null, Boolean(countdown_enabled), Math.max(1, Math.min(168, Number(countdown_hours) || 24))]);
     res.status(201).json({ success: true, tournament: result.rows[0] });
   } catch (error) {
     console.error("Create tournament error:", error);
@@ -589,13 +558,15 @@ app.post("/api/tournaments", requireAdmin, async (req, res) => {
 app.put("/api/tournaments/:id", requireAdmin, async (req, res) => {
   try {
     const { name, game, mode, entry_fee = 0, prize_pool = 0, start_time = null,
-      start_label = "Scheduled", slots = 0, status = "UPCOMING" } = req.body;
+      start_label = "Scheduled", slots = 0, status = "UPCOMING", map = null, rules = null,
+      countdown_enabled = true, countdown_hours = 24 } = req.body;
     if (!name || !game) return res.status(400).json({ success: false, message: "Tournament name and game are required" });
     const result = await pool.query(`
       UPDATE tournaments SET name=$1, game=$2, mode=$3, entry_fee=$4, prize_pool=$5,
-      start_time=$6, start_label=$7, slots=$8, status=$9 WHERE id=$10 RETURNING *
+      start_time=$6, start_label=$7, slots=$8, status=$9, map=$10, rules=$11, countdown_enabled=$12, countdown_hours=$13 WHERE id=$14 RETURNING *
     `, [name, game, mode || null, Number(entry_fee) || 0, Number(prize_pool) || 0,
-        start_time || null, start_label || "Scheduled", Math.max(0, Number(slots) || 0), status || "UPCOMING", req.params.id]);
+        start_time || null, start_label || "Scheduled", Math.max(0, Number(slots) || 0), status || "UPCOMING",
+        map || null, rules || null, Boolean(countdown_enabled), Math.max(1, Math.min(168, Number(countdown_hours) || 24)), req.params.id]);
     if (!result.rows.length) return res.status(404).json({ success: false, message: "Tournament not found" });
     res.json({ success: true, tournament: result.rows[0] });
   } catch (error) {
@@ -675,7 +646,7 @@ app.get("/api/users/:id/registrations", async (req, res) => {
   try {
     const result = await pool.query(`
       SELECT r.id, r.tournament_id, r.user_id, r.team_name, r.mode, r.created_at,
-             t.name, t.game, t.entry_fee, t.prize_pool, t.status, t.start_label
+             t.name, t.game, t.entry_fee, t.prize_pool, t.status, t.start_label, t.start_time, t.countdown_enabled, t.countdown_hours, t.map, t.rules
       FROM tournament_registrations r
       JOIN tournaments t ON t.id = r.tournament_id
       WHERE r.user_id = $1
