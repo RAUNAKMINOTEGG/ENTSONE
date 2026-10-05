@@ -174,6 +174,9 @@ async function createTables() {
         mode VARCHAR(50),
         entry_fee NUMERIC DEFAULT 0,
         prize_pool NUMERIC DEFAULT 0,
+        prize_first NUMERIC DEFAULT 0,
+        prize_second NUMERIC DEFAULT 0,
+        prize_third NUMERIC DEFAULT 0,
         start_time TIMESTAMP,
         status VARCHAR(50) DEFAULT 'UPCOMING',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -234,6 +237,9 @@ async function createTables() {
     `);
 
     await pool.query(`
+      ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS prize_first NUMERIC DEFAULT 0;
+      ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS prize_second NUMERIC DEFAULT 0;
+      ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS prize_third NUMERIC DEFAULT 0;
       ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS slots INTEGER DEFAULT 0;
       ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS start_label VARCHAR(255);
       ALTER TABLE otp_requests ADD COLUMN IF NOT EXISTS provider VARCHAR(30) DEFAULT 'local';
@@ -595,7 +601,7 @@ app.post("/api/auth/logout", async (req, res) => {
 app.get("/api/tournaments", async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT id, name, game, mode, entry_fee, prize_pool, start_time, start_label,
+      SELECT id, name, game, mode, entry_fee, prize_pool, prize_first, prize_second, prize_third, start_time, start_label,
              slots, status, map, rules, countdown_enabled, countdown_hours, registration_deadline, share_slug, checkin_enabled, results_published, created_at
       FROM tournaments ORDER BY id DESC
     `);
@@ -609,7 +615,7 @@ app.get("/api/tournaments", async (req, res) => {
 app.get("/api/tournaments/:id", async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT id, name, game, mode, entry_fee, prize_pool, start_time, start_label,
+      SELECT id, name, game, mode, entry_fee, prize_pool, prize_first, prize_second, prize_third, start_time, start_label,
              slots, status, map, rules, countdown_enabled, countdown_hours, registration_deadline, share_slug, checkin_enabled, results_published, created_at
       FROM tournaments WHERE id = $1
     `, [req.params.id]);
@@ -627,16 +633,26 @@ async function uniqueShareSlug(name, existingId=null) {
   while(true){ const q=existingId?await pool.query('SELECT id FROM tournaments WHERE share_slug=$1 AND id<>$2',[slug,existingId]):await pool.query('SELECT id FROM tournaments WHERE share_slug=$1',[slug]); if(!q.rows.length)return slug; slug=`${base}-${i++}`; }
 }
 
+async function backfillTournamentSlugs(){
+  try {
+    const rows = await pool.query("SELECT id, name FROM tournaments WHERE share_slug IS NULL OR share_slug = ''");
+    for (const row of rows.rows) {
+      const slug = await uniqueShareSlug(row.name, row.id);
+      await pool.query('UPDATE tournaments SET share_slug=$1 WHERE id=$2',[slug,row.id]);
+    }
+  } catch (e) { console.error('Share slug backfill failed:', e.message); }
+}
+
 app.post("/api/tournaments", requireAdmin, async (req, res) => {
   try {
-    const { name, game, mode, entry_fee = 0, prize_pool = 0, start_time = null,
+    const { name, game, mode, entry_fee = 0, prize_pool = 0, prize_first = 0, prize_second = 0, prize_third = 0, start_time = null,
       start_label = "Scheduled", slots = 0, status = "UPCOMING", map = null, rules = null,
       countdown_enabled = true, countdown_hours = 24, registration_deadline = null, share_slug = null, checkin_enabled = false } = req.body;
     if (!name || !game) return res.status(400).json({ success: false, message: "Tournament name and game are required" });
     const result = await pool.query(`
-      INSERT INTO tournaments (name, game, mode, entry_fee, prize_pool, start_time, start_label, slots, status, map, rules, countdown_enabled, countdown_hours, registration_deadline, share_slug, checkin_enabled)
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) RETURNING *
-    `, [name, game, mode || null, Number(entry_fee) || 0, Number(prize_pool) || 0,
+      INSERT INTO tournaments (name, game, mode, entry_fee, prize_pool, prize_first, prize_second, prize_third, start_time, start_label, slots, status, map, rules, countdown_enabled, countdown_hours, registration_deadline, share_slug, checkin_enabled)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19) RETURNING *
+    `, [name, game, mode || null, Number(entry_fee) || 0, Number(prize_pool) || 0, Number(prize_first) || 0, Number(prize_second) || 0, Number(prize_third) || 0,
         start_time || null, start_label || "Scheduled", Math.max(0, Number(slots) || 0), status || "UPCOMING",
         map || null, rules || null, Boolean(countdown_enabled), Math.max(1, Math.min(168, Number(countdown_hours) || 24)), registration_deadline || null, (share_slug || await uniqueShareSlug(name)), Boolean(checkin_enabled)]);
     await audit('CREATE_TOURNAMENT','tournament',result.rows[0].id, result.rows[0].name);
@@ -649,14 +665,14 @@ app.post("/api/tournaments", requireAdmin, async (req, res) => {
 
 app.put("/api/tournaments/:id", requireAdmin, async (req, res) => {
   try {
-    const { name, game, mode, entry_fee = 0, prize_pool = 0, start_time = null,
+    const { name, game, mode, entry_fee = 0, prize_pool = 0, prize_first = 0, prize_second = 0, prize_third = 0, start_time = null,
       start_label = "Scheduled", slots = 0, status = "UPCOMING", map = null, rules = null,
       countdown_enabled = true, countdown_hours = 24, registration_deadline = null, share_slug = null, checkin_enabled = false } = req.body;
     if (!name || !game) return res.status(400).json({ success: false, message: "Tournament name and game are required" });
     const result = await pool.query(`
-      UPDATE tournaments SET name=$1, game=$2, mode=$3, entry_fee=$4, prize_pool=$5,
-      start_time=$6, start_label=$7, slots=$8, status=$9, map=$10, rules=$11, countdown_enabled=$12, countdown_hours=$13, registration_deadline=$14, share_slug=$15, checkin_enabled=$16 WHERE id=$17 RETURNING *
-    `, [name, game, mode || null, Number(entry_fee) || 0, Number(prize_pool) || 0,
+      UPDATE tournaments SET name=$1, game=$2, mode=$3, entry_fee=$4, prize_pool=$5, prize_first=$6, prize_second=$7, prize_third=$8,
+      start_time=$9, start_label=$10, slots=$11, status=$12, map=$13, rules=$14, countdown_enabled=$15, countdown_hours=$16, registration_deadline=$17, share_slug=$18, checkin_enabled=$19 WHERE id=$20 RETURNING *
+    `, [name, game, mode || null, Number(entry_fee) || 0, Number(prize_pool) || 0, Number(prize_first) || 0, Number(prize_second) || 0, Number(prize_third) || 0,
         start_time || null, start_label || "Scheduled", Math.max(0, Number(slots) || 0), status || "UPCOMING",
         map || null, rules || null, Boolean(countdown_enabled), Math.max(1, Math.min(168, Number(countdown_hours) || 24)), registration_deadline || null, (share_slug || await uniqueShareSlug(name, Number(req.params.id))), Boolean(checkin_enabled), req.params.id]);
     if (!result.rows.length) return res.status(404).json({ success: false, message: "Tournament not found" });
@@ -761,7 +777,7 @@ app.get("/api/users/:id/registrations", requireUser, requireUserId, async (req, 
              t.name, t.game, t.entry_fee, t.prize_pool, t.status, t.start_label, t.start_time, t.countdown_enabled, t.countdown_hours, t.map, t.rules, t.registration_deadline, t.checkin_enabled
       FROM tournament_registrations r
       JOIN tournaments t ON t.id = r.tournament_id
-      WHERE r.user_id = $1 AND r.verification_status='VERIFIED'
+      WHERE r.user_id = $1
       ORDER BY r.id DESC
     `, [req.params.id]);
     res.json({ success: true, registrations: result.rows });
@@ -891,7 +907,7 @@ app.get("/api/users/:id/results", requireUser, requireUserId, async (req, res) =
       SELECT r.id, r.tournament_id, r.player_name, r.team_name, r.position, r.kills, r.points,
              r.created_at, t.name AS tournament_name, t.game
       FROM results r JOIN tournaments t ON t.id = r.tournament_id
-      WHERE r.user_id = $1 AND r.verification_status='VERIFIED'
+      WHERE r.user_id = $1
       ORDER BY r.id DESC
     `, [req.params.id]);
     res.json({ success: true, results: result.rows });
@@ -1045,7 +1061,7 @@ app.get("/api/tournaments/:id/room", requireUser, async (req, res) => {
 
 app.patch('/api/registrations/:id', requireUser, async (req,res)=>{try{const team=String(req.body.team_name||'').trim();const members=String(req.body.team_members||'').trim();if(!team||team.length>80)return res.status(400).json({success:false,message:'Valid team name required'});const r=await pool.query(`UPDATE tournament_registrations SET team_name=$1, team_members=$2 WHERE id=$3 AND user_id=$4 RETURNING *`,[team,members||null,req.params.id,req.user.id]);if(!r.rows.length)return res.status(404).json({success:false,message:'Registration not found'});res.json({success:true,registration:r.rows[0]})}catch(e){res.status(500).json({success:false,message:'Could not update team'})}});
 app.post('/api/registrations/:id/checkin', requireUser, async (req,res)=>{try{const r=await pool.query(`UPDATE tournament_registrations r SET checked_in=TRUE FROM tournaments t WHERE r.id=$1 AND r.user_id=$2 AND r.tournament_id=t.id AND t.checkin_enabled=TRUE RETURNING r.*`,[req.params.id,req.user.id]);if(!r.rows.length)return res.status(400).json({success:false,message:'Check-in is not enabled or registration not found'});res.json({success:true,registration:r.rows[0]})}catch(e){res.status(500).json({success:false,message:'Check-in failed'})}});
-app.get('/api/share/tournaments/:slug', async(req,res)=>{try{const r=await pool.query('SELECT id,name,game,mode,entry_fee,prize_pool,start_time,status,slots FROM tournaments WHERE share_slug=$1 LIMIT 1',[req.params.slug]);if(!r.rows.length)return res.status(404).json({success:false,message:'Tournament not found'});res.json({success:true,tournament:r.rows[0]})}catch(e){res.status(500).json({success:false,message:'Share lookup failed'})}});
+app.get('/api/share/tournaments/:slug', async(req,res)=>{try{const r=await pool.query('SELECT id,name,game,mode,entry_fee,prize_pool,prize_first,prize_second,prize_third,start_time,status,slots FROM tournaments WHERE share_slug=$1 LIMIT 1',[req.params.slug]);if(!r.rows.length)return res.status(404).json({success:false,message:'Tournament not found'});res.json({success:true,tournament:r.rows[0]})}catch(e){res.status(500).json({success:false,message:'Share lookup failed'})}});
 app.post('/api/support', requireUser, async(req,res)=>{try{const subject=String(req.body.subject||'').trim(),message=String(req.body.message||'').trim();if(!subject||!message)return res.status(400).json({success:false,message:'Subject and message are required'});const r=await pool.query('INSERT INTO support_tickets(user_id,subject,message) VALUES($1,$2,$3) RETURNING *',[req.user.id,subject,message]);res.status(201).json({success:true,ticket:r.rows[0]})}catch(e){res.status(500).json({success:false,message:'Could not create support ticket'})}});
 app.get('/api/admin/audit', requireAdmin, async(req,res)=>{try{const r=await pool.query('SELECT * FROM audit_logs ORDER BY id DESC LIMIT 200');res.json({success:true,logs:r.rows})}catch(e){res.status(500).json({success:false,logs:[]})}});
 app.get('/api/admin/support', requireAdmin, async(req,res)=>{try{const r=await pool.query('SELECT s.*,u.name,u.phone FROM support_tickets s LEFT JOIN users u ON u.id=s.user_id ORDER BY s.id DESC LIMIT 200');res.json({success:true,tickets:r.rows})}catch(e){res.status(500).json({success:false,tickets:[]})}});
@@ -1065,6 +1081,8 @@ setInterval(async () => {
     console.error("Cleanup error:", error.message);
   }
 }, 60 * 60 * 1000);
+
+backfillTournamentSlugs();
 
 app.listen(PORT, () => {
   console.log(`ENTSONE backend running on port ${PORT}`);
