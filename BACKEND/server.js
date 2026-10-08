@@ -9,8 +9,8 @@ const OTP_TTL_MS = 5 * 60 * 1000;
 const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 const VONAGE_API_KEY = process.env.VONAGE_API_KEY || "";
 const VONAGE_API_SECRET = process.env.VONAGE_API_SECRET || "";
-const VONAGE_BRAND = process.env.VONAGE_BRAND || "ENTSONE";
-const OTP_MODE = "demo"; // OTP intentionally demo-only. Payment remains demo-only in the user app.
+const VONAGE_BRAND = String(process.env.VONAGE_BRAND || "ENTSONE").slice(0, 18);
+const OTP_MODE = String(process.env.OTP_MODE || "demo").toLowerCase(); // Set OTP_MODE=vonage on Render for real SMS OTP. Payment remains demo-only.
 const ENTSONE_ADMIN_KEY = process.env.ENTSONE_ADMIN_KEY || "";
 
 const allowedOrigins = String(process.env.CORS_ORIGINS || "").split(",").map(x => x.trim()).filter(Boolean);
@@ -277,8 +277,24 @@ createTables();
 
 async function syncTournamentStatuses() {
   try {
-    await pool.query(`UPDATE tournaments SET status='ONGOING' WHERE start_time IS NOT NULL AND start_time <= NOW() AND status IN ('UPCOMING','OPEN')`);
-    await pool.query(`UPDATE tournaments SET status='COMPLETED' WHERE results_published=TRUE AND status <> 'COMPLETED'`);
+    // Server/database is the source of truth for tournament lifecycle:
+    // >24h = UPCOMING, <=24h before start = OPEN, start reached = ONGOING,
+    // and published results = COMPLETED. This also works after Render restarts.
+    await pool.query(`
+      UPDATE tournaments
+      SET status = CASE
+        WHEN results_published = TRUE THEN 'COMPLETED'
+        WHEN start_time IS NOT NULL AND start_time <= NOW() THEN 'ONGOING'
+        WHEN start_time IS NOT NULL AND start_time <= NOW() + INTERVAL '24 hours' THEN 'OPEN'
+        ELSE 'UPCOMING'
+      END
+      WHERE status IS DISTINCT FROM CASE
+        WHEN results_published = TRUE THEN 'COMPLETED'
+        WHEN start_time IS NOT NULL AND start_time <= NOW() THEN 'ONGOING'
+        WHEN start_time IS NOT NULL AND start_time <= NOW() + INTERVAL '24 hours' THEN 'OPEN'
+        ELSE 'UPCOMING'
+      END
+    `);
   } catch (e) { console.error('Status sync error:', e.message); }
 }
 setInterval(syncTournamentStatuses, 30000);
@@ -430,8 +446,8 @@ app.get("/api/users/:id", requireUser, requireUserId, async (req, res) => {
 
 app.put("/api/users/:id", requireUser, requireUserId, async (req, res) => {
   try {
-    const name = String(req.body.name || "").trim();
-    if (!name || name.length > 80) {
+    const name = normalizeUsername(req.body.name);
+    if (!validUsername(name)) {
       return res.status(400).json({ success: false, message: "Valid username is required" });
     }
     const result = await pool.query(
@@ -449,8 +465,8 @@ app.put("/api/users/:id", requireUser, requireUserId, async (req, res) => {
 
 app.put("/api/me", requireUser, async (req, res) => {
   try {
-    const name = String(req.body.name || "").trim();
-    if (!name || name.length > 80) return res.status(400).json({ success: false, message: "Valid username is required" });
+    const name = normalizeUsername(req.body.name);
+    if (!validUsername(name)) return res.status(400).json({ success: false, message: "Valid username is required" });
     const result = await pool.query(
       "UPDATE users SET name = $1 WHERE id = $2 RETURNING id, name, email, phone, created_at",
       [name, req.user.id]
@@ -462,12 +478,19 @@ app.put("/api/me", requireUser, async (req, res) => {
   }
 });
 
+function normalizeUsername(value) { return String(value || "").trim().replace(/^@+/, "").toLowerCase(); }
+function validUsername(value) { return /^[a-z0-9._]{3,30}$/.test(value); }
+
 app.post("/api/auth/request-otp", async (req, res) => {
   try {
     const channel = "phone";
     const destination = normalizePhone(req.body.destination);
     const mode = String(req.body.mode || "login").toLowerCase() === "signup" ? "signup" : "login";
+    const username = normalizeUsername(req.body.username);
 
+    if (!username || username.length < 3 || username.length > 30 || !validUsername(username)) {
+      return res.status(400).json({ success: false, message: "Valid username is required (3–30 characters)" });
+    }
     if (!destination || destination.length !== 10 || !/^[6-9]\d{9}$/.test(destination)) {
       return res.status(400).json({ success: false, message: "Enter a valid 10-digit Indian mobile number" });
     }
@@ -479,8 +502,15 @@ app.post("/api/auth/request-otp", async (req, res) => {
     if (mode === "login" && !existing.rows.length) {
       return res.status(404).json({ success: false, message: "Account not found. Create an account first." });
     }
+    if (mode === "login" && existing.rows.length && String(existing.rows[0].name || "").toLowerCase() !== username.toLowerCase()) {
+      return res.status(401).json({ success: false, message: "Username and mobile number do not match." });
+    }
     if (mode === "signup" && existing.rows.length) {
       return res.status(409).json({ success: false, message: "Account already exists. Use Sign In." });
+    }
+    if (mode === "signup") {
+      const nameTaken = await pool.query("SELECT id FROM users WHERE LOWER(name) = LOWER($1) LIMIT 1", [username]);
+      if (nameTaken.rows.length) return res.status(409).json({ success: false, message: "That username is already taken. Choose another." });
     }
 
     await pool.query(
@@ -507,7 +537,7 @@ app.post("/api/auth/request-otp", async (req, res) => {
     }
 
     if (!VONAGE_API_KEY || !VONAGE_API_SECRET) {
-      return res.status(503).json({ success: false, message: "Vonage is not configured. Set OTP_MODE=vonage and add Vonage credentials in Render." });
+      return res.status(503).json({ success: false, message: "Real OTP is not configured. Add VONAGE_API_KEY and VONAGE_API_SECRET in Render." });
     }
 
     const requestId = await requestVonageVerification(destination);
@@ -531,7 +561,11 @@ app.post("/api/auth/verify-otp", async (req, res) => {
     const destination = normalizePhone(req.body.destination);
     const otp = String(req.body.otp || "").trim();
     const mode = String(req.body.mode || "login").toLowerCase() === "signup" ? "signup" : "login";
+    const username = normalizeUsername(req.body.username);
 
+    if (!username || username.length < 3 || username.length > 30 || !validUsername(username)) {
+      return res.status(400).json({ success: false, message: "Valid username is required" });
+    }
     if (!destination || destination.length !== 10 || !/^[6-9]\d{9}$/.test(destination) || !/^\d{6}$/.test(otp)) {
       return res.status(400).json({ success: false, message: "Enter the 6-digit OTP sent to your mobile" });
     }
@@ -560,13 +594,18 @@ app.post("/api/auth/verify-otp", async (req, res) => {
     const userResult = await pool.query("SELECT id, name, email, phone, created_at FROM users WHERE phone = $1 LIMIT 1", [destination]);
 
     if (mode === "login" && !userResult.rows.length) return res.status(404).json({ success: false, message: "Account not found. Create an account first." });
+    if (mode === "login" && userResult.rows.length && String(userResult.rows[0].name || "").toLowerCase() !== username.toLowerCase()) return res.status(401).json({ success: false, message: "Username and mobile number do not match." });
     if (mode === "signup" && userResult.rows.length) return res.status(409).json({ success: false, message: "Account already exists. Use Sign In." });
+    if (mode === "signup") {
+      const nameTaken = await pool.query("SELECT id FROM users WHERE LOWER(name) = LOWER($1) LIMIT 1", [username]);
+      if (nameTaken.rows.length) return res.status(409).json({ success: false, message: "That username is already taken. Choose another." });
+    }
     await pool.query("UPDATE otp_requests SET verified = TRUE WHERE id = $1", [request.id]);
 
     let user;
     if (userResult.rows.length) user = userResult.rows[0];
     else {
-      const created = await pool.query(`INSERT INTO users (name, phone) VALUES ('ENTSONE Player', $1) RETURNING id, name, email, phone, created_at`, [destination]);
+      const created = await pool.query(`INSERT INTO users (name, phone) VALUES ($1, $2) RETURNING id, name, email, phone, created_at`, [username, destination]);
       user = created.rows[0];
     }
 
@@ -600,6 +639,7 @@ app.post("/api/auth/logout", async (req, res) => {
 
 app.get("/api/tournaments", async (req, res) => {
   try {
+    await syncTournamentStatuses();
     const result = await pool.query(`
       SELECT id, name, game, mode, entry_fee, prize_pool, prize_first, prize_second, prize_third, start_time, start_label,
              slots, status, map, rules, countdown_enabled, countdown_hours, registration_deadline, share_slug, checkin_enabled, results_published, created_at
@@ -614,6 +654,7 @@ app.get("/api/tournaments", async (req, res) => {
 
 app.get("/api/tournaments/:id", async (req, res) => {
   try {
+    await syncTournamentStatuses();
     const result = await pool.query(`
       SELECT id, name, game, mode, entry_fee, prize_pool, prize_first, prize_second, prize_third, start_time, start_label,
              slots, status, map, rules, countdown_enabled, countdown_hours, registration_deadline, share_slug, checkin_enabled, results_published, created_at
