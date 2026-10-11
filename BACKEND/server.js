@@ -54,6 +54,22 @@ function hashSecret(value) {
   return crypto.createHash("sha256").update(String(value)).digest("hex");
 }
 
+function passwordHash(password) {
+  const salt = crypto.randomBytes(16).toString("hex");
+  const derived = crypto.scryptSync(String(password), salt, 64).toString("hex");
+  return `${salt}:${derived}`;
+}
+function passwordMatches(password, stored) {
+  const parts = String(stored || "").split(":");
+  if (parts.length !== 2) return false;
+  const expected = Buffer.from(parts[1], "hex");
+  const actual = crypto.scryptSync(String(password), parts[0], 64);
+  return expected.length === actual.length && crypto.timingSafeEqual(expected, actual);
+}
+function validPassword(value) {
+  return typeof value === "string" && value.length >= 8 && value.length <= 128;
+}
+
 function randomToken() {
   return crypto.randomBytes(32).toString("hex");
 }
@@ -204,6 +220,7 @@ async function createTables() {
         name VARCHAR(255),
         email VARCHAR(255) UNIQUE,
         phone VARCHAR(30) UNIQUE,
+        password_hash TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
@@ -227,6 +244,12 @@ async function createTables() {
         position INTEGER NOT NULL,
         kills INTEGER DEFAULT 0,
         points INTEGER DEFAULT 0,
+        rank INTEGER,
+        game_uid VARCHAR(100),
+        proof_url TEXT,
+        prize_status VARCHAR(30) DEFAULT 'PENDING_VERIFICATION',
+        prize_amount NUMERIC DEFAULT 0,
+        prize_credited_at TIMESTAMP,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
@@ -259,6 +282,15 @@ async function createTables() {
       ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS prize_third NUMERIC DEFAULT 0;
       ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS slots INTEGER DEFAULT 0;
       ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS start_label VARCHAR(255);
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash TEXT;
+      ALTER TABLE tournament_registrations ADD COLUMN IF NOT EXISTS game_uid VARCHAR(100);
+      ALTER TABLE tournament_registrations ADD COLUMN IF NOT EXISTS team_members TEXT;
+      ALTER TABLE results ADD COLUMN IF NOT EXISTS rank INTEGER;
+      ALTER TABLE results ADD COLUMN IF NOT EXISTS game_uid VARCHAR(100);
+      ALTER TABLE results ADD COLUMN IF NOT EXISTS proof_url TEXT;
+      ALTER TABLE results ADD COLUMN IF NOT EXISTS prize_status VARCHAR(30) DEFAULT 'PENDING_VERIFICATION';
+      ALTER TABLE results ADD COLUMN IF NOT EXISTS prize_amount NUMERIC DEFAULT 0;
+      ALTER TABLE results ADD COLUMN IF NOT EXISTS prize_credited_at TIMESTAMP;
       ALTER TABLE otp_requests ADD COLUMN IF NOT EXISTS provider VARCHAR(30) DEFAULT 'local';
       ALTER TABLE otp_requests ADD COLUMN IF NOT EXISTS provider_request_id VARCHAR(255);
       ALTER TABLE otp_requests ADD COLUMN IF NOT EXISTS mode VARCHAR(20) DEFAULT 'login';
@@ -542,7 +574,8 @@ app.post("/api/auth/request-otp", async (req, res) => {
   try {
     const channel = "phone";
     const destination = normalizePhone(req.body.destination);
-    const mode = String(req.body.mode || "login").toLowerCase() === "signup" ? "signup" : "login";
+    const requestedMode = String(req.body.mode || "login").toLowerCase();
+    const mode = ["signup", "recovery"].includes(requestedMode) ? requestedMode : "login";
     const username = normalizeUsername(req.body.username);
 
     if (!username || username.length < 3 || username.length > 30 || !validUsername(username)) {
@@ -556,10 +589,10 @@ app.post("/api/auth/request-otp", async (req, res) => {
     }
 
     const existing = await pool.query("SELECT id, name, phone FROM users WHERE phone = $1 LIMIT 1", [destination]);
-    if (mode === "login" && !existing.rows.length) {
+    if (mode !== "signup" && !existing.rows.length) {
       return res.status(404).json({ success: false, message: "Account not found. Create an account first." });
     }
-    if (mode === "login" && existing.rows.length && String(existing.rows[0].name || "").toLowerCase() !== username.toLowerCase()) {
+    if (mode !== "signup" && existing.rows.length && String(existing.rows[0].name || "").toLowerCase() !== username.toLowerCase()) {
       return res.status(401).json({ success: false, message: "Username and mobile number do not match." });
     }
     if (mode === "signup" && existing.rows.length) {
@@ -617,7 +650,8 @@ app.post("/api/auth/verify-otp", async (req, res) => {
     const channel = "phone";
     const destination = normalizePhone(req.body.destination);
     const otp = String(req.body.otp || "").trim();
-    const mode = String(req.body.mode || "login").toLowerCase() === "signup" ? "signup" : "login";
+    const requestedMode = String(req.body.mode || "login").toLowerCase();
+    const mode = ["signup", "recovery"].includes(requestedMode) ? requestedMode : "login";
     const username = normalizeUsername(req.body.username);
 
     if (!username || username.length < 3 || username.length > 30 || !validUsername(username)) {
@@ -650,19 +684,27 @@ app.post("/api/auth/verify-otp", async (req, res) => {
     if (request.mode && request.mode !== mode) return res.status(400).json({ success: false, message: "OTP mode mismatch. Request a new OTP." });
     const userResult = await pool.query("SELECT id, name, email, phone, created_at FROM users WHERE phone = $1 LIMIT 1", [destination]);
 
-    if (mode === "login" && !userResult.rows.length) return res.status(404).json({ success: false, message: "Account not found. Create an account first." });
-    if (mode === "login" && userResult.rows.length && String(userResult.rows[0].name || "").toLowerCase() !== username.toLowerCase()) return res.status(401).json({ success: false, message: "Username and mobile number do not match." });
+    if (mode !== "signup" && !userResult.rows.length) return res.status(404).json({ success: false, message: "Account not found. Create an account first." });
+    if (mode !== "signup" && userResult.rows.length && String(userResult.rows[0].name || "").toLowerCase() !== username.toLowerCase()) return res.status(401).json({ success: false, message: "Username and mobile number do not match." });
     if (mode === "signup" && userResult.rows.length) return res.status(409).json({ success: false, message: "Account already exists. Use Sign In." });
+    if (mode === "signup" && !validPassword(String(req.body.password || ""))) return res.status(400).json({ success: false, message: "Password must be 8–128 characters." });
     if (mode === "signup") {
       const nameTaken = await pool.query("SELECT id FROM users WHERE LOWER(name) = LOWER($1) LIMIT 1", [username]);
       if (nameTaken.rows.length) return res.status(409).json({ success: false, message: "That username is already taken. Choose another." });
     }
     await pool.query("UPDATE otp_requests SET verified = TRUE WHERE id = $1", [request.id]);
 
+    if (mode === "recovery") {
+      const newPassword = String(req.body.password || "");
+      if (!validPassword(newPassword)) return res.status(400).json({ success: false, message: "New password must be 8–128 characters." });
+      await pool.query("UPDATE users SET password_hash=$1 WHERE phone=$2", [passwordHash(newPassword), destination]);
+      return res.json({ success: true, recovered: true, message: "Password reset successfully. Please log in." });
+    }
+
     let user;
     if (userResult.rows.length) user = userResult.rows[0];
     else {
-      const created = await pool.query(`INSERT INTO users (name, phone) VALUES ($1, $2) RETURNING id, name, email, phone, created_at`, [username, destination]);
+      const created = await pool.query(`INSERT INTO users (name, phone, password_hash) VALUES ($1, $2, $3) RETURNING id, name, email, phone, created_at`, [username, destination, passwordHash(String(req.body.password || ""))]);
       user = created.rows[0];
     }
 
@@ -673,6 +715,21 @@ app.post("/api/auth/verify-otp", async (req, res) => {
     console.error("Verify OTP error:", error);
     res.status(500).json({ success: false, message: "Could not verify OTP" });
   }
+});
+
+app.post("/api/auth/password-login", async (req, res) => {
+  try {
+    const username = normalizeUsername(req.body.username);
+    const phone = normalizePhone(req.body.destination || req.body.phone);
+    const password = String(req.body.password || "");
+    if (!validUsername(username) || !phone || phone.length !== 10 || !password) return res.status(400).json({ success:false, message:"Enter your username, 10-digit mobile number and password." });
+    const found = await pool.query("SELECT id,name,email,phone,password_hash,created_at FROM users WHERE phone=$1 AND LOWER(name)=LOWER($2) LIMIT 1",[phone,username]);
+    if (!found.rows.length || !found.rows[0].password_hash || !passwordMatches(password,found.rows[0].password_hash)) return res.status(401).json({success:false,message:"Username, mobile number or password is incorrect."});
+    const u=found.rows[0]; delete u.password_hash;
+    const token=randomToken();
+    await pool.query("INSERT INTO sessions (user_id,token_hash,expires_at) VALUES ($1,$2,$3)",[u.id,hashSecret(token),new Date(Date.now()+SESSION_TTL_MS)]);
+    res.json({success:true,user:u,session_token:token,expires_in_seconds:SESSION_TTL_MS/1000});
+  } catch(e) { console.error("Password login error:",e); res.status(500).json({success:false,message:"Could not log in"}); }
 });
 
 app.get("/api/auth/session", requireUser, async (req, res) => {
@@ -877,10 +934,10 @@ app.post("/api/tournament-registrations", requireUser, async (req, res) => {
       }
 
       const result = await client.query(`
-        INSERT INTO tournament_registrations (tournament_id, user_id, team_name, mode, payment_status, team_members)
-        VALUES ($1,$2,$3,$4,'DEMO',$5)
-        RETURNING id, tournament_id, user_id, team_name, mode, payment_status, team_members, created_at
-      `, [tournamentId, userId, teamName || user.rows[0].name || "Player", mode, memberNames.join(', ')]);
+        INSERT INTO tournament_registrations (tournament_id, user_id, team_name, mode, payment_status, team_members, game_uid)
+        VALUES ($1,$2,$3,$4,'DEMO',$5,$6)
+        RETURNING id, tournament_id, user_id, team_name, mode, payment_status, team_members, game_uid, created_at
+      `, [tournamentId, userId, teamName || user.rows[0].name || "Player", mode, memberNames.join(', '), String(req.body.game_uid || "").trim().slice(0,100)]);
       await client.query("COMMIT");
       return res.status(201).json({ success: true, registration: { ...result.rows[0], tournament: tournament.rows[0], payment_demo: true } });
     } catch (txError) {
@@ -923,12 +980,33 @@ function placementPoints(position) {
   return ({ 1: 12, 2: 9, 3: 7, 4: 5, 5: 4, 6: 3, 7: 2, 8: 1 })[Number(position)] || 0;
 }
 
+// Recalculate persisted overall standings after every result mutation.
+// Tie-breakers: total points DESC, kills DESC, in-game placement ASC, then stable row id.
+async function recalculateTournamentRanks(tournamentId) {
+  await pool.query(`
+    WITH standings AS (
+      SELECT id, ROW_NUMBER() OVER (
+        ORDER BY points DESC, kills DESC, position ASC, id ASC
+      )::int AS computed_rank
+      FROM results
+      WHERE tournament_id = $1
+    )
+    UPDATE results AS r
+    SET rank = standings.computed_rank
+    FROM standings
+    WHERE r.id = standings.id
+  `, [tournamentId]);
+}
+
 app.post("/api/results", requireAdmin, async (req, res) => {
   try {
     const tournamentId = Number(req.body.tournament_id);
     let userId = req.body.user_id ? Number(req.body.user_id) : null;
     const playerName = String(req.body.player_name || req.body.team_name || "").trim();
     const teamName = String(req.body.team_name || playerName).trim();
+    const gameUid = String(req.body.game_uid || "").trim().slice(0,100);
+    const proofUrl = String(req.body.proof_url || "").trim().slice(0,2000);
+    const prizeAmount = Math.max(0, Number(req.body.prize_amount) || 0);
     if (!userId && playerName) {
       const linked = await pool.query(`
         SELECT user_id FROM tournament_registrations
@@ -938,8 +1016,8 @@ app.post("/api/results", requireAdmin, async (req, res) => {
       if (linked.rows.length) userId = Number(linked.rows[0].user_id);
     }
     const position = Number(req.body.position);
-    const kills = Math.max(0, Number(req.body.kills) || 0);
-    if (!Number.isInteger(tournamentId) || !playerName || !Number.isInteger(position) || position < 1) {
+    const kills = Number(req.body.kills ?? 0);
+    if (!Number.isInteger(tournamentId) || !playerName || !Number.isInteger(position) || position < 1 || !Number.isInteger(kills) || kills < 0 || kills > 999) {
       return res.status(400).json({ success: false, message: "Tournament, player, and valid placement are required" });
     }
 
@@ -954,14 +1032,28 @@ app.post("/api/results", requireAdmin, async (req, res) => {
       if (!user.rows.length) return res.status(404).json({ success: false, message: "User not found" });
     }
 
+    // Prevent accidental duplicate entries for the same player/team in one tournament.
+    const duplicate = await pool.query(`
+      SELECT id FROM results
+      WHERE tournament_id = $1 AND (
+        ($2::integer IS NOT NULL AND user_id = $2) OR
+        LOWER(TRIM(player_name)) = LOWER(TRIM($3))
+      )
+      LIMIT 1
+    `, [tournamentId, userId, playerName]);
+    if (duplicate.rows.length) {
+      return res.status(409).json({ success: false, message: "A result for this player already exists in this tournament. Edit/remove the existing result instead of uploading it twice." });
+    }
+
     const points = placementPoints(position) + kills;
     const result = await pool.query(`
-      INSERT INTO results (tournament_id, user_id, player_name, team_name, position, kills, points, verification_status)
-      VALUES ($1,$2,$3,$4,$5,$6,$7,'PENDING')
+      INSERT INTO results (tournament_id, user_id, player_name, team_name, position, kills, points, rank, game_uid, proof_url, prize_amount, prize_status, verification_status)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,NULL,$8,$9,$10,'PENDING_VERIFICATION','PENDING')
       RETURNING *
-    `, [tournamentId, userId, playerName, teamName, position, kills, points]);
-
-    res.status(201).json({ success: true, result: result.rows[0] });
+    `, [tournamentId, userId, playerName, teamName, position, kills, points, gameUid, proofUrl, prizeAmount]);
+    await recalculateTournamentRanks(tournamentId);
+    const ranked = await pool.query("SELECT * FROM results WHERE id=$1", [result.rows[0].id]);
+    res.status(201).json({ success: true, result: ranked.rows[0], message: "Result saved and tournament ranks recalculated." });
   } catch (error) {
     console.error("Add result error:", error);
     res.status(500).json({ success: false, message: "Could not save result" });
@@ -971,8 +1063,8 @@ app.post("/api/results", requireAdmin, async (req, res) => {
 app.get("/api/results/:tournamentId", async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT id, tournament_id, user_id, player_name, team_name, position, kills, points, verification_status, verified_at, created_at
-      FROM results WHERE tournament_id = $1 ORDER BY points DESC, position ASC, kills DESC, id ASC
+      SELECT id, tournament_id, user_id, player_name, team_name, position, kills, points, rank, verification_status, verified_at, created_at
+      FROM results WHERE tournament_id = $1 ORDER BY rank ASC NULLS LAST, points DESC, kills DESC, position ASC, id ASC
     `, [req.params.tournamentId]);
     res.json({ success: true, results: result.rows });
   } catch (error) {
@@ -984,8 +1076,8 @@ app.get("/api/results/:tournamentId", async (req, res) => {
 app.get("/api/leaderboard/:tournamentId", async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT id, tournament_id, user_id, player_name, team_name, position, kills, points, verification_status, verified_at, created_at,
-             ROW_NUMBER() OVER (ORDER BY points DESC, position ASC, kills DESC, id ASC) AS rank
+      SELECT id, tournament_id, user_id, player_name, team_name, position, kills, points, rank AS stored_rank, verification_status, verified_at, created_at,
+             ROW_NUMBER() OVER (ORDER BY points DESC, kills DESC, position ASC, id ASC) AS rank
       FROM results
       WHERE tournament_id = $1 AND verification_status = 'VERIFIED'
       ORDER BY points DESC, position ASC, kills DESC, id ASC
@@ -1001,14 +1093,31 @@ app.delete("/api/results/:id", requireAdmin, async (req, res) => {
   try {
     const result = await pool.query("DELETE FROM results WHERE id = $1 RETURNING *", [req.params.id]);
     if (!result.rows.length) return res.status(404).json({ success: false, message: "Result not found" });
-    res.json({ success: true, message: "Result deleted", result: result.rows[0] });
+    await recalculateTournamentRanks(result.rows[0].tournament_id);
+    res.json({ success: true, message: "Result deleted and remaining ranks recalculated", result: result.rows[0] });
   } catch (error) {
     console.error("Delete result error:", error);
     res.status(500).json({ success: false, message: "Could not delete result" });
   }
 });
 
-app.patch('/api/results/:id/verify', requireAdmin, async(req,res)=>{try{const status=String(req.body.status||'VERIFIED').toUpperCase();if(!['VERIFIED','REJECTED','PENDING'].includes(status))return res.status(400).json({success:false,message:'Invalid verification status'});const r=await pool.query(`UPDATE results SET verification_status=$1, verified_at=CASE WHEN $1='PENDING' THEN NULL ELSE NOW() END, verified_by=CASE WHEN $1='PENDING' THEN NULL ELSE 'ADMIN' END WHERE id=$2 RETURNING *`,[status,req.params.id]);if(!r.rows.length)return res.status(404).json({success:false,message:'Result not found'});await audit('VERIFY_RESULT','result',r.rows[0].id,status);res.json({success:true,result:r.rows[0]})}catch(e){res.status(500).json({success:false,message:'Could not verify result'})}});
+app.patch('/api/results/:id/verify', requireAdmin, async(req,res)=>{try{const status=String(req.body.status||'VERIFIED').toUpperCase();if(!['VERIFIED','REJECTED','PENDING'].includes(status))return res.status(400).json({success:false,message:'Invalid verification status'});const r=await pool.query(`UPDATE results SET verification_status=$1, verified_at=CASE WHEN $1='PENDING' THEN NULL ELSE NOW() END, verified_by=CASE WHEN $1='PENDING' THEN NULL ELSE 'ADMIN' END, prize_status=CASE WHEN $1='VERIFIED' THEN 'APPROVED_FOR_PAYOUT' WHEN $1='REJECTED' THEN 'REJECTED' ELSE 'PENDING_VERIFICATION' END WHERE id=$2 RETURNING *`,[status,req.params.id]);if(!r.rows.length)return res.status(404).json({success:false,message:'Result not found'});await recalculateTournamentRanks(r.rows[0].tournament_id);await audit('VERIFY_RESULT','result',r.rows[0].id,status);res.json({success:true,result:r.rows[0]})}catch(e){res.status(500).json({success:false,message:'Could not verify result'})}});
+
+app.patch("/api/results/:id/prize-status", requireAdmin, async (req,res) => {
+  try {
+    const status=String(req.body.status||"").toUpperCase();
+    if(!["APPROVED_FOR_PAYOUT","PAYOUT_PROCESSED","PENDING_VERIFICATION"].includes(status)) return res.status(400).json({success:false,message:"Invalid prize status"});
+    if(status==="PAYOUT_PROCESSED"){
+      const check=await pool.query("SELECT id,verification_status FROM results WHERE id=$1",[req.params.id]);
+      if(!check.rows.length)return res.status(404).json({success:false,message:"Result not found"});
+      if(check.rows[0].verification_status!=="VERIFIED")return res.status(400).json({success:false,message:"Verify the result before processing prize payout"});
+    }
+    const result=await pool.query("UPDATE results SET prize_status=$1, prize_credited_at=CASE WHEN $1='PAYOUT_PROCESSED' THEN NOW() ELSE NULL END WHERE id=$2 RETURNING *",[status,req.params.id]);
+    if(!result.rows.length)return res.status(404).json({success:false,message:"Result not found"});
+    await audit("PRIZE_STATUS","result",result.rows[0].id,status);
+    res.json({success:true,result:result.rows[0],message:"Prize status updated. This records the payout state; it does not transfer money to a bank or UPI account."});
+  }catch(e){console.error("Prize status error:",e);res.status(500).json({success:false,message:"Could not update prize status"});}
+});
 
 app.post("/api/tournaments/:id/publish-results", requireAdmin, async (req, res) => {
   try {
