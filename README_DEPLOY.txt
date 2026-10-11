@@ -136,3 +136,15 @@ V20 FINAL UI + BRACKET EXPERIENCE (2026-10-09)
 GAME ART UPDATE (6 TITLES)
 --------------------------
 USER_APP now includes separate art files for BGMI, Free Fire, Valorant, COD Mobile, ScarFall, and Ludo. Tournament card styles select the matching artwork by game name. These are generated concept artworks for the ENTSONE UI, not official publisher assets.
+
+
+ENTSONE UPDATE NOTES (ACCOUNT + RESULTS)
+- Signup requires a password (minimum 8 characters) and matching confirmation in the user interface, then verifies the registered Indian mobile number with OTP.
+- Login supports username + registered mobile number + password. OTP sign-in remains available.
+- Forgot Password / Account Recovery uses a recovery OTP and lets the user set a new password and confirm it.
+- Passwords are stored as salted scrypt hashes; they are not stored as plain text.
+- Admin result entry supports game UID, HTTPS result-proof URL, and prize amount. New results start PENDING and PENDING_VERIFICATION.
+- Admin verification changes prize status to APPROVED_FOR_PAYOUT. Admin can mark PAYOUT_PROCESSED after handling the actual payout externally.
+- IMPORTANT: PAYOUT_PROCESSED only records status; this code does NOT send bank/UPI transfers or make real-money payments. Do not mark it processed until payout has actually been handled and checked.
+- Existing users created before password login can still use OTP and should use Forgot Password to set a password.
+- After replacing the project, redeploy the BACKEND service on Render. Keep DATABASE_URL, ENTSONE_ADMIN_KEY, and Vonage credentials private. Live database/provider behavior must be checked in the deployed environment.
